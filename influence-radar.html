@@ -4412,16 +4412,32 @@ function renderLearnDashboard() {
     .filter(x=>x.sd&&x.cases>0)
     .sort((a,b)=>b.cases-a.cases);
 
-  // 종목별 성과 (수익 추적)
+  // 종목별 현황 (signalLog 자동 집계 + 수동 트레이드 병합)
   const tickerPnl = {};
+  // 1) 수동 트레이드(closed)
   (state.trades||[]).filter(t=>t.status==='closed').forEach(t=>{
-    if(!tickerPnl[t.ticker]) tickerPnl[t.ticker]={pnl:0,count:0,wins:0};
+    if(!tickerPnl[t.ticker]) tickerPnl[t.ticker]={pnl:0,count:0,wins:0,signals:0,scores:[]};
     tickerPnl[t.ticker].pnl += t.pnl||0;
     tickerPnl[t.ticker].count++;
     if((t.pnl||0)>0) tickerPnl[t.ticker].wins++;
   });
+  // 2) signalLog 자동 집계
+  signalLog.forEach(s=>{
+    const raw = s.tickers||s.topTickers||'';
+    const tickers = raw.split(/[,\s]+/).map(t=>t.trim()).filter(t=>t&&t.length>=2&&t.length<=5&&/^[A-Z\^]+$/.test(t));
+    tickers.forEach(t=>{
+      if(!tickerPnl[t]) tickerPnl[t]={pnl:0,count:0,wins:0,signals:0,scores:[]};
+      tickerPnl[t].signals++;
+      tickerPnl[t].scores.push(s.score||s.maxScore||0);
+    });
+  });
+  Object.values(tickerPnl).forEach(v=>{
+    v.avgScore = v.scores.length>0 ? Math.round(v.scores.reduce((a,b)=>a+b,0)/v.scores.length) : 0;
+  });
   const topTickers = Object.entries(tickerPnl)
-    .sort((a,b)=>b[1].pnl-a[1].pnl).slice(0,5);
+    .filter(([,v])=>v.signals>0||v.count>0)
+    .sort((a,b)=>(b[1].signals+b[1].count*2)-(a[1].signals+a[1].count*2))
+    .slice(0,8);
 
   // 유사패턴 추천 (A + C 통합)
   const recommendations = generateRecommendations();
@@ -4574,21 +4590,27 @@ function renderLearnDashboard() {
       </div>
     </div>`:''}
 
-    <!-- 종목별 수익 성과 -->
+    <!-- 종목별 시그널 현황 -->
     ${topTickers.length>0?`
     <div style="margin-bottom:14px">
-      <div class="sec">종목별 수익 성과 (Top 5)</div>
-      ${topTickers.map(([ticker,{pnl,count,wins}])=>{
+      <div class="sec">종목별 시그널 현황 (Top 8)</div>
+      ${topTickers.map(([ticker,{pnl,count,wins,signals,avgScore}])=>{
         const pc = pnl>=0?'#16a34a':'#dc2626';
-        const wr = Math.round(wins/count*100);
+        const wr = count>0?Math.round(wins/count*100):null;
+        const sc = avgScore>=70?'#ff4444':avgScore>=45?'#ff8c00':'#2563eb';
+        const lp = livePrices[ticker];
         return `
         <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;
           background:#eef0f8;border-bottom:1px solid #e8ecf5">
-          <span style="font-size:13px;font-weight:bold;color:#2563eb;font-family:var(--mono);width:50px">${ticker}</span>
-          <span style="font-size:12px;color:#445577">${count}건 · 승률 ${wr}%</span>
-          <span style="font-size:13px;font-weight:bold;color:${pc};font-family:var(--mono);margin-left:auto">
-            ${pnl>=0?'+':''}${fmtUSD(Math.round(pnl))}
-          </span>
+          <span style="font-size:13px;font-weight:bold;color:#2563eb;font-family:var(--mono);width:52px">${ticker}</span>
+          <div style="flex:1">
+            <div style="font-size:12px;color:#445577">시그널 ${signals}건${count>0?` · 트레이드 ${count}건 · 승률 ${wr}%`:''}</div>
+            <div style="font-size:12px;color:${sc};margin-top:1px">평균 점수 ${avgScore}점</div>
+          </div>
+          <div style="text-align:right">
+            ${lp?.price?`<div style="font-size:13px;font-weight:bold;color:#1a2340;font-family:var(--mono)">${fmtUSD(lp.price)}</div>`:''}
+            ${count>0?`<div style="font-size:12px;font-weight:bold;color:${pc};font-family:var(--mono)">${pnl>=0?'+':''}${fmtUSD(Math.round(pnl))}</div>`:''}
+          </div>
         </div>`;
       }).join('')}
     </div>`:''}
