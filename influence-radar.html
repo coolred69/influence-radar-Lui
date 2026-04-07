@@ -41,7 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <!-- Apple 홈화면 아이콘 -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2304040f'/%3E%3Ccircle cx='90' cy='90' r='38' fill='none' stroke='%23ff4444' stroke-width='7'/%3E%3Ccircle cx='90' cy='90' r='19' fill='none' stroke='%23ff8c00' stroke-width='5'/%3E%3Ccircle cx='90' cy='90' r='6' fill='%23ff4444'/%3E%3Cline x1='90' y1='10' x2='90' y2='33' stroke='%23ff4444' stroke-width='4'/%3E%3Cline x1='90' y1='147' x2='90' y2='170' stroke='%23ff4444' stroke-width='4'/%3E%3Cline x1='10' y1='90' x2='33' y2='90' stroke='%23ff4444' stroke-width='4'/%3E%3Cline x1='147' y1='90' x2='170' y2='90' stroke='%23ff4444' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="icon" type="image/x-icon" href="./favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
 <style>
 :root{
   --bg:#ffffff;--panel:#f2f4f8;--border:#d0d4e8;--text:#0a0a1a;--dim:#556;
@@ -1552,6 +1556,56 @@ function getMLApiUrl() {
   return localStorage.getItem('ir_ml_api_url') || '';
 }
 
+// ── 서버 영구 저장/복원 (캐시 삭제에도 데이터 보존)
+async function serverSave(key, data) {
+  const url = getMLApiUrl();
+  if(!url) return false;
+  try {
+    const res = await fetch(`${url}/save`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({key, data}),
+      signal: AbortSignal.timeout(8000)
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+async function serverLoad(key) {
+  const url = getMLApiUrl();
+  if(!url) return null;
+  try {
+    const res = await fetch(`${url}/load?key=${encodeURIComponent(key)}`, {
+      signal: AbortSignal.timeout(8000)
+    });
+    const json = await res.json();
+    return json.status === 'ok' ? json.data : null;
+  } catch(e) { return null; }
+}
+
+// 앱 시작 시 서버에서 데이터 복원
+async function restoreFromServer() {
+  const url = getMLApiUrl();
+  if(!url) return;
+  try {
+    // signalLog 복원
+    const savedLog = await serverLoad('ir_signal_log');
+    if(savedLog && Array.isArray(savedLog) && savedLog.length > signalLog.length) {
+      signalLog = savedLog;
+      localStorage.setItem('ir_signal_log', JSON.stringify(signalLog));
+      console.log(`[서버복원] signalLog ${signalLog.length}건 복원`);
+      if(typeof renderSim === 'function') renderSim();
+    }
+    // learnData 복원
+    const savedLearn = await serverLoad('ir_learn');
+    if(savedLearn && (savedLearn.newsCount||0) > (learnData.newsCount||0)) {
+      learnData = Object.assign(learnData, savedLearn);
+      localStorage.setItem('ir_learn', JSON.stringify(learnData));
+      console.log(`[서버복원] learnData ${learnData.newsCount}건 복원`);
+    }
+  } catch(e) { console.warn('[서버복원] 실패:', e); }
+}
+
 async function mlPredict(signalInput) {
   const url = getMLApiUrl();
   if(!url) return null;
@@ -1766,6 +1820,7 @@ openIDB().then(async () => {
 function saveSignalLog() {
   localStorage.setItem('ir_signal_log', JSON.stringify(signalLog));
   idbSaveSignalLog(signalLog); // IndexedDB 이중 저장
+  serverSave('ir_signal_log', signalLog); // 서버 영구 저장
   if(window.fbSave) {
     window.fbSave({ logs: state.logs, alerts: state.alerts, learnData, signalLog });
   }
@@ -1785,6 +1840,7 @@ function addToSignalLog(alertObj) {
 
 function saveLearn(){
   localStorage.setItem('ir_learn', JSON.stringify(learnData));
+  serverSave('ir_learn', learnData); // 서버 영구 저장
   if(window.fbSave) {
     window.fbSave({ logs: state.logs, alerts: state.alerts, learnData, signalLog });
   }
@@ -5347,6 +5403,9 @@ window.onload = function(){
   // ── 자동 결과 추적 (앱 시작 3초 후 + 6시간마다)
   setTimeout(() => autoTrackResults(true), 3000);
   setInterval(() => autoTrackResults(true), 6*60*60*1000);
+
+  // ── 서버에서 데이터 복원 (캐시 삭제 복구)
+  setTimeout(() => restoreFromServer(), 1500);
 
   updateClock();
   setInterval(updateClock, 10000);
