@@ -5203,7 +5203,7 @@ window.onload = function(){
   }, 4000);
 
   // 실시간 현재가 업데이트 (15분마다)
-  updateAllPrices().then(()=>{\
+  updateAllPrices().then(()=>{
     if(state.currentTab==='filter') renderFilter();
     if(state.currentTab==='stocks') renderStocks();
   });
@@ -5226,6 +5226,8 @@ window.onload = function(){
   renderRadar();
   checkInstallPrompt();
   initNotifPermission();
+  // 로드 즉시 상태 표시 (1초 후 — startMonitor 보다 빠르게)
+  setTimeout(() => updateNewsStatus('ok'), 500);
 
   // Firebase 상태 표시
   setTimeout(()=>{
@@ -5241,7 +5243,10 @@ window.onload = function(){
 
   // Firebase 데이터 로드 + 실시간 동기화
   setTimeout(async () => {
-    if(!window.fbLoad) return;
+    if(!window.fbLoad) {
+      updateNewsStatus('ok'); // Firebase 없어도 상태 정상 표시
+      return;
+    }
 
     const fbData = await window.fbLoad();
     if(fbData) {
