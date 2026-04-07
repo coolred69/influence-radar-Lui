@@ -2096,7 +2096,7 @@ async function processArticles(fig, articles, apiName) {
       addToSignalLog(alert);
       setTimeout(()=>{
         showSignalDetail(fig, alert, affectedSectors, topTickers, maxScore);
-      }, 0);
+      }, 800);
     }
   }
   return count;
@@ -3867,7 +3867,7 @@ function createManualSignal(figId, title, sectors, tickers, dropPct) {
   if(sc>=45) {
     const lvl = getSignalLevel(sc);
     showSignalBanner(lvl, title.slice(0,50), fig.name, tickers);
-    setTimeout(()=>showSignalDetail(fig,alert,sectors,tickers,sc), 0);
+    setTimeout(()=>showSignalDetail(fig,alert,sectors,tickers,sc), 600);
   }
   return alert;
 }
@@ -5039,7 +5039,7 @@ window.onload = function(){
               if(fig) {
                 setTimeout(()=>{
                   showSignalDetail(fig, s, s.sectors||[], s.tickers||s.topTickers||'', sc);
-                }, 0);
+                }, 800);
               }
             }
 
