@@ -1030,8 +1030,10 @@ async function showSignalDetail(fig, article, sectors, tickers, score) {
     priceData[t] = await getLivePrice(t);
   }
 
-  // 예상 급락가 계산
-  const avgDrop = relPattern?.avgDropPct || 10;
+  // 예상 급락폭 — 실학습 결과 우선, 없으면 패턴 기본값
+  const learnedDrop = getLearnedAvgDrop(fig.id, sectors);
+  const avgDrop = learnedDrop || relPattern?.avgDropPct || 10;
+  const dropSource = learnedDrop ? `실데이터 ${learnData.studyResults?.filter(r=>r.figureId===fig.id||sectors?.some(s=>r.sectors?.includes(s))).length||0}건 기반` : '패턴 기본값';
   const recoveryDays = relPattern?.avgRecoveryDays || 7;
   const action = relPattern?.actionOnDetect || '분할매수 검토';
   const patternName = relPattern?.name || '발언 영향 패턴';
@@ -1139,9 +1141,10 @@ async function showSignalDetail(fig, article, sectors, tickers, score) {
             <div style="font-size:12px;color:${probColor};margin-top:3px">예상 확률 · ${probLabel}</div>
           </div>
           <div style="padding:10px;background:#eef0f8;border-radius:4px;text-align:center;
-            border:1px solid #c0c8e0">
+            border:1px solid ${learnedDrop?'#16a34a33':'#c0c8e0'}">
             <div style="font-size:18px;font-weight:bold;color:#fbbf24;font-family:var(--mono)">${avgDrop}%</div>
             <div style="font-size:12px;color:#445577;margin-top:3px">예상 급락폭</div>
+            <div style="font-size:10px;color:${learnedDrop?'#16a34a':'#aab'};margin-top:1px">${dropSource}</div>
           </div>
           <div style="padding:10px;background:#eef0f8;border-radius:4px;text-align:center;
             border:1px solid #c0c8e0">
@@ -1813,6 +1816,132 @@ function recordStudyResult(alert, accResult) {
 
   saveLearn();
   console.log(`✅ 학습 결과 저장: ${result.figureName} 적중률 ${result.hitRate}%`);
+}
+
+// ══════════════════════════════════════════════════════
+// ── 자동 결과 추적 시스템 (1순위 파이프라인)
+// ══════════════════════════════════════════════════════
+
+// Yahoo Finance 특정 날짜 종가 조회
+async function getHistoricalPrice(ticker, targetDate) {
+  try {
+    const d = new Date(targetDate);
+    // 주말이면 다음 월요일로 보정
+    const dow = d.getDay();
+    if(dow === 6) d.setDate(d.getDate() + 2);
+    if(dow === 0) d.setDate(d.getDate() + 1);
+    const p1 = Math.floor(d.getTime() / 1000) - 3600;
+    const p2 = p1 + 86400 * 3; // 3일 범위로 안전마진
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&period1=${p1}&period2=${p2}`;
+    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxy, {signal: AbortSignal.timeout(8000)});
+    const json = await res.json();
+    const closes = json?.chart?.result?.[0]?.indicators?.quote?.[0]?.close;
+    if(!closes?.length) return null;
+    const validCloses = closes.filter(v => v != null);
+    if(!validCloses.length) return null;
+    return Math.round(validCloses[0] * 100) / 100;
+  } catch(e) {
+    return null;
+  }
+}
+
+// 실제 결과에서 인물×섹터별 평균 급락폭 도출
+function getLearnedAvgDrop(figId, sectors) {
+  const results = learnData.studyResults || [];
+  const relevant = results.filter(r => {
+    const figMatch = r.figureId === figId;
+    const secMatch = sectors?.some(s => r.sectors?.includes(s));
+    return figMatch || secMatch;
+  });
+  if(relevant.length < 3) return null; // 데이터 부족
+  const drops = relevant
+    .flatMap(r => r.results || [])
+    .map(r => r.actualChange)
+    .filter(v => v != null && v < 0);
+  if(drops.length < 3) return null;
+  const avg = drops.reduce((s,v) => s + Math.abs(v), 0) / drops.length;
+  return Math.round(avg * 10) / 10;
+}
+
+// 자동 결과 추적 메인 함수
+let autoTrackRunning = false;
+async function autoTrackResults(silent = false) {
+  if(autoTrackRunning) return;
+  autoTrackRunning = true;
+
+  const now = new Date();
+  // 기일 지났고 priceAtResult 없는 시그널만
+  const targets = signalLog.filter(a => {
+    if(!a.prediction?.expectedDate) return false;
+    if(a.prediction?.priceAtResult) return false; // 이미 추적 완료
+    const alreadyRecorded = learnData.studyResults?.find(r => r.signalId === a.prediction?.id);
+    if(alreadyRecorded) return false;
+    return new Date(a.prediction.expectedDate) < now;
+  }).slice(0, 10); // 1회 최대 10건
+
+  if(targets.length === 0) { autoTrackRunning = false; return; }
+
+  if(!silent) {
+    const el = document.getElementById('autotrack-status');
+    if(el) el.textContent = `🔄 결과 자동 추적 중... (${targets.length}건)`;
+  }
+
+  let tracked = 0;
+  for(const alert of targets) {
+    const pred = alert.prediction;
+    if(!pred?.tickers?.length) continue;
+
+    const resultPrices = {};
+    for(const ticker of pred.tickers.slice(0, 3)) {
+      const price = await getHistoricalPrice(ticker, pred.expectedDate);
+      if(price) resultPrices[ticker] = price;
+      await new Promise(r => setTimeout(r, 300)); // rate limit 방지
+    }
+
+    if(!Object.keys(resultPrices).length) continue;
+
+    // priceAtResult 저장
+    pred.priceAtResult = resultPrices;
+    pred.trackedAt = now.toISOString();
+
+    // 정확도 계산
+    const results = pred.tickers.map(t => {
+      const signalPrice = pred.priceAtSignal?.[t] || 0;
+      const resultPrice = resultPrices[t] || 0;
+      if(!signalPrice || !resultPrice) return null;
+      const actualChange = Math.round((resultPrice - signalPrice) / signalPrice * 1000) / 10;
+      const predicted = -(pred.avgDrop || 10);
+      const sameDir = (actualChange < 0 && predicted < 0) || (actualChange > 0 && predicted > 0);
+      const hit = sameDir && Math.abs(actualChange - predicted) <= Math.abs(predicted) * 0.6;
+      return { t, signalPrice, resultPrice, actualChange, predicted, hit };
+    }).filter(Boolean);
+
+    if(!results.length) continue;
+
+    const hitCount = results.filter(r => r.hit).length;
+    const hitRate = Math.round(hitCount / results.length * 100);
+    const accResult = { isPast: true, results, hitCount, hitRate, total: results.length };
+
+    recordStudyResult(alert, accResult);
+    tracked++;
+
+    // signalLog 갱신 (priceAtResult 영구 저장)
+    saveSignalLog();
+  }
+
+  autoTrackRunning = false;
+
+  const el = document.getElementById('autotrack-status');
+  if(el) {
+    el.textContent = tracked > 0
+      ? `✅ ${tracked}건 결과 자동 학습 완료 (${new Date().toLocaleTimeString('ko-KR')})`
+      : `✅ 추적 완료 — 신규 결과 없음`;
+    setTimeout(() => { if(el) el.textContent = ''; }, 5000);
+  }
+
+  if(tracked > 0 && typeof renderSim === 'function') renderSim();
+  if(tracked > 0) console.log(`[AutoTrack] ${tracked}건 결과 자동 기록 완료`);
 }
 
 // ── 학습 보정값을 확률 계산에 반영
@@ -4446,6 +4575,29 @@ function renderLearnDashboard() {
     <div class="sec">학습 대시보드 — 누적 성과 + AI 추천</div>
 
     <!-- 백데이터 수집 버튼 -->
+    <!-- 자동 결과 추적 상태 -->
+    <div style="padding:12px 14px;background:#f0fdf4;border:1px solid #16a34a33;
+      border-radius:4px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;color:#16a34a;font-family:sans-serif;margin-bottom:2px">
+            🤖 자동 결과 추적 — 예측 기일 도달 시 실제 주가 수집 + 학습 자동 반영
+          </div>
+          <div style="font-size:12px;color:#445577">
+            추적 대상: ${signalLog.filter(a=>a.prediction?.expectedDate&&!a.prediction?.priceAtResult&&new Date(a.prediction.expectedDate)<new Date()).length}건 대기
+            · 학습 완료: ${learnData.studyResults?.length||0}건
+          </div>
+          <div id="autotrack-status" style="font-size:12px;color:#2563eb;margin-top:2px"></div>
+        </div>
+        <button onclick="autoTrackResults(false)"
+          style="padding:8px 14px;border:1px solid #16a34a;background:transparent;
+            color:#16a34a;font-size:13px;cursor:pointer;border-radius:3px;
+            font-family:var(--mono);white-space:nowrap;flex-shrink:0">
+          🔄 지금 추적
+        </button>
+      </div>
+    </div>
+
     <div style="padding:12px 14px;background:#eef0f8;border:1px solid #4a9eff33;
       border-radius:4px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -5043,7 +5195,7 @@ window.onload = function(){
   }, 4000);
 
   // 실시간 현재가 업데이트 (15분마다)
-  updateAllPrices().then(()=>{
+  updateAllPrices().then(()=>{\
     if(state.currentTab==='filter') renderFilter();
     if(state.currentTab==='stocks') renderStocks();
   });
@@ -5053,6 +5205,10 @@ window.onload = function(){
       if(state.currentTab==='stocks') renderStocks();
     });
   }, 15*60*1000);
+
+  // ── 자동 결과 추적 (앱 시작 3초 후 + 6시간마다)
+  setTimeout(() => autoTrackResults(true), 3000);
+  setInterval(() => autoTrackResults(true), 6*60*60*1000);
 
   updateClock();
   setInterval(updateClock, 10000);
