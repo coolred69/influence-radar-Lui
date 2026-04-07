@@ -1603,12 +1603,104 @@ if(!learnData.studyStats || typeof learnData.studyStats.totalCases === 'undefine
   }, learnData.studyStats||{});
 }
 
+// ── IndexedDB 이중 백업 시스템 (localStorage 소실 대비)
+const IDB_NAME = 'influence-radar-db';
+const IDB_STORE = 'signalLog';
+let idbReady = false;
+let idb = null;
+
+function openIDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore(IDB_STORE, { keyPath: 'id' });
+    };
+    req.onsuccess = e => {
+      idb = e.target.result;
+      idbReady = true;
+      resolve(idb);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function idbSaveSignalLog(log) {
+  if (!idbReady || !idb) return;
+  try {
+    const tx = idb.transaction(IDB_STORE, 'readwrite');
+    const store = tx.objectStore(IDB_STORE);
+    store.clear();
+    log.forEach(item => {
+      const safe = {...item};
+      if (!safe.id) safe.id = String(Date.now()) + Math.random();
+      store.put(safe);
+    });
+  } catch(e) { console.warn('[IDB] save error', e); }
+}
+
+function idbLoadSignalLog() {
+  return new Promise((resolve) => {
+    if (!idbReady || !idb) return resolve([]);
+    try {
+      const tx = idb.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    } catch(e) { resolve([]); }
+  });
+}
+
+function exportSignalLogJSON() {
+  const blob = new Blob([JSON.stringify(signalLog, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ir_signal_log_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importSignalLogJSON(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) return alert('올바른 백업 파일이 아닙니다');
+      const merged = [...data];
+      signalLog.forEach(s => {
+        if (!merged.find(m => m.id === s.id)) merged.push(s);
+      });
+      merged.sort((a,b) => (b.detectedAt||0) - (a.detectedAt||0));
+      signalLog = merged.slice(0, 500);
+      saveSignalLog();
+      renderSim();
+      alert(`✅ 복구 완료: ${merged.length}건`);
+    } catch(err) { alert('파일 파싱 오류: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
 // ── 시그널 기록 전용 저장소 (alerts와 완전 분리 — 절대 삭제 안 됨)
 let signalLog = JSON.parse(localStorage.getItem('ir_signal_log') || '[]');
 
+// 앱 시작 시 IndexedDB → localStorage 자동 복구
+openIDB().then(async () => {
+  if (signalLog.length === 0) {
+    const idbData = await idbLoadSignalLog();
+    if (idbData.length > 0) {
+      signalLog = idbData.sort((a,b) => (b.detectedAt||0) - (a.detectedAt||0));
+      localStorage.setItem('ir_signal_log', JSON.stringify(signalLog));
+      console.log(`[복구] IndexedDB → localStorage: ${signalLog.length}건 복원`);
+      if (typeof renderSim === 'function') renderSim();
+    }
+  } else {
+    idbSaveSignalLog(signalLog); // 최신 데이터를 IDB에도 동기화
+  }
+}).catch(e => console.warn('[IDB] init failed', e));
+
 function saveSignalLog() {
   localStorage.setItem('ir_signal_log', JSON.stringify(signalLog));
-  // Firebase에도 동기화
+  idbSaveSignalLog(signalLog); // IndexedDB 이중 저장
   if(window.fbSave) {
     window.fbSave({ logs: state.logs, alerts: state.alerts, learnData, signalLog });
   }
@@ -3164,6 +3256,17 @@ function renderSim(){
             background:${(state.sigFilter||0)===i?'#eff4ff':'transparent'};
             color:${(state.sigFilter||0)===i?'#2563eb':'#445577'}">${label}</button>
       `).join('')}
+      <button onclick="exportSignalLogJSON()"
+        style="font-size:13px;padding:5px 12px;border-radius:3px;cursor:pointer;
+          border:1px solid #16a34a;background:transparent;color:#16a34a;">
+        💾 백업 다운로드
+      </button>
+      <label style="font-size:13px;padding:5px 12px;border-radius:3px;cursor:pointer;
+          border:1px solid #2563eb;background:transparent;color:#2563eb;display:inline-block">
+        📂 백업 복구
+        <input type="file" accept=".json" style="display:none"
+          onchange="importSignalLogJSON(this.files[0])">
+      </label>
       <button onclick="if(confirm('시그널 기록 전체 삭제?')){signalLog=[];saveSignalLog();renderSim();}"
         style="font-size:13px;padding:5px 12px;border-radius:3px;cursor:pointer;
           border:1px solid #f87171;background:transparent;color:#dc2626;margin-left:auto">
