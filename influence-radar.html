@@ -1030,11 +1030,30 @@ async function showSignalDetail(fig, article, sectors, tickers, score) {
     priceData[t] = await getLivePrice(t);
   }
 
-  // 예상 급락폭 — 실학습 결과 우선, 없으면 패턴 기본값
+  // ── ML API 예측 (Railway 서버) — 비동기 우선 시도
+  let mlResult = null;
+  if(ML_API_URL) {
+    mlResult = await mlPredict({
+      person: fig.name,
+      influence_score: fig.inf / 100,
+      sector: sectors?.[0] || '',
+      ticker: tickerList?.[0] || '',
+      signal_strength: score / 100,
+      sentiment: score >= 70 ? 'negative' : score >= 45 ? 'neutral' : 'positive',
+      news_frequency: 3,
+      cross_validation: ['Reuters', 'Bloomberg', 'CNBC']
+    });
+  }
+
+  // 예상 급락폭 우선순위: ML API > 실학습 > 패턴 기본값
   const learnedDrop = getLearnedAvgDrop(fig.id, sectors);
-  const avgDrop = learnedDrop || relPattern?.avgDropPct || 10;
-  const dropSource = learnedDrop ? `실데이터 ${learnData.studyResults?.filter(r=>r.figureId===fig.id||sectors?.some(s=>r.sectors?.includes(s))).length||0}건 기반` : '패턴 기본값';
-  const recoveryDays = relPattern?.avgRecoveryDays || 7;
+  const avgDrop = mlResult?.predicted_drop_pct || learnedDrop || relPattern?.avgDropPct || 10;
+  const recoveryDays = mlResult?.hold_days || relPattern?.avgRecoveryDays || 7;
+  const dropSource = mlResult
+    ? `ML 모델 (${mlResult.model_signals||0}건 학습)`
+    : learnedDrop
+      ? `실데이터 ${learnData.studyResults?.filter(r=>r.figureId===fig.id||sectors?.some(s=>r.sectors?.includes(s))).length||0}건 기반`
+      : '패턴 기본값';
   const action = relPattern?.actionOnDetect || '분할매수 검토';
   const patternName = relPattern?.name || '발언 영향 패턴';
 
@@ -1527,6 +1546,44 @@ let monitorInterval;
 const GNEWS_KEY = 'd02a2d820d99df4f5c981a365a118eef';
 const GNEWS_URL = 'https://gnews.io/api/v4/search';
 const CURRENTS_KEY = 'tWNp1egV25PGsljlScRHuk03eryF64K38n8GSBMhgh2cwzlD';
+
+// ── ML API (Railway 배포 서버)
+const ML_API_URL = localStorage.getItem('ir_ml_api_url') || '';
+
+async function mlPredict(signalInput) {
+  if(!ML_API_URL) return null;
+  try {
+    const res = await fetch(`${ML_API_URL}/predict`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(signalInput),
+      signal: AbortSignal.timeout(6000)
+    });
+    if(!res.ok) return null;
+    return await res.json();
+  } catch(e) { return null; }
+}
+
+async function mlTrain(studyResults) {
+  if(!ML_API_URL || !studyResults?.length) return null;
+  try {
+    const res = await fetch(`${ML_API_URL}/train`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({signals: studyResults}),
+      signal: AbortSignal.timeout(30000)
+    });
+    return await res.json();
+  } catch(e) { return null; }
+}
+
+async function mlStats() {
+  if(!ML_API_URL) return null;
+  try {
+    const res = await fetch(`${ML_API_URL}/stats`, {signal: AbortSignal.timeout(4000)});
+    return await res.json();
+  } catch(e) { return null; }
+}
 const CURRENTS_URL = 'https://api.currentsapi.services/v1/search';
 
 // ── 구글 번역 (무료 비공식 API — 키 불필요)
@@ -1941,7 +1998,15 @@ async function autoTrackResults(silent = false) {
   }
 
   if(tracked > 0 && typeof renderSim === 'function') renderSim();
-  if(tracked > 0) console.log(`[AutoTrack] ${tracked}건 결과 자동 기록 완료`);
+  if(tracked > 0) {
+    console.log(`[AutoTrack] ${tracked}건 결과 자동 기록 완료`);
+    // ML API 자동 재학습 (데이터 쌓일 때마다)
+    if(ML_API_URL && (learnData.studyResults?.length||0) >= 5) {
+      mlTrain(learnData.studyResults).then(r => {
+        if(r?.status === 'ok') console.log(`[ML] 재학습 완료: ${r.total_signals}건 · MAE $${r.buy_mae}`);
+      });
+    }
+  }
 }
 
 // ── 학습 보정값을 확률 계산에 반영
@@ -4602,6 +4667,66 @@ function renderLearnDashboard() {
             color:#16a34a;font-size:13px;cursor:pointer;border-radius:3px;
             font-family:var(--mono);white-space:nowrap;flex-shrink:0">
           🔄 지금 추적
+        </button>
+      </div>
+    </div>
+
+    <!-- ML API 설정 + 재학습 -->
+    <div style="padding:12px 14px;background:#eff4ff;border:1px solid #2563eb33;
+      border-radius:4px;margin-bottom:10px">
+      <div style="font-size:13px;color:#2563eb;font-family:sans-serif;margin-bottom:8px;font-weight:bold">
+        ⚡ ML 예측 API (Railway)
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+        <input id="ml-api-input" type="text"
+          placeholder="https://your-api.railway.app"
+          value="${ML_API_URL}"
+          style="flex:1;padding:7px 10px;border:1px solid #c0c8e0;border-radius:3px;
+            font-size:12px;font-family:var(--mono);background:#fff;color:#1a2340">
+        <button onclick="(()=>{
+          const v=document.getElementById('ml-api-input').value.trim().replace(/\\/$/,'');
+          localStorage.setItem('ir_ml_api_url',v);
+          document.getElementById('ml-api-status').textContent=v?'✅ 저장됨':'삭제됨';
+          setTimeout(()=>{document.getElementById('ml-api-status').textContent=''},2000);
+        })()"
+          style="padding:7px 12px;border:1px solid #2563eb;background:#2563eb;
+            color:#fff;font-size:12px;cursor:pointer;border-radius:3px;white-space:nowrap">
+          저장
+        </button>
+        <button onclick="(async()=>{
+          const el=document.getElementById('ml-api-status');
+          el.textContent='테스트 중...';
+          const url=(document.getElementById('ml-api-input').value||'').trim().replace(/\\/$/,'');
+          try{
+            const r=await fetch(url+'/health',{signal:AbortSignal.timeout(5000)});
+            const d=await r.json();
+            el.textContent=d.model_loaded?'✅ 연결됨 · 모델 로드 완료':'⚠️ 연결됨 · 모델 없음 (재학습 필요)';
+            el.style.color=d.model_loaded?'#16a34a':'#fbbf24';
+          }catch(e){el.textContent='❌ 연결 실패';el.style.color='#dc2626';}
+        })()"
+          style="padding:7px 12px;border:1px solid #445577;background:transparent;
+            color:#445577;font-size:12px;cursor:pointer;border-radius:3px;white-space:nowrap">
+          테스트
+        </button>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div id="ml-api-status" style="font-size:12px;color:#445577;flex:1"></div>
+        <button onclick="(async()=>{
+          const el=document.getElementById('ml-api-status');
+          el.textContent='재학습 전송 중...';el.style.color='#2563eb';
+          const r=await mlTrain(learnData.studyResults||[]);
+          if(r?.status==='ok'){
+            el.textContent='✅ 재학습 완료: '+r.total_signals+'건 · MAE $'+r.buy_mae;
+            el.style.color='#16a34a';
+          } else if(r?.error) {
+            el.textContent='⚠️ '+r.error;el.style.color='#fbbf24';
+          } else {
+            el.textContent='❌ API URL 미설정';el.style.color='#dc2626';
+          }
+        })()"
+          style="padding:7px 12px;border:1px solid #7c3aed;background:transparent;
+            color:#7c3aed;font-size:12px;cursor:pointer;border-radius:3px;white-space:nowrap">
+          🧠 지금 재학습
         </button>
       </div>
     </div>
