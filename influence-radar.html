@@ -1178,7 +1178,7 @@ async function showSignalDetail(fig, article, sectors, tickers, score) {
         <div style="margin-bottom:14px">
           <div style="font-size:13px;color:#445577;font-family:var(--mono);margin-bottom:6px;letter-spacing:1px">📌 신호 발생 원인</div>
           <div style="padding:10px 12px;background:#eef0f8;border-radius:4px;border-left:3px solid ${fig.color}">
-            <div style="font-size:13px;color:#eeeeff;font-family:sans-serif;line-height:1.6;margin-bottom:6px">
+            <div style="font-size:13px;color:#1a2340;font-family:sans-serif;line-height:1.6;margin-bottom:6px">
               ${article.title}
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
@@ -1236,7 +1236,7 @@ async function showSignalDetail(fig, article, sectors, tickers, score) {
                 <div style="flex:1">
                   <div style="display:flex;gap:6px;align-items:center;margin-bottom:3px">
                     <span style="font-size:12px;color:#556">현재가</span>
-                    <span style="font-size:12px;font-weight:bold;color:#eeeeff;font-family:var(--mono)">${fmtUSD(curPrice)}</span>
+                    <span style="font-size:12px;font-weight:bold;color:#1a2340;font-family:var(--mono)">${fmtUSD(curPrice)}</span>
                     ${pd.changePct?`<span style="font-size:12px;color:${pd.changePct>0?'#16a34a':'#dc2626'}">${pd.changePct>0?'▲':'▼'}${Math.abs(pd.changePct)}%</span>`:''}
                   </div>
                   <div style="display:flex;gap:6px;align-items:center">
@@ -1312,7 +1312,7 @@ async function showSignalDetail(fig, article, sectors, tickers, score) {
             </div>`:'')
           +(p?`<div style="padding:10px 12px;background:#fefce8;border:1px solid #b4530933;border-radius:4px;margin-bottom:14px">
             <div style="font-size:12px;color:#fbbf24;font-family:var(--mono);margin-bottom:5px">🔍 유사 과거 패턴 · 유사도 ${p.similarity}%</div>
-            <div style="font-size:13px;color:#eeeeff;font-family:sans-serif;margin-bottom:5px">${p.title}</div>
+            <div style="font-size:13px;color:#1a2340;font-family:sans-serif;margin-bottom:5px">${p.title}</div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px">
               ${p.hitRate!==null?`<span style="font-size:12px;color:${p.hitRate>=70?'#16a34a':'#fbbf24'}">적중률 ${p.hitRate}%</span>`:''}
               ${p.avgActualDrop!==null?`<span style="font-size:12px;color:#dc2626">실제 ${p.avgActualDrop}%</span>`:''}
@@ -1399,7 +1399,7 @@ function processSignalQueue(){
             background:#eff4ff;border:1px solid #4a9eff55;color:#2563eb;
             border-radius:3px;font-family:var(--mono);font-weight:bold">${t}</span>`).join(''):''}
         </div>
-        <div style="font-size:12px;color:#eeeeff;font-family:sans-serif;line-height:1.5;margin-bottom:4px">${sig.title}</div>
+        <div style="font-size:12px;color:#1a2340;font-family:sans-serif;line-height:1.5;margin-bottom:4px">${sig.title}</div>
         <div style="font-size:13px;color:#556677;font-family:sans-serif">${sig.body}</div>
       </div>
       <button onclick="document.getElementById('signal-banner').remove();processSignalQueue()"
@@ -1464,7 +1464,7 @@ function renderNotifPanel(){
       border-bottom:1px solid #c0c8e0;padding:10px 16px;
       display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:12px;font-weight:bold;color:#eeeeff;font-family:var(--mono)">
+        <span style="font-size:12px;font-weight:bold;color:#1a2340;font-family:var(--mono)">
           🔔 알림 ${allAlerts.length}건
         </span>
         ${sigAlerts.length>0?`<span style="font-size:13px;padding:2px 8px;
@@ -1501,7 +1501,7 @@ function renderNotifPanel(){
           ${sc>0?`<span style="font-size:13px;font-weight:bold;color:${lv.color};
             font-family:var(--mono);margin-left:auto">${sc}점</span>`:''}
         </div>
-        <div style="color:#eeeeff;font-size:12px;font-family:sans-serif;line-height:1.5;margin-bottom:4px">${a.title}</div>
+        <div style="color:#1a2340;font-size:12px;font-family:sans-serif;line-height:1.5;margin-bottom:4px">${a.title}</div>
         ${a.body?`<div style="color:#556677;font-size:13px;font-family:sans-serif;margin-bottom:4px">${a.body}</div>`:''}
         <div style="display:flex;align-items:center;gap:8px">
           <span style="color:#445577;font-size:12px;font-family:var(--mono)">${a.time||''}</span>
@@ -2285,7 +2285,7 @@ function renderRadar(){
           ${avatar(fig)}
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:12px;color:#eeeeff;font-family:sans-serif">${fig.name}</span>
+              <span style="font-size:12px;color:#1a2340;font-family:sans-serif">${fig.name}</span>
               <span style="font-size:12px">${fig.country}</span>
               ${tag(fig.chType,typeColor,true)}
             </div>
@@ -2317,7 +2317,7 @@ function renderFigDetail(fig){
       <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
         ${avatar(fig)}
         <div style="flex:1">
-          <div style="font-size:14px;color:#eeeeff;font-family:sans-serif">${fig.name} ${fig.country}</div>
+          <div style="font-size:14px;color:#1a2340;font-family:sans-serif">${fig.name} ${fig.country}</div>
           <div style="font-size:13px;color:#556;font-family:sans-serif">${fig.title}</div>
         </div>
         <div class="score-big" style="color:${fig.color}">${fig.inf}</div>
@@ -2331,7 +2331,7 @@ function renderFigDetail(fig){
             <span style="width:18px;height:18px;border-radius:50%;background:${i===0?fig.color+'22':'#e8ecf5'};
               border:1px solid ${i===0?fig.color:'#1a1a3a'};display:flex;align-items:center;
               justify-content:center;font-size:13px;color:${i===0?fig.color:'#445577'};flex-shrink:0">${i+1}</span>
-            <span style="font-size:13px;color:${i===0?'#eeeeff':'#556677'};font-family:sans-serif">${c}</span>
+            <span style="font-size:13px;color:${i===0?'#1a2340':'#556677'};font-family:sans-serif">${c}</span>
           </div>`).join('')}
       </div>
       <div>
@@ -2411,7 +2411,7 @@ function renderStocksSearch() {
       </div>
       <div style="flex:1;font-size:13px;color:#556677;font-family:sans-serif">${s.n}</div>
       <div style="text-align:right">
-        <div style="font-size:12px;color:#eeeeff;font-family:var(--mono)">${fmtUSD(lp.price)}</div>
+        <div style="font-size:12px;color:#1a2340;font-family:var(--mono)">${fmtUSD(lp.price)}</div>
         ${lp.isLive&&lp.change!==0?`<div style="font-size:12px;color:${lp.color}">${lp.arrow}${Math.abs(lp.change)}%</div>`:''}
       </div>
     </div>`;
@@ -2456,7 +2456,7 @@ function renderTickerDetail(ticker, fig) {
         ${s?.note?`<div style="font-size:13px;color:#556;margin-top:3px;font-family:sans-serif">${s.note}</div>`:''}
       </div>
       <div style="text-align:center">
-        <div style="font-size:24px;font-weight:bold;color:${lp.isLive?'#eeeeff':'#556'};font-family:var(--mono)">${fmtUSD(lp.price)}</div>
+        <div style="font-size:24px;font-weight:bold;color:${lp.isLive?'#1a2340':'#556'};font-family:var(--mono)">${fmtUSD(lp.price)}</div>
         ${lp.isLive?`<div style="font-size:13px;color:${lp.color};font-family:var(--mono)">${lp.arrow}${Math.abs(lp.change)}%</div>`:''}
         <div style="font-size:13px;color:${lp.isLive?'#16a34a':'#445577'};margin-top:2px">${lp.isLive?'실시간':'추정가'}</div>
       </div>
@@ -2489,7 +2489,7 @@ function renderTickerDetail(ticker, fig) {
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div>
             <div style="font-size:12px;color:#445577;margin-bottom:2px">현재가</div>
-            <div style="font-size:14px;font-weight:bold;color:#eeeeff;font-family:var(--mono)">${fmtUSD(b.price)}</div>
+            <div style="font-size:14px;font-weight:bold;color:#1a2340;font-family:var(--mono)">${fmtUSD(b.price)}</div>
           </div>
           <div>
             <div style="font-size:12px;color:#445577;margin-bottom:2px">목표 매입가</div>
@@ -2548,7 +2548,7 @@ function renderStocks(){
             value="${state.tickerSearch||''}"
             oninput="state.tickerSearch=this.value;renderStocksSearch()"
             style="width:100%;background:#e8ecf5;border:1px solid #c0c8e0;
-              color:#eeeeff;padding:10px 14px;font-size:12px;
+              color:#1a2340;padding:10px 14px;font-size:12px;
               border-radius:3px;font-family:sans-serif;box-sizing:border-box">
           <div id="ticker-search-results" style="position:absolute;left:0;right:0;top:100%;
             background:#e8ecf5;border:1px solid #c0c8e0;border-top:none;
@@ -2584,7 +2584,7 @@ function renderStocks(){
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;
       padding:10px 12px;background:${sd.color}0d;border:1px solid ${sd.color}33;border-radius:4px">
       <div style="width:10px;height:10px;border-radius:50%;background:${sd.color}"></div>
-      <span style="font-size:14px;color:#eeeeff;font-family:sans-serif">${sd.label}</span>
+      <span style="font-size:14px;color:#1a2340;font-family:sans-serif">${sd.label}</span>
       <span class="tag ${tempInfo(sd.temp).cls}" style="border:none;background:none;font-size:12px">${tempInfo(sd.temp).text}</span>
       <span style="margin-left:auto;font-size:12px;color:#445577">기준: <span style="color:${fig.color}">${fig.name}</span> · 가정 -${state.simDrop}%</span>
     </div>
@@ -2601,7 +2601,7 @@ function renderStocks(){
     <div style="margin-top:28px;padding-top:20px;border-top:1px solid #c0c8e0">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div>
-          <div style="font-size:13px;color:#eeeeff;font-family:sans-serif">📊 전체 종목 기회점수 순위</div>
+          <div style="font-size:13px;color:#1a2340;font-family:sans-serif">📊 전체 종목 기회점수 순위</div>
           <div style="font-size:13px;color:#445577;margin-top:3px">
             ${fig.name} (${fig.inf}pt) 기준 · 가정 하락 -${state.simDrop}% · 
             <span style="color:#2563eb">총 ${ranked.length}종목</span>
@@ -2651,7 +2651,7 @@ function renderStocks(){
             <div style="font-size:13px;font-family:var(--mono)">
               ${(()=>{
                 const lp = fmtPrice(s.t);
-                return `<span style="color:${lp.isLive?'#eeeeff':'#556'}">${fmtUSD(lp.price)}</span>`
+                return `<span style="color:${lp.isLive?(s.os>=45?'#f0f4ff':'#1a2340'):'#556'}">${fmtUSD(lp.price)}</span>`
                   + (lp.isLive ? `<span style="color:${lp.color};font-size:7px;margin-left:2px">${lp.arrow}${Math.abs(lp.change)}%</span>` : ' <span style="color:#334;font-size:7px">추정</span>');
               })()}
             </div>
@@ -2827,7 +2827,7 @@ function renderFilter(){
         const tk=a.tickers||a.topTickers||'';
         return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
           <span style="font-size:14px">${lv.emoji}</span>
-          <span style="font-size:13px;color:#eeeeff;flex:1;font-family:sans-serif">${a.title?.slice(0,45)||''}</span>
+          <span style="font-size:13px;color:#ffcccc;flex:1;font-family:sans-serif">${a.title?.slice(0,45)||''}</span>
           ${tk?tk.split('·').slice(0,2).map(t=>`<span style="font-size:12px;padding:1px 6px;
             background:#eff4ff;border:1px solid #4a9eff44;color:#2563eb;
             border-radius:2px;font-family:var(--mono)">${t}</span>`).join(''):''}
@@ -2860,7 +2860,7 @@ function renderFilter(){
             </div>
             <!-- 현재가 -->
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
-              <span style="font-size:14px;font-weight:bold;color:${lp.isLive?'#eeeeff':'#556'};font-family:var(--mono)">${fmtUSD(lp.price)}</span>
+              <span style="font-size:14px;font-weight:bold;color:${lp.isLive?'#1a2340':'#556'};font-family:var(--mono)">${fmtUSD(lp.price)}</span>
               ${lp.isLive&&lp.change!==0?`<span style="font-size:13px;color:${lp.color}">${lp.arrow}${Math.abs(lp.change)}%</span>`:''}
               ${lp.isLive?'<span style="font-size:13px;color:#16a34a">실시간</span>':'<span style="font-size:13px;color:#334">추정</span>'}
             </div>
@@ -3002,7 +3002,7 @@ function renderLog(){
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
           ${avatar(fig)}
           <div style="flex:1">
-            <div style="font-size:12px;color:#eeeeff;font-family:sans-serif">${fig.name}</div>
+            <div style="font-size:12px;color:#1a2340;font-family:sans-serif">${fig.name}</div>
             <div style="display:flex;gap:6px;align-items:center;margin-top:3px">
               ${tag(log.type,tc,true)}
               <span style="font-size:12px;color:#445577">${log.date}</span>
@@ -3209,7 +3209,7 @@ function renderSim(){
           <div style="font-size:13px;color:#445577;margin-top:3px">평균 예상확률</div>
         </div>`:''}
         <div style="text-align:center;padding:8px;background:#eef0f8;border-radius:3px">
-          <div style="font-size:24px;font-weight:bold;color:#eeeeff;font-family:var(--mono);line-height:1">${signals.length}</div>
+          <div style="font-size:24px;font-weight:bold;color:#1a2340;font-family:var(--mono);line-height:1">${signals.length}</div>
           <div style="font-size:13px;color:#445577;margin-top:3px">총 시그널</div>
         </div>
         <div style="text-align:center;padding:8px;background:#eef0f8;border-radius:3px">
@@ -3310,7 +3310,7 @@ function renderSim(){
               <span style="font-size:12px;font-weight:bold;color:${lv.color};
                 font-family:var(--mono);margin-left:auto">${sc}점</span>
             </div>
-            <div style="font-size:12px;color:#eeeeff;font-family:sans-serif;
+            <div style="font-size:12px;color:#1a2340;font-family:sans-serif;
               line-height:1.5;margin-bottom:5px">${a.title}</div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               ${a.figureName?`<span style="font-size:13px;color:${a.figureColor||'#556677'}">${a.figureName}</span>`:''}
@@ -3462,7 +3462,7 @@ function renderSim(){
                     <span style="font-size:12px;color:#334">→</span>
                     <div style="display:flex;flex-direction:column;gap:1px">
                       <span style="font-size:7px;color:#334;letter-spacing:0.5px">현재가</span>
-                      <span style="font-size:13px;color:#eeeeff;font-family:var(--mono)">${fmtUSD(r.currentPrice)}</span>
+                      <span style="font-size:13px;color:#1a2340;font-family:var(--mono)">${fmtUSD(r.currentPrice)}</span>
                     </div>
                     <div style="margin-left:auto;padding:4px 10px;border-radius:3px;
                       background:${r.dollarDiff>0?'#f0fdf4':r.dollarDiff<0?'#fff0f0':'#eef0f8'};
@@ -3507,7 +3507,7 @@ function renderMap(){
       <div class="card" style="margin-bottom:10px;border-top:2px solid ${fig.color}">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
           ${avatar(fig)}
-          <span style="font-size:13px;color:#eeeeff;font-family:sans-serif">${fig.name}</span>
+          <span style="font-size:13px;color:#1a2340;font-family:sans-serif">${fig.name}</span>
           <span style="margin-left:auto;font-size:18px;font-weight:bold;color:${fig.color};font-family:var(--mono)">${fig.inf}</span>
         </div>
         ${fig.rel.map(rel=>{
@@ -3629,7 +3629,7 @@ function renderPattern(){
         <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
           <div style="flex:1">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">
-              <span style="font-size:13px;color:#eeeeff;font-family:sans-serif;font-weight:bold">${sp.name}</span>
+              <span style="font-size:13px;color:#1a2340;font-family:sans-serif;font-weight:bold">${sp.name}</span>
               <span style="font-size:13px;padding:2px 7px;border-radius:2px;
                 border:1px solid ${typeColor}44;background:${typeColor}15;color:${typeColor}">${sp.type}</span>
               <span style="font-size:13px;color:#445577">${sp.frequency}</span>
@@ -3713,7 +3713,7 @@ function renderPattern(){
               display:flex;align-items:center;justify-content:center;
               font-size:12px;color:${p.color};font-weight:bold;flex-shrink:0">${fig.avatar}</div>
             <div style="flex:1">
-              <div style="font-size:13px;color:#eeeeff;font-family:sans-serif">${p.name}</div>
+              <div style="font-size:13px;color:#1a2340;font-family:sans-serif">${p.name}</div>
               <div style="font-size:12px;color:#556677;font-family:sans-serif;margin-top:2px">${topPat?.name||'—'}</div>
             </div>
             <div style="display:flex;gap:10px">
@@ -3827,7 +3827,7 @@ function renderNews(){
             display:flex;align-items:center;justify-content:center;
             font-size:13px;color:${fig.color};font-weight:bold;flex-shrink:0">${fig.avatar}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;color:#eeeeff;font-family:sans-serif">${fig.name}</div>
+            <div style="font-size:13px;color:#1a2340;font-family:sans-serif">${fig.name}</div>
             <div style="display:flex;gap:8px;margin-top:3px;flex-wrap:wrap">
               <span style="font-size:12px;color:#445577">수집 <span style="color:#2563eb">${fs.totalNews}건</span></span>
               <span style="font-size:12px;color:#445577">부정 <span style="color:#dc2626">${negRatio}%</span></span>
@@ -3874,7 +3874,7 @@ function renderNews(){
             display:flex;align-items:center;justify-content:center;
             font-size:7px;color:${a.figureColor||'#888'};font-weight:bold">${a.figureAvatar||'?'}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;color:#eeeeff;font-family:sans-serif;
+            <div style="font-size:13px;color:#1a2340;font-family:sans-serif;
               line-height:1.5;margin-bottom:5px">${a.title}
               ${a.isDemo?`<span style="font-size:13px;color:#445577;margin-left:4px">[데모]</span>`:''}
             </div>
@@ -4052,13 +4052,13 @@ function renderTrade() {
         <div>
           <div style="font-size:12px;color:#445577;margin-bottom:4px">매입가 ($)</div>
           <input id="trade-entry" type="number" placeholder="118.50" style="width:100%;background:#e8ecf5;
-            border:1px solid #c0c8e0;color:#eeeeff;padding:8px;font-size:12px;
+            border:1px solid #c0c8e0;color:#1a2340;padding:8px;font-size:12px;
             border-radius:3px;font-family:var(--mono);box-sizing:border-box">
         </div>
         <div>
           <div style="font-size:12px;color:#445577;margin-bottom:4px">수량 (주)</div>
           <input id="trade-shares" type="number" placeholder="10" style="width:100%;background:#e8ecf5;
-            border:1px solid #c0c8e0;color:#eeeeff;padding:8px;font-size:12px;
+            border:1px solid #c0c8e0;color:#1a2340;padding:8px;font-size:12px;
             border-radius:3px;font-family:var(--mono);box-sizing:border-box">
         </div>
         <div>
@@ -4106,7 +4106,7 @@ function renderTrade() {
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <span style="font-size:13px;color:#eeeeff;font-family:var(--mono)">현재 ${fmtUSD(cur)}</span>
+          <span style="font-size:13px;color:#1a2340;font-family:var(--mono)">현재 ${fmtUSD(cur)}</span>
           ${t.target?`<span style="font-size:12px;color:#fbbf24">목표 ${fmtUSD(t.target)} (${toTarget>=0?'+':''}${toTarget}%)</span>`:''}
           ${lp?.changePct?`<span style="font-size:12px;color:${lp.changePct>0?'#16a34a':'#dc2626'}">${lp.changePct>0?'▲':'▼'}${Math.abs(lp.changePct)}%</span>`:''}
           <button onclick="closeTrade(${i})" style="margin-left:auto;padding:5px 14px;
@@ -4237,7 +4237,7 @@ function renderHistory() {
 
     <input placeholder="종목 검색 (예: NVDA, TSM)" value="${searchVal}"
       oninput="state.histSearch=this.value;renderHistory()"
-      style="width:100%;background:#e8ecf5;border:1px solid #c0c8e0;color:#eeeeff;
+      style="width:100%;background:#e8ecf5;border:1px solid #c0c8e0;color:#1a2340;
         padding:10px 14px;font-size:12px;border-radius:3px;margin-bottom:14px;
         font-family:sans-serif;box-sizing:border-box">
 
@@ -4261,7 +4261,7 @@ function renderHistory() {
             </div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:16px;font-weight:bold;color:${lp.isLive?'#eeeeff':'#556'};font-family:var(--mono)">${fmtUSD(lp.price)}</div>
+            <div style="font-size:16px;font-weight:bold;color:${lp.isLive?'#1a2340':'#556'};font-family:var(--mono)">${fmtUSD(lp.price)}</div>
             ${lp.isLive&&lp.change!==0?`<div style="font-size:13px;color:${lp.color}">${lp.arrow}${Math.abs(lp.change)}%</div>`:''}
           </div>
         </div>
@@ -4304,7 +4304,7 @@ function renderHistory() {
             <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;
               background:#eef0f8;border-radius:2px">
               <span style="font-size:13px">${lv.emoji}</span>
-              <span style="font-size:13px;color:#eeeeff;flex:1;min-width:0;
+              <span style="font-size:13px;color:#1a2340;flex:1;min-width:0;
                 overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.title?.slice(0,35)||''}</span>
               <span style="font-size:12px;color:${lv.color};font-family:var(--mono);flex-shrink:0">${sc}점</span>
               ${r?`<span style="font-size:12px;font-family:var(--mono);flex-shrink:0;
@@ -4351,7 +4351,7 @@ function renderManualSignalForm() {
       <div style="font-size:12px;color:#445577;margin-bottom:4px">발언 내용</div>
       <input id="msig-title" placeholder="예: Trump, 반도체 수출 전면 금지 발표"
         style="width:100%;background:#e8ecf5;border:1px solid #c0c8e0;
-        color:#eeeeff;padding:8px;font-size:13px;border-radius:3px;
+        color:#1a2340;padding:8px;font-size:13px;border-radius:3px;
         font-family:sans-serif;box-sizing:border-box">
     </div>
     <div style="margin-bottom:10px">
@@ -4434,7 +4434,7 @@ function renderLearnDashboard() {
       border-radius:4px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <div style="flex:1;min-width:0">
-          <div style="font-size:13px;color:#eeeeff;font-family:sans-serif;margin-bottom:3px">📥 과거 1달 뉴스 백데이터 수집</div>
+          <div style="font-size:13px;color:#1a2340;font-family:sans-serif;margin-bottom:3px">📥 과거 1달 뉴스 백데이터 수집</div>
           <div style="font-size:12px;color:#445577">실제 뉴스만 사용 · GNews API · 한국어 번역 포함</div>
           <div id="backfill-prog" style="font-size:12px;color:#2563eb;margin-top:3px"></div>
         </div>
@@ -4481,7 +4481,7 @@ function renderLearnDashboard() {
               <div style="font-size:13px;color:#445577">추천 점수</div>
             </div>
             <div style="text-align:right">
-              <div style="font-size:13px;color:#eeeeff;font-family:var(--mono)">${fmtUSD(livePrices[r.ticker]?.price||PRICES[r.ticker]||0)}</div>
+              <div style="font-size:13px;color:#1a2340;font-family:var(--mono)">${fmtUSD(livePrices[r.ticker]?.price||PRICES[r.ticker]||0)}</div>
               ${livePrices[r.ticker]?.changePct?`<div style="font-size:12px;color:${livePrices[r.ticker].changePct>0?'#16a34a':'#dc2626'}">${livePrices[r.ticker].changePct>0?'▲':'▼'}${Math.abs(livePrices[r.ticker].changePct)}%</div>`:''}
             </div>
           </div>`).join('')}
@@ -4504,7 +4504,7 @@ function renderLearnDashboard() {
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
             <span style="font-size:20px">${p.fig?.avatar||'?'}</span>
             <div style="flex:1">
-              <div style="font-size:13px;color:#eeeeff;font-family:sans-serif">${p.title}</div>
+              <div style="font-size:13px;color:#1a2340;font-family:sans-serif">${p.title}</div>
               <div style="font-size:12px;color:#445577;margin-top:2px">${p.date}</div>
             </div>
             <div style="text-align:center;flex-shrink:0">
@@ -4542,7 +4542,7 @@ function renderLearnDashboard() {
             background:${fig.color}1a;border:1px solid ${fig.color}44;
             display:flex;align-items:center;justify-content:center;
             font-size:7px;color:${fig.color};font-weight:bold;flex-shrink:0">${fig.avatar}</div>
-          <span style="font-size:13px;color:#eeeeff;font-family:sans-serif;width:90px;flex-shrink:0">${fig.name.split(' ')[0]}</span>
+          <span style="font-size:13px;color:#1a2340;font-family:sans-serif;width:90px;flex-shrink:0">${fig.name.split(' ')[0]}</span>
           <div style="flex:1;height:5px;background:#c0c8e0;border-radius:3px;overflow:hidden">
             <div style="width:${rate||0}%;height:100%;background:${rc};border-radius:3px"></div>
           </div>
@@ -4659,10 +4659,10 @@ function renderLearnDashboard() {
                 const bc = pct>=74?'rgba(0,255,136,0.2)':pct>=70?'rgba(255,170,0,0.2)':'rgba(255,68,68,0.2)';
                 const tc = pct>=74?'#00ff88':pct>=70?'#ffaa00':'#ff4444';
                 return `<tr style="border-bottom:1px solid #e8ecf5">
-                  <td style="padding:8px 6px;color:#eeeeff;font-family:var(--mono);font-size:12px">${row.n.split(' ')[0]}</td>
+                  <td style="padding:8px 6px;color:#1a2340;font-family:var(--mono);font-size:12px">${row.n.split(' ')[0]}</td>
                   <td style="padding:8px 6px;color:#556677;font-size:12px">${row.r}</td>
                   <td style="padding:8px 6px;color:#2563eb;font-family:var(--mono)">${row.s}</td>
-                  <td style="padding:8px 6px;color:#eeeeff;font-family:var(--mono)">${row.h}</td>
+                  <td style="padding:8px 6px;color:#1a2340;font-family:var(--mono)">${row.h}</td>
                   <td style="padding:8px 6px"><span style="background:${bc};color:${tc};padding:2px 7px;border-radius:3px;font-weight:700;font-family:var(--mono)">${row.a}</span></td>
                   <td style="padding:8px 6px;color:#16a34a;font-family:var(--mono);font-weight:700">${row.ret}</td>
                 </tr>`;
@@ -4904,7 +4904,7 @@ function showIOSGuide() {
     padding:20px 20px 34px;`;
   guide.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <span style="font-size:13px;color:#eeeeff;font-family:sans-serif;font-weight:bold">📲 홈화면에 추가하는 방법</span>
+      <span style="font-size:13px;color:#1a2340;font-family:sans-serif;font-weight:bold">📲 홈화면에 추가하는 방법</span>
       <button onclick="document.getElementById('ios-guide').remove()"
         style="background:none;border:none;color:#666;font-size:20px;cursor:pointer">✕</button>
     </div>
@@ -4914,7 +4914,7 @@ function showIOSGuide() {
         background:#eef0f8;border-radius:4px">
         <span style="font-size:24px">1️⃣</span>
         <div>
-          <div style="font-size:12px;color:#eeeeff;font-family:sans-serif">하단 공유 버튼 탭</div>
+          <div style="font-size:12px;color:#1a2340;font-family:sans-serif">하단 공유 버튼 탭</div>
           <div style="font-size:13px;color:#556677;font-family:sans-serif">Safari 하단 중앙 □↑ 아이콘</div>
         </div>
       </div>
@@ -4922,7 +4922,7 @@ function showIOSGuide() {
         background:#eef0f8;border-radius:4px">
         <span style="font-size:24px">2️⃣</span>
         <div>
-          <div style="font-size:12px;color:#eeeeff;font-family:sans-serif">"홈 화면에 추가" 선택</div>
+          <div style="font-size:12px;color:#1a2340;font-family:sans-serif">"홈 화면에 추가" 선택</div>
           <div style="font-size:13px;color:#556677;font-family:sans-serif">스크롤해서 찾기</div>
         </div>
       </div>
@@ -4930,7 +4930,7 @@ function showIOSGuide() {
         background:#eef0f8;border-radius:4px">
         <span style="font-size:24px">3️⃣</span>
         <div>
-          <div style="font-size:12px;color:#eeeeff;font-family:sans-serif">우상단 "추가" 탭</div>
+          <div style="font-size:12px;color:#1a2340;font-family:sans-serif">우상단 "추가" 탭</div>
           <div style="font-size:13px;color:#556677;font-family:sans-serif">홈화면에 레이더 앱 아이콘 생성</div>
         </div>
       </div>
@@ -4940,7 +4940,7 @@ function showIOSGuide() {
         background:#eef0f8;border-radius:4px">
         <span style="font-size:24px">1️⃣</span>
         <div>
-          <div style="font-size:12px;color:#eeeeff;font-family:sans-serif">Chrome 우상단 점 3개 메뉴</div>
+          <div style="font-size:12px;color:#1a2340;font-family:sans-serif">Chrome 우상단 점 3개 메뉴</div>
           <div style="font-size:13px;color:#556677;font-family:sans-serif">⋮ 버튼 탭</div>
         </div>
       </div>
@@ -4948,7 +4948,7 @@ function showIOSGuide() {
         background:#eef0f8;border-radius:4px">
         <span style="font-size:24px">2️⃣</span>
         <div>
-          <div style="font-size:12px;color:#eeeeff;font-family:sans-serif">"홈 화면에 추가" 탭</div>
+          <div style="font-size:12px;color:#1a2340;font-family:sans-serif">"홈 화면에 추가" 탭</div>
           <div style="font-size:13px;color:#556677;font-family:sans-serif">또는 "앱 설치"</div>
         </div>
       </div>
@@ -4956,7 +4956,7 @@ function showIOSGuide() {
         background:#eef0f8;border-radius:4px">
         <span style="font-size:24px">3️⃣</span>
         <div>
-          <div style="font-size:12px;color:#eeeeff;font-family:sans-serif">"추가" 또는 "설치" 확인</div>
+          <div style="font-size:12px;color:#1a2340;font-family:sans-serif">"추가" 또는 "설치" 확인</div>
           <div style="font-size:13px;color:#556677;font-family:sans-serif">홈화면에 앱 아이콘 생성 완료</div>
         </div>
       </div>
