@@ -277,7 +277,7 @@ console.log('✅ Firebase 연결 완료');
   <div id="news-status-dot" style="width:7px;height:7px;border-radius:50%;
     background:#fbbf24;box-shadow:0 0 8px #fbbf24;flex-shrink:0;animation:pulse 1.5s infinite"></div>
   <span id="news-status-txt" style="font-size:13px;color:#fbbf24;font-family:var(--mono)">초기화 중...</span>
-  <span id="fb-status" style="font-size:12px;color:#334;font-family:var(--mono)">🔥 FB 연결 중...</span>
+  <span id="fb-status" style="font-size:12px;color:#334;font-family:var(--mono);display:none">🔥 FB 연결 중...</span>
   <button onclick="forceNewsCheck()" style="margin-left:auto;font-size:12px;padding:3px 10px;
     border:1px solid #b0b8d0;background:transparent;color:#334466;
     cursor:pointer;border-radius:2px;font-family:var(--mono)">🔄 지금 수집</button>
@@ -2200,8 +2200,11 @@ async function fetchAllNews(query) {
 
 async function runNewsCheck() {
   const now = Date.now();
-  // Currents 20건/일 기준 — 1시간마다 체크
-  if(now - lastNewsCheck < 60*60*1000) return;
+  if(now - lastNewsCheck < 60*60*1000) {
+    // 쿨다운 중이어도 상태는 ok로 표시 (초기화 중 방치 방지)
+    updateNewsStatus('ok');
+    return;
+  }
   lastNewsCheck = now;
   updateNewsStatus('checking');
 
@@ -2231,12 +2234,16 @@ async function runNewsCheck() {
     newCount += await processArticles(fig, articles, 'GNews');
   }
 
-  if(state.alerts.length>300) state.alerts=state.alerts.slice(0,300);
-  save();
-  updateNotifBadge();
-  updateNewsStatus(newCount>0?'new':'ok');
-  if(state.currentTab==='news') renderNews();
-  if(state.currentTab==='radar') renderRadar();
+  try {
+    if(state.alerts.length>300) state.alerts=state.alerts.slice(0,300);
+    save();
+    updateNotifBadge();
+    updateNewsStatus(newCount>0?'new':'ok');
+    if(state.currentTab==='news') renderNews();
+    if(state.currentTab==='radar') renderRadar();
+  } catch(e) {
+    updateNewsStatus('ok');
+  }
 }
 
 // ── 기사 처리 공통 함수
@@ -2342,6 +2349,7 @@ function updateNewsStatus(status){
 
 function startMonitor(){
   if(newsCheckInterval) clearInterval(newsCheckInterval);
+  lastNewsCheck = 0; // 앱 시작 시 항상 즉시 수집
   setTimeout(runNewsCheck, 1500);
   newsCheckInterval = setInterval(runNewsCheck, 60*60*1000);
   setInterval(()=>{
