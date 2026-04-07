@@ -1032,7 +1032,7 @@ async function showSignalDetail(fig, article, sectors, tickers, score) {
 
   // ── ML API 예측 (Railway 서버) — 비동기 우선 시도
   let mlResult = null;
-  if(ML_API_URL) {
+  if(getMLApiUrl()) {
     mlResult = await mlPredict({
       person: fig.name,
       influence_score: fig.inf / 100,
@@ -1547,13 +1547,16 @@ const GNEWS_KEY = 'd02a2d820d99df4f5c981a365a118eef';
 const GNEWS_URL = 'https://gnews.io/api/v4/search';
 const CURRENTS_KEY = 'tWNp1egV25PGsljlScRHuk03eryF64K38n8GSBMhgh2cwzlD';
 
-// ── ML API (Railway 배포 서버)
-const ML_API_URL = localStorage.getItem('ir_ml_api_url') || '';
+// ML_API_URL은 항상 localStorage에서 실시간으로 읽음
+function getMLApiUrl() {
+  return localStorage.getItem('ir_ml_api_url') || '';
+}
 
 async function mlPredict(signalInput) {
-  if(!ML_API_URL) return null;
+  const url = getMLApiUrl();
+  if(!url) return null;
   try {
-    const res = await fetch(`${ML_API_URL}/predict`, {
+    const res = await fetch(`${url}/predict`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(signalInput),
@@ -1565,12 +1568,13 @@ async function mlPredict(signalInput) {
 }
 
 async function mlTrain(studyResults) {
-  if(!ML_API_URL || !studyResults?.length) return null;
+  const url = getMLApiUrl();
+  if(!url) return null;
   try {
-    const res = await fetch(`${ML_API_URL}/train`, {
+    const res = await fetch(`${url}/train`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({signals: studyResults}),
+      body: JSON.stringify({signals: studyResults||[]}),
       signal: AbortSignal.timeout(30000)
     });
     return await res.json();
@@ -1578,9 +1582,10 @@ async function mlTrain(studyResults) {
 }
 
 async function mlStats() {
-  if(!ML_API_URL) return null;
+  const url = getMLApiUrl();
+  if(!url) return null;
   try {
-    const res = await fetch(`${ML_API_URL}/stats`, {signal: AbortSignal.timeout(4000)});
+    const res = await fetch(`${url}/stats`, {signal: AbortSignal.timeout(4000)});
     return await res.json();
   } catch(e) { return null; }
 }
@@ -2001,7 +2006,7 @@ async function autoTrackResults(silent = false) {
   if(tracked > 0) {
     console.log(`[AutoTrack] ${tracked}건 결과 자동 기록 완료`);
     // ML API 자동 재학습 (데이터 쌓일 때마다)
-    if(ML_API_URL && (learnData.studyResults?.length||0) >= 5) {
+    if(getMLApiUrl() && (learnData.studyResults?.length||0) >= 5) {
       mlTrain(learnData.studyResults).then(r => {
         if(r?.status === 'ok') console.log(`[ML] 재학습 완료: ${r.total_signals}건 · MAE $${r.buy_mae}`);
       });
@@ -4680,7 +4685,7 @@ function renderLearnDashboard() {
       <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
         <input id="ml-api-input" type="text"
           placeholder="https://your-api.railway.app"
-          value="${ML_API_URL}"
+          value="${getMLApiUrl()}"
           style="flex:1;padding:7px 10px;border:1px solid #c0c8e0;border-radius:3px;
             font-size:12px;font-family:var(--mono);background:#fff;color:#1a2340">
         <button onclick="(()=>{
