@@ -4687,6 +4687,14 @@ function submitManualSignal() {
 // B. 학습 대시보드
 // ═══════════════════════════════════════
 function renderLearnDashboard() {
+  try { _renderLearnDashboard(); }
+  catch(e) {
+    console.error('[renderLearnDashboard]', e);
+    const el = document.getElementById('tab-learn');
+    if(el) el.innerHTML = '<div style="padding:20px;color:#dc2626;font-size:13px;font-family:sans-serif">⚠ 렌더링 오류: '+e.message+'<br><br><button onclick="learnData.studyStats=null;renderLearnDashboard()" style="padding:8px 16px;border:1px solid #dc2626;background:transparent;color:#dc2626;cursor:pointer;border-radius:3px">🔄 초기화 후 재시도</button></div>';
+  }
+}
+function _renderLearnDashboard() {
   if(!learnData.studyStats) learnData.studyStats={totalPredictions:0,totalHits:0,totalCases:0,avgPredError:0,avgTimingError:0,figAccuracy:{},sectorAccuracy:{},probCalibration:0};
   const ss = learnData.studyStats;
   const overall = ss.totalCases>0 ? Math.round(ss.totalHits/ss.totalCases*100) : null;
@@ -4740,7 +4748,8 @@ function renderLearnDashboard() {
     .slice(0,8);
 
   // 유사패턴 추천 (A + C 통합)
-  const recommendations = generateRecommendations();
+  let recommendations = {stockRecs:[], similarPatterns:[]};
+  try { recommendations = generateRecommendations(); } catch(e) { console.warn('generateRecommendations error:', e); }
 
   document.getElementById('tab-learn').innerHTML = `
     <div class="sec">학습 대시보드 — 누적 성과 + AI 추천</div>
