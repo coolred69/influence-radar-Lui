@@ -2353,18 +2353,22 @@ async function runNewsCheck() {
 
   // ① Currents — 상위 2명 실시간 수집
   for(const fig of currFigs) {
-    const keywords = FIG_KEYWORDS[fig.id]; if(!keywords) continue;
+    const baseKws = FIG_KEYWORDS[fig.id]||[]; if(!baseKws.length) continue;
+    const learnedKws = learnData.learnedKeywords?.[fig.id]||[];
+    const allKws = [...baseKws, ...learnedKws];
     const checkCount = learnData.figStats[fig.id]?.totalNews||0;
-    const query = keywords[checkCount % keywords.length];
+    const query = allKws[checkCount % allKws.length];
     const articles = await fetchCurrents(query);
     newCount += await processArticles(fig, articles, 'Currents');
   }
 
   // ② GNews 프록시 — 나머지 인물 (지연 있지만 커버리지 확대)
   for(const fig of gnewsFigs) {
-    const keywords = FIG_KEYWORDS[fig.id]; if(!keywords) continue;
+    const baseKws = FIG_KEYWORDS[fig.id]||[]; if(!baseKws.length) continue;
+    const learnedKws = learnData.learnedKeywords?.[fig.id]||[];
+    const allKws = [...baseKws, ...learnedKws];
     const checkCount = learnData.figStats[fig.id]?.totalNews||0;
-    const query = keywords[checkCount % keywords.length];
+    const query = allKws[checkCount % allKws.length];
     const articles = await fetchGNewsAPI(query);
     newCount += await processArticles(fig, articles, 'GNews');
   }
@@ -2460,6 +2464,30 @@ async function processArticles(fig, articles, apiName) {
       setTimeout(()=>{
         showSignalDetail(fig, alert, affectedSectors, topTickers, maxScore);
       }, 0);
+
+      // ── 키워드 자동 학습 — 시그널 기사에서 의미 단어 추출 → 다음 검색에 활용
+      const rawText = (art.title||'')+' '+(art.description||'');
+      const stopWords = new Set(['this','that','with','from','have','will','been','were','they','their','there','what','when','which','about','after','before','could','would','should','also','more','some','than','then','into','over','such','only','both','each','most','other','these','those','while','where','through','during','between','against','under','above','below','since','within','without','around','along','across','behind','toward','because','itself','already','always','never','often','sometimes','every','everything','anything','something','nothing','everyone','anyone','someone']);
+      const extracted = rawText.toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/)
+        .filter(w=>w.length>=4&&!stopWords.has(w));
+      // 고빈도 단어 우선 (2회↑ 등장한 단어)
+      const freq = {};
+      extracted.forEach(w=>{freq[w]=(freq[w]||0)+1;});
+      const topKws = Object.entries(freq).filter(([,c])=>c>=1)
+        .sort((a,b)=>b[1]-a[1]).slice(0,4).map(([w])=>w);
+
+      if(!learnData.learnedKeywords) learnData.learnedKeywords = {};
+      if(!learnData.learnedKeywords[fig.id]) learnData.learnedKeywords[fig.id] = [];
+      const existingKws = new Set(learnData.learnedKeywords[fig.id]);
+      const baseKwsFlat = (FIG_KEYWORDS[fig.id]||[]).join(' ').toLowerCase();
+      topKws.forEach(kw=>{
+        if(!existingKws.has(kw)&&!baseKwsFlat.includes(kw)) {
+          learnData.learnedKeywords[fig.id].push(kw);
+          existingKws.add(kw);
+        }
+      });
+      learnData.learnedKeywords[fig.id] = learnData.learnedKeywords[fig.id].slice(-30);
+      saveLearn();
     }
   }
   return count;
