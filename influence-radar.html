@@ -1109,6 +1109,15 @@ async function showSignalDetail(fig, article, sectors, tickers, score) {
     state.alerts[alertIdx].prediction = prediction;
     save();
   }
+  // signalLog에도 prediction 동기화 (자동 결과 추적용)
+  const slIdx = signalLog.findIndex(s=>s.id===signalId||(s.title===article.title));
+  if(slIdx>=0) {
+    signalLog[slIdx].prediction = prediction;
+    saveSignalLog();
+  } else {
+    addToSignalLog({...article, prediction, figureId: fig.id, figureName: fig.name,
+      sectors, score, tickers: tickerList});
+  }
 
   // 매수 시기
   const buyTiming = recoveryDays === 0
@@ -5399,6 +5408,20 @@ window.onload = function(){
       if(state.currentTab==='stocks') renderStocks();
     });
   }, 15*60*1000);
+
+  // ── 기존 signalLog에 prediction 소급 동기화 (1회)
+  setTimeout(() => {
+    let synced = 0;
+    state.alerts.forEach(alert => {
+      if(!alert.prediction) return;
+      const slIdx = signalLog.findIndex(s=>s.id===alert.id||(s.title===alert.title));
+      if(slIdx>=0 && !signalLog[slIdx].prediction) {
+        signalLog[slIdx].prediction = alert.prediction;
+        synced++;
+      }
+    });
+    if(synced>0) { saveSignalLog(); console.log(`[Sync] prediction 소급 동기화: ${synced}건`); }
+  }, 1000);
 
   // ── 자동 결과 추적 (앱 시작 3초 후 + 6시간마다)
   setTimeout(() => autoTrackResults(true), 3000);
