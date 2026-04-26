@@ -1530,7 +1530,7 @@ function renderNotifPanel(){
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
           <span style="font-size:13px;font-weight:bold;color:${lv.color}">${lv.label}</span>
-          ${tk?tk.split('·').map(t=>`<span style="font-size:12px;padding:2px 7px;background:#eff4ff;
+          ${tk?String(tk).split('·').map(t=>`<span style="font-size:12px;padding:2px 7px;background:#eff4ff;
             border:1px solid #4a9eff44;color:#2563eb;border-radius:2px;font-family:var(--mono);
             font-weight:bold">${t}</span>`).join(''):''}
           ${sc>0?`<span style="font-size:13px;font-weight:bold;color:${lv.color};
@@ -3040,7 +3040,7 @@ function renderFilter(){
   // 학습 기반 전체 종목 점수 계산
   const tickerData = {};
   signalLog.forEach(a=>{
-    const tickers = StringStringString(a.tickers||a.topTickers||'').split('·').filter(Boolean);
+    const tickers = String(a.tickers||a.topTickers||'').split('·').filter(Boolean);
     const acc = a.prediction ? calcSignalAccuracy(a) : null;
     tickers.forEach(t=>{
       if(!tickerData[t]) tickerData[t]={
@@ -3128,7 +3128,7 @@ function renderFilter(){
         return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
           <span style="font-size:14px">${lv.emoji}</span>
           <span style="font-size:13px;color:#ffcccc;flex:1;font-family:sans-serif">${a.title?.slice(0,45)||''}</span>
-          ${tk?tk.split('·').slice(0,2).map(t=>`<span style="font-size:12px;padding:1px 6px;
+          ${tk?String(tk).split('·').slice(0,2).map(t=>`<span style="font-size:12px;padding:1px 6px;
             background:#eff4ff;border:1px solid #4a9eff44;color:#2563eb;
             border-radius:2px;font-family:var(--mono)">${t}</span>`).join(''):''}
         </div>`;
@@ -3614,7 +3614,7 @@ function renderSim(){
               line-height:1.5;margin-bottom:5px">${a.title}</div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               ${a.figureName?`<span style="font-size:13px;color:${a.figureColor||'#556677'}">${a.figureName}</span>`:''}
-              ${tk?tk.split('·').map(t=>`
+              ${tk?String(tk).split('·').map(t=>`
                 <span style="font-size:12px;padding:2px 7px;background:#eff4ff;
                   border:1px solid #4a9eff44;color:#2563eb;border-radius:2px;
                   font-family:var(--mono);font-weight:bold">${t}</span>`).join(''):''}
@@ -4196,7 +4196,7 @@ function renderNews(){
           </div>`:''}
         </div>
         ${a.topTickers?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">
-          ${String(a.topTickers||'').split('·').map(t=>`
+          ${String(a.topTickers).split('·').map(t=>`
             <span style="font-size:12px;padding:2px 7px;background:#eff4ff;
               border:1px solid #4a9eff33;color:#2563eb;border-radius:2px;
               font-family:var(--mono)">${t}</span>`).join('')}
@@ -4246,7 +4246,7 @@ function resetLearn(){
 function createManualSignal(figId, title, sectors, tickers, dropPct) {
   const fig = state.figs.find(f=>f.id===figId);
   if(!fig) return;
-  const sc = Math.max(...String(tickers||'').split('·').filter(Boolean).map(t=>{
+  const sc = Math.max(...String(tickers).split('·').filter(Boolean).map(t=>{
     const allS = Object.values(SM).flatMap(sv=>[...sv.d,...sv.i]);
     const found = allS.find(s=>s.t===t);
     return opp(fig.inf, found?.f||70, dropPct);
@@ -4504,7 +4504,7 @@ function renderHistory() {
   // 종목별 시그널 반응 집계
   const tickerMap = {};
   signalLog.forEach(a=>{
-    const tickers = StringStringString(a.tickers||a.topTickers||'').split('·').filter(Boolean);
+    const tickers = String(a.tickers||a.topTickers||'').split('·').filter(Boolean);
     tickers.forEach(t=>{
       if(!tickerMap[t]) tickerMap[t]={ticker:t,signals:[],hitCount:0,totalCount:0,avgDrop:0};
       tickerMap[t].signals.push(a);
@@ -4687,14 +4687,6 @@ function submitManualSignal() {
 // B. 학습 대시보드
 // ═══════════════════════════════════════
 function renderLearnDashboard() {
-  try { _renderLearnDashboard(); }
-  catch(e) {
-    console.error('[renderLearnDashboard]', e);
-    const el = document.getElementById('tab-learn');
-    if(el) el.innerHTML = '<div style="padding:20px;color:#dc2626;font-size:13px;font-family:sans-serif">⚠ 렌더링 오류: '+e.message+'<br><br><button onclick="learnData.studyStats=null;renderLearnDashboard()" style="padding:8px 16px;border:1px solid #dc2626;background:transparent;color:#dc2626;cursor:pointer;border-radius:3px">🔄 초기화 후 재시도</button></div>';
-  }
-}
-function _renderLearnDashboard() {
   if(!learnData.studyStats) learnData.studyStats={totalPredictions:0,totalHits:0,totalCases:0,avgPredError:0,avgTimingError:0,figAccuracy:{},sectorAccuracy:{},probCalibration:0};
   const ss = learnData.studyStats;
   const overall = ss.totalCases>0 ? Math.round(ss.totalHits/ss.totalCases*100) : null;
@@ -4731,8 +4723,8 @@ function _renderLearnDashboard() {
   });
   // 2) signalLog 자동 집계
   signalLog.forEach(s=>{
-    const raw = String(s.tickers||s.topTickers||'');
-    const tickers = raw.split(/[,·\s]+/).map(t=>t.trim()).filter(t=>t&&t.length>=2&&t.length<=5&&/^[A-Z\^]+$/.test(t));
+    const raw = s.tickers||s.topTickers||'';
+    const tickers = String(raw).split(/[,\s]+/).map(t=>t.trim()).filter(t=>t&&t.length>=2&&t.length<=5&&/^[A-Z\^]+$/.test(t));
     tickers.forEach(t=>{
       if(!tickerPnl[t]) tickerPnl[t]={pnl:0,count:0,wins:0,signals:0,scores:[]};
       tickerPnl[t].signals++;
@@ -4748,8 +4740,7 @@ function _renderLearnDashboard() {
     .slice(0,8);
 
   // 유사패턴 추천 (A + C 통합)
-  let recommendations = {stockRecs:[], similarPatterns:[]};
-  try { recommendations = generateRecommendations(); } catch(e) { console.warn('generateRecommendations error:', e); }
+  const recommendations = generateRecommendations();
 
   document.getElementById('tab-learn').innerHTML = `
     <div class="sec">학습 대시보드 — 누적 성과 + AI 추천</div>
@@ -5161,7 +5152,7 @@ function generateRecommendations() {
   // ── A. 종목 추천: 시그널 빈도 + 적중률 + 현재 영향력 결합
   const tickerScore = {};
   signalLog.forEach(a=>{
-    const tickers = StringStringString(a.tickers||a.topTickers||'').split('·').filter(Boolean);
+    const tickers = String(a.tickers||a.topTickers||'').split('·').filter(Boolean);
     const acc = a.prediction ? calcSignalAccuracy(a) : null;
     tickers.forEach(t=>{
       if(!tickerScore[t]) tickerScore[t]={freq:0,hits:0,total:0,scores:[],drops:[]};
