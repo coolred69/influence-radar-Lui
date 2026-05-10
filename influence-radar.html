@@ -4742,7 +4742,7 @@ function renderLearnDashboard() {
   // 2) signalLog 자동 집계
   signalLog.forEach(s=>{
     const raw = s.tickers||s.topTickers||'';
-    const tickers = raw.split(/[·,\s]+/).map(t=>t.trim()).filter(t=>t&&t.length>=2&&t.length<=5&&/^[A-Z\^]+$/.test(t));
+    const tickers = (typeof raw==='string' ? raw.split(/[·,\s]+/) : (Array.isArray(raw) ? raw : [])).map(t=>t.trim()).filter(t=>t&&t.length>=2&&t.length<=5&&/^[A-Z\^]+$/.test(t));
     tickers.forEach(t=>{
       if(!tickerPnl[t]) tickerPnl[t]={pnl:0,count:0,wins:0,signals:0,scores:[]};
       tickerPnl[t].signals++;
