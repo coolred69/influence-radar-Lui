@@ -3034,6 +3034,7 @@ function selSector(s){
 // RENDER: FILTER
 // ═══════════════════════════════════════
 function renderFilter(){
+  try {
   const recs = generateRecommendations();
   const ss = learnData.studyStats||{};
   if(!learnData.studyStats) learnData.studyStats={totalPredictions:0,totalHits:0,totalCases:0,avgPredError:0,avgTimingError:0,figAccuracy:{},sectorAccuracy:{},probCalibration:0};
@@ -3142,7 +3143,7 @@ function renderFilter(){
       const sc = d.learnScore;
       const scColor = sc>=70?'#16a34a':sc>=50?'#fbbf24':'#556677';
       const hrColor = d.hitRate>=70?'#16a34a':d.hitRate>=40?'#fbbf24':'#dc2626';
-      const figs = [...(d.figIds||[])].map(id=>state.figs.find(f=>f.id===id)).filter(Boolean);
+      const figs = [...(d.figIds instanceof Set ? d.figIds : new Set(d.figIds||[]))].map(id=>state.figs.find(f=>f.id===id)).filter(Boolean);
       return `
       <div style="padding:13px 14px;background:#eef0f8;
         border:1px solid ${sc>=70?'#4ade8033':sc>=50?'#fbbf2422':'#c0c8e0'};
@@ -3218,6 +3219,11 @@ function renderFilter(){
       </div>`;
     }).join('')}
   `;
+  } catch(e) {
+    console.error('[renderFilter]', e);
+    const el = document.getElementById('tab-filter');
+    if(el) el.innerHTML = '<div style="padding:30px;text-align:center;color:#dc2626;font-family:sans-serif">⚠️ 종목발굴 오류: '+e.message+'<br><button onclick="renderFilter()" style="margin-top:10px;padding:6px 14px;border:1px solid #2563eb;background:transparent;color:#2563eb;cursor:pointer;border-radius:3px">다시 시도</button></div>';
+  }
 }
 
 
@@ -4688,6 +4694,7 @@ function submitManualSignal() {
 // B. 학습 대시보드
 // ═══════════════════════════════════════
 function renderLearnDashboard() {
+  try {
   if(!learnData.studyStats) learnData.studyStats={totalPredictions:0,totalHits:0,totalCases:0,avgPredError:0,avgTimingError:0,figAccuracy:{},sectorAccuracy:{},probCalibration:0};
   const ss = learnData.studyStats;
   const overall = ss.totalCases>0 ? Math.round(ss.totalHits/ss.totalCases*100) : null;
@@ -4725,7 +4732,7 @@ function renderLearnDashboard() {
   // 2) signalLog 자동 집계
   signalLog.forEach(s=>{
     const raw = s.tickers||s.topTickers||'';
-    const tickers = raw.split(/[,\s]+/).map(t=>t.trim()).filter(t=>t&&t.length>=2&&t.length<=5&&/^[A-Z\^]+$/.test(t));
+    const tickers = raw.split(/[·,\s]+/).map(t=>t.trim()).filter(t=>t&&t.length>=2&&t.length<=5&&/^[A-Z\^]+$/.test(t));
     tickers.forEach(t=>{
       if(!tickerPnl[t]) tickerPnl[t]={pnl:0,count:0,wins:0,signals:0,scores:[]};
       tickerPnl[t].signals++;
@@ -5089,6 +5096,11 @@ function renderLearnDashboard() {
 
   // ML 차트 렌더링 (DOM 삽입 후)
   requestAnimationFrame(() => renderMLCharts());
+  } catch(e) {
+    console.error('[LearnDashboard]', e);
+    const el = document.getElementById('tab-learn');
+    if(el) el.innerHTML = '<div style="padding:30px;text-align:center;color:#dc2626;font-family:sans-serif"><div style="font-size:30px;margin-bottom:10px">⚠️</div><div style="font-size:13px">대시보드 로딩 오류 — 콘솔에서 상세 확인</div><div style="font-size:12px;color:#445577;margin-top:6px">Error: '+e.message+'</div><button onclick="renderLearnDashboard()" style="margin-top:12px;padding:6px 14px;border:1px solid #2563eb;background:transparent;color:#2563eb;cursor:pointer;border-radius:3px;font-size:12px">다시 시도</button></div>';
+  }
 }
 
 // ── ML 차트 (Chart.js)
