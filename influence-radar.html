@@ -1645,7 +1645,7 @@ async function mlTrain(studyResults) {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({signals: studyResults||[]}),
-      signal: AbortSignal.timeout(30000)
+      signal: AbortSignal.timeout(60000)
     });
     return await res.json();
   } catch(e) { return null; }
@@ -1655,7 +1655,7 @@ async function mlStats() {
   const url = getMLApiUrl();
   if(!url) return null;
   try {
-    const res = await fetch(`${url}/stats`, {signal: AbortSignal.timeout(4000)});
+    const res = await fetch(`${url}/stats`, {signal: AbortSignal.timeout(60000)});
     return await res.json();
   } catch(e) { return null; }
 }
@@ -1906,6 +1906,7 @@ function recordStudyResult(alert, accResult) {
     hitRate: accResult.hitRate,
     hitCount: accResult.hitCount,
     totalCases: accResult.total,
+    avgSimPnl: accResult.avgSimPnl ?? null,
     realized,
     timingDiff,
     avgPredError,
@@ -1924,16 +1925,24 @@ function recordStudyResult(alert, accResult) {
 
   // 인물별 적중률 업데이트
   if(pred.figureId) {
-    if(!ss.figAccuracy[pred.figureId]) ss.figAccuracy[pred.figureId]={hits:0,cases:0};
+    if(!ss.figAccuracy[pred.figureId]) ss.figAccuracy[pred.figureId]={hits:0,cases:0,simPnlSum:0,simPnlCount:0};
     ss.figAccuracy[pred.figureId].hits += result.hitCount||0;
     ss.figAccuracy[pred.figureId].cases += result.totalCases||0;
+    if(result.avgSimPnl != null) {
+      ss.figAccuracy[pred.figureId].simPnlSum = (ss.figAccuracy[pred.figureId].simPnlSum||0) + result.avgSimPnl;
+      ss.figAccuracy[pred.figureId].simPnlCount = (ss.figAccuracy[pred.figureId].simPnlCount||0) + 1;
+    }
   }
 
   // 섹터별 적중률 업데이트
   (alert.sectors||[]).forEach(sec=>{
-    if(!ss.sectorAccuracy[sec]) ss.sectorAccuracy[sec]={hits:0,cases:0};
+    if(!ss.sectorAccuracy[sec]) ss.sectorAccuracy[sec]={hits:0,cases:0,simPnlSum:0,simPnlCount:0};
     ss.sectorAccuracy[sec].hits += result.hitCount||0;
     ss.sectorAccuracy[sec].cases += result.totalCases||0;
+    if(result.avgSimPnl != null) {
+      ss.sectorAccuracy[sec].simPnlSum = (ss.sectorAccuracy[sec].simPnlSum||0) + result.avgSimPnl;
+      ss.sectorAccuracy[sec].simPnlCount = (ss.sectorAccuracy[sec].simPnlCount||0) + 1;
+    }
   });
 
   // 예상확률 보정값 업데이트 (실제 - 예상 평균)
@@ -1949,7 +1958,7 @@ function recordStudyResult(alert, accResult) {
   if(timeList.length>0) ss.avgTimingError = Math.round(timeList.reduce((s,v)=>s+v,0)/timeList.length*10)/10;
 
   saveLearn();
-  console.log(`✅ 학습 결과 저장: ${result.figureName} 적중률 ${result.hitRate}%`);
+  console.log(`✅ 학습 결과 저장: ${result.figureName} 수익종목 ${result.hitRate}% · 평균시뮬 ${result.avgSimPnl!=null?result.avgSimPnl+'%':'N/A'}`);
 }
 
 // ══════════════════════════════════════════════════════
@@ -2039,23 +2048,28 @@ async function autoTrackResults(silent = false) {
     pred.priceAtResult = resultPrices;
     pred.trackedAt = now.toISOString();
 
-    // 정확도 계산
+    // 가상 매매 시뮬레이션 (SHORT 전략: 신호가 매도 → 목표가 하락 후 되사기)
     const results = splitTk(pred.tickers).map(t => {
       const signalPrice = pred.priceAtSignal?.[t] || 0;
       const resultPrice = resultPrices[t] || 0;
       if(!signalPrice || !resultPrice) return null;
       const actualChange = Math.round((resultPrice - signalPrice) / signalPrice * 1000) / 10;
       const predicted = -(pred.avgDrop || 10);
-      const sameDir = (actualChange < 0 && predicted < 0) || (actualChange > 0 && predicted > 0);
-      const hit = sameDir && Math.abs(actualChange - predicted) <= Math.abs(predicted) * 0.6;
-      return { t, signalPrice, resultPrice, actualChange, predicted, hit };
+      // SHORT 수익 = 신호가에 공매도 → 결과가에 환매 → 하락할수록 이익
+      const simPnl = Math.round(-actualChange * 10) / 10;
+      const profitable = simPnl > 0;
+      // 목표 딥 가격 (예: avgDrop=10% → dipPrice = signalPrice * 0.9)
+      const dipPrice = Math.round(signalPrice * (1 + predicted / 100) * 100) / 100;
+      return { t, signalPrice, resultPrice, actualChange, predicted, simPnl, dipPrice, profitable, hit: profitable };
     }).filter(Boolean);
 
     if(!results.length) continue;
 
-    const hitCount = results.filter(r => r.hit).length;
-    const hitRate = Math.round(hitCount / results.length * 100);
-    const accResult = { isPast: true, results, hitCount, hitRate, total: results.length };
+    const profitCount = results.filter(r => r.profitable).length;
+    const avgSimPnl = Math.round(results.reduce((s,r) => s + r.simPnl, 0) / results.length * 10) / 10;
+    const hitCount = profitCount;
+    const hitRate = Math.round(profitCount / results.length * 100);
+    const accResult = { isPast: true, results, hitCount, hitRate, total: results.length, avgSimPnl };
 
     recordStudyResult(alert, accResult);
     tracked++;
@@ -3442,7 +3456,7 @@ function calcSignalAccuracy(a) {
   const results = splitTk(pred.tickers).map(t=>{
     const signalPrice = pred.priceAtSignal?.[t]||0;
     // priceAtResult 우선 (autotrack 확정가), 없으면 실시간, 없으면 정적
-    const evalPrice = pred.priceAtResult?.[t] || livePrices[t]?.price || PRICES[t] || 0;
+    const evalPrice = pred.priceAtResult?.[t] || livePrices[t]?.price || 0; // 정적PRICES 제외-실데이터만
     if(!signalPrice||!evalPrice) return null;
     const actualChange = Math.round((evalPrice-signalPrice)/signalPrice*1000)/10;
     const predicted = -(pred.avgDrop||10);
@@ -3453,13 +3467,17 @@ function calcSignalAccuracy(a) {
     const sameDir = (actualChange<0&&predicted<0)||(actualChange>0&&predicted>0);
     const hit = sameDir && Math.abs(actualChange-predicted)<=Math.abs(predicted)*0.6;
     const usedResult = !!(pred.priceAtResult?.[t]);
-    return {t,signalPrice,evalPrice,actualChange,predicted,expectedBuyPrice,dollarDiff,dollarDiffPct,hit,usedResult};
+    // SHORT 시뮬: 신호가 공매도 → 평가가 환매
+    const simPnl = Math.round(-actualChange * 10) / 10;
+    const profitable = simPnl > 0;
+    return {t,signalPrice,evalPrice,actualChange,predicted,expectedBuyPrice,dollarDiff,dollarDiffPct,hit:profitable,simPnl,profitable,usedResult};
   }).filter(Boolean);
 
   if(!results.length) return {isPast:true, noData:true};
-  const hitCount = results.filter(r=>r.hit).length;
+  const hitCount = results.filter(r=>r.profitable).length;
   const hitRate = Math.round(hitCount/results.length*100);
-  return {isPast:true, results, hitCount, hitRate, total:results.length};
+  const avgSimPnl = Math.round(results.reduce((s,r)=>s+r.simPnl,0)/results.length*10)/10;
+  return {isPast:true, results, hitCount, hitRate, total:results.length, avgSimPnl};
 }
 
 function renderSim(){
@@ -3719,8 +3737,10 @@ function renderSim(){
               ${pc2?`<span style="font-size:13px;color:${pc2Color};font-family:var(--mono)">예상 ${pc2}%</span>
               <span style="font-size:12px;color:#334">→</span>`:''}
               <span style="font-size:14px;font-weight:bold;color:${hc};font-family:var(--mono)">
-                적중률 ${acc.hitRate}%</span>
-              <span style="font-size:12px;color:#445577">(${acc.hitCount}/${acc.total})</span>
+                수익률 ${acc.hitRate}%</span>
+              <span style="font-size:12px;color:#445577">(${acc.hitCount}/${acc.total}건 이익)</span>
+              ${acc.avgSimPnl!=null?`<span style="font-size:13px;font-weight:bold;color:${acc.avgSimPnl>0?'#16a34a':'#dc2626'};font-family:var(--mono);margin-left:8px">평균 ${acc.avgSimPnl>0?'+':''}${acc.avgSimPnl}%</span>`:''}
+
             </div>
 
             <!-- 기일 분석 -->
@@ -3759,16 +3779,16 @@ function renderSim(){
                     padding:6px 8px;">
                     <span style="font-size:12px;font-weight:bold;color:#2563eb;
                       font-family:var(--mono);width:50px;flex-shrink:0">${r.t}</span>
-                    <span style="font-size:12px;color:#fbbf24;font-family:var(--mono)">예상 ${r.predicted}%</span>
+                    <span style="font-size:12px;color:#fbbf24;font-family:var(--mono)">목표 ${r.predicted}%</span>
                     <span style="font-size:12px;color:#334">→</span>
                     <span style="font-size:13px;font-weight:bold;font-family:var(--mono);
                       color:${r.actualChange<=0?'#dc2626':'#16a34a'}">
                       실제 ${r.actualChange>0?'+':''}${r.actualChange}%
                     </span>
-                    <span style="font-size:13px;color:#556">
-                      오차 ${Math.abs(Math.round((r.actualChange-r.predicted)*10)/10)}%p
-                    </span>
-                    <span style="font-size:14px;flex-shrink:0;margin-left:auto">${r.hit?'✅':'❌'}</span>
+                    ${r.simPnl!=null?`<span style="font-size:12px;font-weight:bold;font-family:var(--mono);
+                      color:${r.simPnl>0?'#16a34a':'#dc2626'};margin-left:4px">
+                      SHORT ${r.simPnl>0?'+':''}${r.simPnl}%</span>`:''}
+                    <span style="font-size:14px;flex-shrink:0;margin-left:auto">${r.profitable?'🟢':'🔴'}</span>
                   </div>
                   <!-- 행 2: 예상매입가 → 현재가 → 차액 -->
                   <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;
@@ -4716,22 +4736,24 @@ function renderLearnDashboard() {
   const overall = ss.totalCases>0 ? Math.round(ss.totalHits/ss.totalCases*100) : null;
   const overallColor = overall>=70?'#16a34a':overall>=40?'#fbbf24':'#dc2626';
 
-  // 인물별 적중률
+  // 인물별 적중률 + 평균 시뮬 P&L
   const figStats = Object.entries(ss.figAccuracy||{})
     .map(([id,fa])=>{
       const fig = state.figs.find(f=>f.id===+id);
       const rate = fa.cases>0?Math.round(fa.hits/fa.cases*100):null;
-      return {id:+id, fig, rate, hits:fa.hits, cases:fa.cases};
+      const avgPnl = (fa.simPnlCount||0)>0 ? Math.round(fa.simPnlSum/fa.simPnlCount*10)/10 : null;
+      return {id:+id, fig, rate, hits:fa.hits, cases:fa.cases, avgPnl};
     })
     .filter(x=>x.fig&&x.cases>0)
     .sort((a,b)=>b.cases-a.cases);
 
-  // 섹터별 적중률
+  // 섹터별 적중률 + 평균 시뮬 P&L
   const secStats = Object.entries(ss.sectorAccuracy||{})
     .map(([sec,sa])=>{
       const sd = SM[sec];
       const rate = sa.cases>0?Math.round(sa.hits/sa.cases*100):null;
-      return {sec, sd, rate, hits:sa.hits, cases:sa.cases};
+      const avgPnl = (sa.simPnlCount||0)>0 ? Math.round(sa.simPnlSum/sa.simPnlCount*10)/10 : null;
+      return {sec, sd, rate, hits:sa.hits, cases:sa.cases, avgPnl};
     })
     .filter(x=>x.sd&&x.cases>0)
     .sort((a,b)=>b.cases-a.cases);
@@ -4954,12 +4976,14 @@ function renderLearnDashboard() {
         </div>`).join('')}
     </div>`:''}
 
-    <!-- B. 인물별 적중률 -->
+    <!-- B. 인물별 예측 정확도 + 시뮬 P&L -->
     ${figStats.length>0?`
     <div style="margin-bottom:14px">
-      <div class="sec">인물별 예측 정확도</div>
-      ${figStats.map(({fig,rate,hits,cases})=>{
+      <div class="sec">인물별 예측 정확도 (SHORT 시뮬 기준)</div>
+      ${figStats.map(({fig,rate,hits,cases,avgPnl})=>{
         const rc = rate>=70?'#16a34a':rate>=40?'#fbbf24':'#dc2626';
+        const pc = avgPnl==null?'#888':avgPnl>0?'#16a34a':'#dc2626';
+        const pnlTxt = avgPnl==null?'-':(avgPnl>0?'+':'')+avgPnl+'%';
         return `
         <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;
           background:#eef0f8;border-bottom:1px solid #e8ecf5">
@@ -4967,36 +4991,44 @@ function renderLearnDashboard() {
             background:${fig.color}1a;border:1px solid ${fig.color}44;
             display:flex;align-items:center;justify-content:center;
             font-size:7px;color:${fig.color};font-weight:bold;flex-shrink:0">${fig.avatar}</div>
-          <span style="font-size:13px;color:#1a2340;font-family:sans-serif;width:90px;flex-shrink:0">${fig.name.split(' ')[0]}</span>
+          <span style="font-size:13px;color:#1a2340;font-family:sans-serif;width:80px;flex-shrink:0">${fig.name.split(' ')[0]}</span>
           <div style="flex:1;height:5px;background:#c0c8e0;border-radius:3px;overflow:hidden">
             <div style="width:${rate||0}%;height:100%;background:${rc};border-radius:3px"></div>
           </div>
-          <span style="font-size:13px;font-weight:bold;color:${rc};font-family:var(--mono);width:36px;text-align:right">${rate}%</span>
-          <span style="font-size:12px;color:#445577;width:40px;text-align:right">${hits}/${cases}건</span>
+          <span style="font-size:13px;font-weight:bold;color:${rc};font-family:var(--mono);width:36px;text-align:right">${rate??'-'}%</span>
+          <span style="font-size:12px;color:#445577;width:36px;text-align:right">${cases}건</span>
+          <span style="font-size:12px;font-weight:bold;color:${pc};font-family:var(--mono);width:52px;text-align:right" title="평균 시뮬 수익률">${pnlTxt}</span>
         </div>`;
       }).join('')}
+      <div style="font-size:11px;color:#8899aa;padding:4px 12px">※ SHORT 시뮬: 신호가 공매도→결과가 환매 기준 평균 수익률</div>
     </div>`:''}
 
-    <!-- B. 섹터별 적중률 -->
+    <!-- B. 섹터별 적중률 + 시뮬 P&L -->
     ${secStats.length>0?`
     <div style="margin-bottom:14px">
-      <div class="sec">섹터별 예측 정확도</div>
+      <div class="sec">섹터별 예측 정확도 (SHORT 시뮬 기준)</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-        ${secStats.map(({sec,sd,rate,cases})=>{
+        ${secStats.map(({sec,sd,rate,cases,avgPnl})=>{
           const rc = rate>=70?'#16a34a':rate>=40?'#fbbf24':'#dc2626';
+          const pc = avgPnl==null?'#888':avgPnl>0?'#16a34a':'#dc2626';
+          const pnlTxt = avgPnl==null?'추적중':(avgPnl>0?'+':'')+avgPnl+'%';
           return `
           <div style="padding:8px 10px;background:#eef0f8;border:1px solid ${sd.color}22;border-radius:3px">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
               <span style="font-size:13px;color:${sd.color}">${sd.label}</span>
-              <span style="font-size:13px;font-weight:bold;color:${rc};font-family:var(--mono);margin-left:auto">${rate}%</span>
+              <span style="font-size:13px;font-weight:bold;color:${rc};font-family:var(--mono);margin-left:auto">${rate??'-'}%</span>
             </div>
             <div style="height:3px;background:#c0c8e0;border-radius:2px;overflow:hidden">
-              <div style="width:${rate}%;height:100%;background:${rc}"></div>
+              <div style="width:${rate||0}%;height:100%;background:${rc}"></div>
             </div>
-            <div style="font-size:13px;color:#445577;margin-top:3px">${cases}건 분석</div>
+            <div style="display:flex;justify-content:space-between;margin-top:3px">
+              <span style="font-size:11px;color:#445577">${cases}건 분석</span>
+              <span style="font-size:12px;font-weight:bold;color:${pc};font-family:var(--mono)">${pnlTxt}</span>
+            </div>
           </div>`;
         }).join('')}
       </div>
+      <div style="font-size:11px;color:#8899aa;padding:4px 4px">※ SHORT 시뮬 평균 수익률</div>
     </div>`:''}
 
     <!-- 종목별 시그널 현황 -->
