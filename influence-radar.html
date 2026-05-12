@@ -2081,7 +2081,11 @@ function simulateTrade(ticker, series, pred) {
   const actualHoldDays = Math.round((new Date(sellDate) - new Date(buyDate)) / 86400000);
   const timingDiff = actualHoldDays - expectedDays; // 양수=예상보다 오래걸림
 
-  const targetDiff = Math.round((sellPrice - sellTarget) / sellTarget * 1000) / 10; // 목표가 오차
+  // 가격 오차
+  // Phase 1 가격: 실제 매입가 vs 예측 딥가 (buyPrice <= dipPrice 이므로 보통 음수)
+  const buyPriceDiff = Math.round((buyPrice - dipPrice) / dipPrice * 1000) / 10;
+  // Phase 2 가격: 실제 매도가 vs 목표가
+  const targetDiff = Math.round((sellPrice - sellTarget) / sellTarget * 1000) / 10;
 
   return {
     outcome: sellType === 'target' ? 'success' : sellType === 'stopLoss' ? 'stopLoss' : 'expiry',
@@ -2089,8 +2093,10 @@ function simulateTrade(ticker, series, pred) {
     signalDate, buyDate, buyPrice, sellDate, sellPrice, sellType,
     // Phase 1: 시그널→매입
     dipDays, predDipDays, dipTimingError,
+    buyPriceDiff,   // 실제매입가 vs 예측딥가 (%)
     // Phase 2: 매입→매도
-    pnlPct, actualHoldDays, expectedDays, timingDiff, targetDiff,
+    pnlPct, actualHoldDays, expectedDays, timingDiff,
+    targetDiff,     // 실제매도가 vs 목표가 (%)
   };
 }
 
@@ -3675,10 +3681,12 @@ function calcSignalAccuracy(a) {
       dipDays:simRecord?.dipDays??null,
       predDipDays:simRecord?.predDipDays??null,
       dipTimingError:simRecord?.dipTimingError??null,
+      buyPriceDiff:simRecord?.buyPriceDiff??null,   // 매입가 오차 %
       // Phase 2: 매입→매도
       actualHoldDays:simRecord?.actualHoldDays??null,
       expectedDays:simRecord?.expectedDays??null,
-      timingDiff:simRecord?.timingDiff??null};
+      timingDiff:simRecord?.timingDiff??null,
+      targetDiff:simRecord?.targetDiff??null}; // 매도가 오차 %
   }).filter(Boolean);
 
   if(!results.length) return {isPast:true, noData:true};
@@ -4031,7 +4039,7 @@ function renderSim(){
                       <div style="font-size:13px;color:${diffColor}99">${diffSign}${r.dollarDiffPct}%</div>
                     </div>
                   </div>
-                  <!-- 행 3: 2-Phase 타이밍 (시뮬 완료된 경우만) -->
+                  <!-- 행 3: 2-Phase 타이밍+가격 오차 (시뮬 완료된 경우만) -->
                   ${(r.dipDays!=null||r.actualHoldDays!=null)?`
                   <div style="padding:5px 8px 6px;border-top:1px solid #e8ecf5;
                     background:#f5f7fc;font-size:11px;color:#445577;font-family:var(--mono)">
@@ -4039,22 +4047,31 @@ function renderSim(){
                       <span style="color:#7c3aed;font-weight:bold">📡 P1</span>
                       <span>시그널→매입</span>
                       ${r.dipDays!=null?`<span style="color:#1a2340;font-weight:bold">${r.dipDays}일</span>`:'<span>-</span>'}
-                      ${r.predDipDays!=null?`<span style="color:#556677">(예측 ${r.predDipDays}일</span>`:''}
+                      ${r.predDipDays!=null?`<span style="color:#556677">(기간예측 ${r.predDipDays}일</span>`:''}
                       ${r.dipTimingError!=null?`<span style="color:${Math.abs(r.dipTimingError)<=2?'#16a34a':Math.abs(r.dipTimingError)<=5?'#fbbf24':'#dc2626'};font-weight:bold">
                         오차${r.dipTimingError>0?'+':''}${r.dipTimingError}일)</span>`
                         :r.predDipDays!=null?'<span>)</span>':''}
-                      ${r.buyPrice!=null?`<span style="color:#2563eb;margin-left:4px">@${fmtUSD(r.buyPrice)}</span>`:''}
+                      <span style="color:#334;margin-left:2px">|</span>
+                      <span style="color:#556677">예측딥가 ${fmtUSD(r.dipPrice)}</span>
+                      ${r.buyPrice!=null?`<span style="color:#2563eb;font-weight:bold">→ 실제 ${fmtUSD(r.buyPrice)}</span>`:''}
+                      ${r.buyPriceDiff!=null?`<span style="color:${Math.abs(r.buyPriceDiff)<=1?'#16a34a':Math.abs(r.buyPriceDiff)<=3?'#fbbf24':'#dc2626'}">
+                        (${r.buyPriceDiff>0?'+':''}${r.buyPriceDiff}%)</span>`:''}
                     </div>
                     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
                       <span style="color:#059669;font-weight:bold">📈 P2</span>
                       <span>매입→매도</span>
                       ${r.actualHoldDays!=null?`<span style="color:#1a2340;font-weight:bold">${r.actualHoldDays}일</span>`:'<span>-</span>'}
-                      ${r.expectedDays!=null?`<span style="color:#556677">(예측 ${r.expectedDays}일</span>`:''}
+                      ${r.expectedDays!=null?`<span style="color:#556677">(기간예측 ${r.expectedDays}일</span>`:''}
                       ${r.timingDiff!=null?`<span style="color:${Math.abs(r.timingDiff)<=3?'#16a34a':Math.abs(r.timingDiff)<=7?'#fbbf24':'#dc2626'};font-weight:bold">
                         오차${r.timingDiff>0?'+':''}${r.timingDiff}일)</span>`
                         :r.expectedDays!=null?'<span>)</span>':''}
-                      ${r.simPnl!=null?`<span style="color:${r.simPnl>0?'#16a34a':'#dc2626'};font-weight:bold;margin-left:4px">
-                        수익${r.simPnl>0?'+':''}${r.simPnl}%</span>`:''}
+                      <span style="color:#334;margin-left:2px">|</span>
+                      <span style="color:#556677">목표가 ${fmtUSD(r.signalPrice)}</span>
+                      ${r.sellDate&&r.sellPrice!=null?`<span style="color:${r.outcome==='success'?'#16a34a':r.outcome==='stopLoss'?'#dc2626':'#ff8c00'};font-weight:bold">→ 실제 ${fmtUSD(r.sellPrice)}</span>`:''}
+                      ${r.targetDiff!=null?`<span style="color:${Math.abs(r.targetDiff)<=1?'#16a34a':Math.abs(r.targetDiff)<=3?'#fbbf24':'#dc2626'}">
+                        (${r.targetDiff>0?'+':''}${r.targetDiff}%)</span>`:''}
+                      ${r.simPnl!=null?`<span style="color:${r.simPnl>0?'#16a34a':'#dc2626'};font-weight:bold;margin-left:6px">
+                        순수익${r.simPnl>0?'+':''}${r.simPnl}%</span>`:''}
                     </div>
                   </div>`:''}
                 </div>`;
@@ -4585,6 +4602,14 @@ function renderLearnDashboard() {
   const holdDaysList = simBought.filter(t=>t.actualHoldDays!=null).map(t=>t.actualHoldDays);
   const avgHoldDays = holdDaysList.length>0
     ? Math.round(holdDaysList.reduce((s,v)=>s+v,0)/holdDaysList.length*10)/10 : null;
+  // 매입가 오차 평균 (실제매입가 vs 예측딥가)
+  const buyPriceDiffList = simBought.filter(t=>t.buyPriceDiff!=null).map(t=>t.buyPriceDiff);
+  const avgBuyPriceDiff = buyPriceDiffList.length>0
+    ? Math.round(buyPriceDiffList.reduce((s,v)=>s+v,0)/buyPriceDiffList.length*10)/10 : null;
+  // 매도가 오차 평균 (실제매도가 vs 목표가)
+  const targetDiffList = simBought.filter(t=>t.targetDiff!=null).map(t=>t.targetDiff);
+  const avgTargetDiff = targetDiffList.length>0
+    ? Math.round(targetDiffList.reduce((s,v)=>s+v,0)/targetDiffList.length*10)/10 : null;
 
   // 인물별 적중률 + 평균 시뮬 P&L
   const figStats = Object.entries(ss.figAccuracy||{})
@@ -4734,8 +4759,8 @@ function renderLearnDashboard() {
           (${totalPnlPct>=0?'+':''}${totalPnlPct}%)
         </div>
         <div style="margin-left:auto;text-align:right;display:flex;flex-direction:column;gap:2px">
-          ${avgDipDays!=null?`<div style="font-size:10px;color:#7c3aed">📡 P1 평균 ${avgDipDays}일 소요${avgDipTiming!=null?` <span style="color:${Math.abs(avgDipTiming)<=2?'#16a34a':'#ff8c00'}">(오차${avgDipTiming>0?'+':''}${avgDipTiming}일)</span>`:''}</div>`:''}
-          ${avgHoldDays!=null?`<div style="font-size:10px;color:#059669">📈 P2 평균 ${avgHoldDays}일 보유${avgTiming!=null?` <span style="color:${Math.abs(avgTiming)<=3?'#16a34a':'#ff8c00'}">(오차${avgTiming>0?'+':''}${avgTiming}일)</span>`:''}</div>`:''}
+          ${avgDipDays!=null?`<div style="font-size:10px;color:#7c3aed">📡 P1 평균 ${avgDipDays}일 소요${avgDipTiming!=null?` <span style="color:${Math.abs(avgDipTiming)<=2?'#16a34a':'#ff8c00'}">(기간오차${avgDipTiming>0?'+':''}${avgDipTiming}일)</span>`:''}${avgBuyPriceDiff!=null?` · 매입가오차 <span style="color:${Math.abs(avgBuyPriceDiff)<=1?'#16a34a':Math.abs(avgBuyPriceDiff)<=3?'#fbbf24':'#dc2626'}">${avgBuyPriceDiff>0?'+':''}${avgBuyPriceDiff}%</span>`:''}</div>`:''}
+          ${avgHoldDays!=null?`<div style="font-size:10px;color:#059669">📈 P2 평균 ${avgHoldDays}일 보유${avgTiming!=null?` <span style="color:${Math.abs(avgTiming)<=3?'#16a34a':'#ff8c00'}">(기간오차${avgTiming>0?'+':''}${avgTiming}일)</span>`:''}${avgTargetDiff!=null?` · 매도가오차 <span style="color:${Math.abs(avgTargetDiff)<=1?'#16a34a':Math.abs(avgTargetDiff)<=3?'#fbbf24':'#dc2626'}">${avgTargetDiff>0?'+':''}${avgTargetDiff}%</span>`:''}</div>`:''}
         </div>
       </div>`:''}
       ${firstDate?`<div style="font-size:11px;color:#8899aa;margin-top:6px">
