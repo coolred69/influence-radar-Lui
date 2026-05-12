@@ -2110,6 +2110,140 @@ function getLearnedAvgDrop(figId, sectors) {
   return Math.round(avg * 10) / 10;
 }
 
+// ── 시그널 1건 딥바이 시뮬 실행 (공통 로직)
+async function runSimForAlert(alert, statusEl, forceResim = false) {
+  const pred = alert.prediction;
+  if(!pred || !splitTk(pred?.tickers).length) return null;
+
+  // 이미 simTrades에 이 signalId가 있으면 스킵 (force가 아닐 때)
+  if(!forceResim) {
+    const already = (learnData.simTrades||[]).find(tr => tr.signalId === pred.id);
+    if(already) return null;
+  } else {
+    // force 재시뮬 시 기존 simTrades 항목 제거
+    learnData.simTrades = (learnData.simTrades||[]).filter(tr => tr.signalId !== pred.id);
+  }
+
+  const now = new Date();
+  const signalDate = new Date(alert.id || alert.signalDate || pred.createdAt || now);
+  const tickers = splitTk(pred.tickers).slice(0, 3);
+  const seriesMap = {};
+
+  for(const ticker of tickers) {
+    const series = await fetchPriceSeries(ticker, signalDate.toISOString(), pred.expectedDate);
+    if(series?.length) seriesMap[ticker] = series;
+    await new Promise(r => setTimeout(r, 400));
+  }
+
+  if(!Object.keys(seriesMap).length) return null;
+
+  // priceAtResult 저장 (하위 호환)
+  const resultPrices = {};
+  Object.entries(seriesMap).forEach(([t, s]) => { const last = s[s.length-1]; if(last) resultPrices[t] = last.close; });
+  pred.priceAtResult = resultPrices;
+  pred.trackedAt = now.toISOString();
+
+  // 딥바이 시뮬
+  const simResults = tickers.map(t => seriesMap[t] ? simulateTrade(t, seriesMap[t], pred) : null).filter(Boolean);
+  if(!simResults.length) return null;
+
+  // simTrades 누적
+  const tradeRecords = simResults.map(r => ({
+    ...r,
+    signalId: pred.id,
+    figureId: pred.figureId,
+    figureName: pred.figureName,
+    signalDate: signalDate.toISOString(),
+    expectedDate: pred.expectedDate,
+    predictedDrop: pred.avgDrop,
+    predictedDays: pred.recoveryDays,
+    recordedAt: now.toISOString(),
+  }));
+  learnData.simTrades = learnData.simTrades || [];
+  learnData.simTrades.push(...tradeRecords);
+  if(learnData.simTrades.length > 500) learnData.simTrades = learnData.simTrades.slice(-500);
+
+  // recordStudyResult 호환 변환
+  const results = simResults.map(r => {
+    if(r.outcome==='noData') return null;
+    const actualChange = r.buyPrice
+      ? Math.round((r.sellPrice - r.signalPrice) / r.signalPrice * 1000) / 10
+      : Math.round(((resultPrices[r.ticker]||r.signalPrice) - r.signalPrice) / r.signalPrice * 1000) / 10;
+    return {
+      t: r.ticker, signalPrice: r.signalPrice, resultPrice: r.sellPrice||resultPrices[r.ticker],
+      actualChange, predicted: -(pred.avgDrop||10),
+      simPnl: r.pnlPct||0, dipPrice: r.dipPrice,
+      profitable: r.outcome==='success', hit: r.outcome==='success',
+      outcome: r.outcome, buyDate: r.buyDate, sellDate: r.sellDate,
+      sellType: r.sellType, timingDiff: r.timingDiff,
+    };
+  }).filter(Boolean);
+
+  if(!results.length) return null;
+
+  const successCount = results.filter(r=>r.hit).length;
+  const avgSimPnl = results.filter(r=>r.simPnl!=null).length>0
+    ? Math.round(results.filter(r=>r.simPnl!=null).reduce((s,r)=>s+r.simPnl,0)/results.filter(r=>r.simPnl!=null).length*10)/10 : 0;
+  const accResult = {
+    isPast: true, results,
+    hitCount: successCount, hitRate: Math.round(successCount/results.length*100),
+    total: results.length, avgSimPnl,
+  };
+
+  recordStudyResult(alert, accResult);
+  return tradeRecords.length;
+}
+
+// 과거 전체 시그널 재분석 (simTrades 미등록 + 기일 지난 것 전부)
+let fullResimRunning = false;
+async function resimAllPast() {
+  if(fullResimRunning || autoTrackRunning) {
+    alert('이미 추적 작업이 진행 중입니다.');
+    return;
+  }
+  fullResimRunning = true;
+
+  const now = new Date();
+  const targets = signalLog.filter(a => {
+    if(!a.prediction?.expectedDate) return false;
+    if(new Date(a.prediction.expectedDate) >= now) return false; // 기일 미도달
+    if(!a.prediction?.priceAtSignal || !Object.keys(a.prediction.priceAtSignal).length) return false;
+    // simTrades에 없는 것만
+    const already = (learnData.simTrades||[]).find(tr => tr.signalId === a.prediction?.id);
+    return !already;
+  });
+
+  if(targets.length === 0) {
+    fullResimRunning = false;
+    const el = document.getElementById('autotrack-status');
+    if(el) { el.textContent = '✅ 재분석 완료 — 새로 처리할 시그널 없음'; setTimeout(()=>{if(el)el.textContent='';},4000); }
+    return;
+  }
+
+  const el = document.getElementById('autotrack-status');
+  if(el) el.textContent = `📊 과거 전체 재분석 중... (총 ${targets.length}건, 시간 소요)`;
+
+  let done = 0;
+  for(const alert of targets) {
+    const n = await runSimForAlert(alert, el, false);
+    if(n) {
+      done++;
+      saveSignalLog();
+      saveLearn();
+      if(el) el.textContent = `📊 과거 재분석 중... ${done}/${targets.length}건`;
+    }
+    await new Promise(r => setTimeout(r, 200));
+  }
+
+  fullResimRunning = false;
+  if(el) {
+    el.textContent = `✅ 과거 ${done}건 가상투자 재분석 완료`;
+    setTimeout(()=>{if(el)el.textContent='';},6000);
+  }
+  renderLearnDashboard();
+  if(typeof renderSim==='function') renderSim();
+}
+
 // 자동 결과 추적 메인 함수
 let autoTrackRunning = false;
 async function autoTrackResults(silent = false) {
@@ -2117,13 +2251,13 @@ async function autoTrackResults(silent = false) {
   autoTrackRunning = true;
 
   const now = new Date();
-  // 기일 지났고 priceAtResult 없는 시그널만
+  // simTrades에 없는 + 기일 지난 시그널
   const targets = signalLog.filter(a => {
     if(!a.prediction?.expectedDate) return false;
-    if(a.prediction?.priceAtResult) return false; // 이미 추적 완료
-    const alreadyRecorded = learnData.studyResults?.find(r => r.signalId === a.prediction?.id);
-    if(alreadyRecorded) return false;
-    return new Date(a.prediction.expectedDate) < now;
+    if(new Date(a.prediction.expectedDate) >= now) return false;
+    const already = (learnData.simTrades||[]).find(tr => tr.signalId === a.prediction?.id);
+    if(already) return false;
+    return true;
   }).slice(0, 10); // 1회 최대 10건
 
   if(targets.length === 0) { autoTrackRunning = false; return; }
@@ -2135,86 +2269,11 @@ async function autoTrackResults(silent = false) {
 
   let tracked = 0;
   for(const alert of targets) {
-    const pred = alert.prediction;
-    if(!splitTk(pred?.tickers).length) continue;
-
-    // 신호 발생일 ~ 예측 기일 동안 일별 가격 시리즈 수집
-    const signalDate = new Date(alert.id || alert.signalDate || pred.createdAt || now);
-    const tickers = splitTk(pred.tickers).slice(0, 3);
-    const seriesMap = {};
-    for(const ticker of tickers) {
-      const series = await fetchPriceSeries(ticker, signalDate.toISOString(), pred.expectedDate);
-      if(series?.length) seriesMap[ticker] = series;
-      await new Promise(r => setTimeout(r, 400)); // rate limit 방지
-    }
-
-    if(!Object.keys(seriesMap).length) continue;
-
-    // priceAtResult (기간 마지막 가격) 저장 — 하위 호환성 유지
-    const resultPrices = {};
-    Object.entries(seriesMap).forEach(([t, series]) => {
-      const last = series[series.length - 1];
-      if(last) resultPrices[t] = last.close;
-    });
-    pred.priceAtResult = resultPrices;
-    pred.trackedAt = now.toISOString();
-
-    // 가상 딥바이 시뮬레이션 (종목별)
-    const simResults = tickers.map(t => {
-      if(!seriesMap[t]) return null;
-      return simulateTrade(t, seriesMap[t], pred);
-    }).filter(Boolean);
-
-    if(!simResults.length) continue;
-
-    // simTrades 누적 저장
-    const tradeRecords = simResults.map(r => ({
-      ...r,
-      signalId: pred.id,
-      figureId: pred.figureId,
-      figureName: pred.figureName,
-      signalDate: signalDate.toISOString(),
-      expectedDate: pred.expectedDate,
-      predictedDrop: pred.avgDrop,
-      predictedDays: pred.recoveryDays,
-      recordedAt: now.toISOString(),
-    }));
-    learnData.simTrades = learnData.simTrades || [];
-    learnData.simTrades.push(...tradeRecords);
-    if(learnData.simTrades.length > 500) learnData.simTrades = learnData.simTrades.slice(-500);
-
-    // recordStudyResult용 결과 변환 (기존 학습 파이프라인 호환)
-    const results = simResults.map(r => {
-      if(r.outcome === 'noData') return null;
-      const actualChange = r.buyPrice
-        ? Math.round((r.sellPrice - r.signalPrice) / r.signalPrice * 1000) / 10
-        : Math.round((resultPrices[r.ticker] - r.signalPrice) / r.signalPrice * 1000) / 10;
-      return {
-        t: r.ticker, signalPrice: r.signalPrice, resultPrice: r.sellPrice || resultPrices[r.ticker],
-        actualChange, predicted: -(pred.avgDrop || 10),
-        simPnl: r.pnlPct || 0, dipPrice: r.dipPrice,
-        profitable: r.outcome === 'success',
-        hit: r.outcome === 'success',
-        outcome: r.outcome, buyDate: r.buyDate, sellDate: r.sellDate,
-        sellType: r.sellType, timingDiff: r.timingDiff,
-      };
-    }).filter(Boolean);
-
-    if(!results.length) continue;
-
-    const successCount = results.filter(r => r.hit).length;
-    const avgSimPnl = results.filter(r=>r.simPnl!=null).length > 0
-      ? Math.round(results.filter(r=>r.simPnl!=null).reduce((s,r)=>s+r.simPnl,0)/results.filter(r=>r.simPnl!=null).length*10)/10
-      : 0;
-    const hitCount = successCount;
-    const hitRate = Math.round(successCount / results.length * 100);
-    const accResult = { isPast: true, results, hitCount, hitRate, total: results.length, avgSimPnl };
-
-    recordStudyResult(alert, accResult);
-    tracked++;
-
-    // signalLog 갱신 (priceAtResult 영구 저장)
-    saveSignalLog();
+    const el2 = document.getElementById('autotrack-status');
+    if(el2&&!silent) el2.textContent = `🔄 추적 중... ${tracked+1}/${targets.length}건`;
+    const n = await runSimForAlert(alert, null, false);
+    if(n) { tracked++; saveSignalLog(); saveLearn(); }
+    await new Promise(r => setTimeout(r, 200));
   }
 
   autoTrackRunning = false;
@@ -2222,18 +2281,17 @@ async function autoTrackResults(silent = false) {
   const el = document.getElementById('autotrack-status');
   if(el) {
     el.textContent = tracked > 0
-      ? `✅ ${tracked}건 결과 자동 학습 완료 (${new Date().toLocaleTimeString('ko-KR')})`
+      ? `✅ ${tracked}건 가상투자 분석 완료 (${new Date().toLocaleTimeString('ko-KR')})`
       : `✅ 추적 완료 — 신규 결과 없음`;
     setTimeout(() => { if(el) el.textContent = ''; }, 5000);
   }
 
-  if(tracked > 0 && typeof renderSim === 'function') renderSim();
   if(tracked > 0) {
-    console.log(`[AutoTrack] ${tracked}건 결과 자동 기록 완료`);
-    // ML API 자동 재학습 (데이터 쌓일 때마다)
+    renderLearnDashboard();
+    if(typeof renderSim === 'function') renderSim();
     if(getMLApiUrl() && (learnData.studyResults?.length||0) >= 5) {
       mlTrain(learnData.studyResults).then(r => {
-        if(r?.status === 'ok') console.log(`[ML] 재학습 완료: ${r.total_signals}건 · MAE $${r.buy_mae}`);
+        if(r?.status === 'ok') console.log(`[ML] 재학습: ${r.total_signals}건`);
       });
     }
   }
@@ -4993,12 +5051,20 @@ function renderLearnDashboard() {
           </div>
           <div id="autotrack-status" style="font-size:12px;color:#2563eb;margin-top:2px"></div>
         </div>
-        <button onclick="autoTrackResults(false)"
-          style="padding:8px 14px;border:1px solid #16a34a;background:transparent;
-            color:#16a34a;font-size:13px;cursor:pointer;border-radius:3px;
-            font-family:var(--mono);white-space:nowrap;flex-shrink:0">
-          🔄 지금 추적
-        </button>
+        <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+          <button onclick="autoTrackResults(false)"
+            style="padding:8px 14px;border:1px solid #16a34a;background:transparent;
+              color:#16a34a;font-size:13px;cursor:pointer;border-radius:3px;
+              font-family:var(--mono);white-space:nowrap">
+            🔄 신규 추적
+          </button>
+          <button onclick="resimAllPast()"
+            style="padding:8px 14px;border:1px solid #7c3aed;background:transparent;
+              color:#7c3aed;font-size:12px;cursor:pointer;border-radius:3px;
+              font-family:var(--mono);white-space:nowrap">
+            📊 과거 전체 재분석
+          </button>
+        </div>
       </div>
     </div>
 
