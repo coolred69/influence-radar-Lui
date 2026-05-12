@@ -4766,105 +4766,8 @@ function renderLearnDashboard() {
       ${firstDate?`<div style="font-size:11px;color:#8899aa;margin-top:6px">
         전체 기간: ${firstDate} ~ ${lastDate||'현재'} · 손절 기준 ${cfg.stopLossPct||5}% (딥가 대비)</div>`:''}
 
-      <!-- 선택기간 필터 -->
-      ${simTotal>0?`
-      <div style="margin-top:12px;padding:10px 12px;background:#f8f9fc;border:1px solid #c0c8e0;border-radius:4px">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-          <span style="font-size:12px;color:#445577;font-weight:bold">📅 선택 기간</span>
-          <input id="sim-filter-from" type="date"
-            value="${localStorage.getItem('ir_sim_filter_from')||''}"
-            onchange="localStorage.setItem('ir_sim_filter_from',this.value);renderLearnDashboard()"
-            style="font-size:12px;padding:3px 6px;border:1px solid #c0c8e0;border-radius:3px;
-              background:#fff;color:#1a2340;font-family:var(--mono)">
-          <span style="font-size:12px;color:#445577">~</span>
-          <input id="sim-filter-to" type="date"
-            value="${localStorage.getItem('ir_sim_filter_to')||''}"
-            onchange="localStorage.setItem('ir_sim_filter_to',this.value);renderLearnDashboard()"
-            style="font-size:12px;padding:3px 6px;border:1px solid #c0c8e0;border-radius:3px;
-              background:#fff;color:#1a2340;font-family:var(--mono)">
-          <button onclick="localStorage.removeItem('ir_sim_filter_from');localStorage.removeItem('ir_sim_filter_to');renderLearnDashboard()"
-            style="font-size:11px;padding:3px 8px;border:1px solid #c0c8e0;background:#fff;
-              color:#445577;border-radius:3px;cursor:pointer">전체</button>
-        </div>
-        ${(()=>{
-          const fromStr = localStorage.getItem('ir_sim_filter_from');
-          const toStr   = localStorage.getItem('ir_sim_filter_to');
-          const fromD = fromStr ? new Date(fromStr) : null;
-          const toD   = toStr   ? new Date(toStr + 'T23:59:59') : null;
-          const period = simTrades.filter(t => {
-            const d = new Date(t.recordedAt || t.signalDate || '');
-            if(isNaN(d)) return false;
-            if(fromD && d < fromD) return false;
-            if(toD   && d > toD)   return false;
-            return true;
-          });
-          if(!period.length) return `<div style="font-size:12px;color:#8899aa">선택 기간에 거래 없음</div>`;
-
-          const pBought  = period.filter(t=>t.outcome!=='noBuy'&&t.outcome!=='noData');
-          const pSuccess = period.filter(t=>t.outcome==='success');
-          const pStop    = period.filter(t=>t.outcome==='stopLoss');
-          const pExpiry  = period.filter(t=>t.outcome==='expiry');
-          const pNoBuy   = period.filter(t=>t.outcome==='noBuy');
-          const pPnlList = pBought.filter(t=>t.pnlPct!=null).map(t=>t.pnlPct);
-          const pAvgPnl  = pPnlList.length>0 ? Math.round(pPnlList.reduce((s,v)=>s+v,0)/pPnlList.length*10)/10 : null;
-          const pTotalUSD = pPnlList.reduce((s,v)=>s+Math.round(capital*v/100*100)/100, 0);
-          const pTotalPct = pBought.length>0 ? Math.round(pTotalUSD/(capital*pBought.length)*1000)/10 : null;
-          const pBuyRate  = period.length>0 ? Math.round(pBought.length/period.length*100) : null;
-          const pSuccRate = pBought.length>0 ? Math.round(pSuccess.length/pBought.length*100) : null;
-
-          const badgeMap = {success:'✅',stopLoss:'🛑',expiry:'⏰',noBuy:'❌'};
-          const colorMap = {success:'#16a34a',stopLoss:'#dc2626',expiry:'#2563eb',noBuy:'#888'};
-          const bgMap    = {success:'#f0fdf4',stopLoss:'#fff0f0',expiry:'#f0f4ff',noBuy:'#f5f5f5'};
-
-          return `
-          <!-- 기간 요약 -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px">
-            ${[
-              ['기간 시도', period.length+'건', '#445577'],
-              ['매수성공', pBuyRate!=null?pBuyRate+'%':'N/A', pBuyRate>=60?'#16a34a':pBuyRate>=30?'#fbbf24':'#dc2626'],
-              ['목표달성', pSuccRate!=null?pSuccRate+'%':'N/A', pSuccRate>=60?'#16a34a':pSuccRate>=30?'#fbbf24':'#dc2626'],
-              ['기간수익', pAvgPnl!=null?(pAvgPnl>0?'+':'')+pAvgPnl+'%':'N/A', pAvgPnl>0?'#16a34a':pAvgPnl<0?'#dc2626':'#445577'],
-            ].map(([l,v,c])=>`
-              <div style="padding:6px;background:#fff;border-radius:3px;border:1px solid #c0c8e044;text-align:center">
-                <div style="font-size:10px;color:#445577;margin-bottom:2px">${l}</div>
-                <div style="font-size:13px;font-weight:bold;color:${c};font-family:var(--mono)">${v}</div>
-              </div>`).join('')}
-          </div>
-          ${pTotalUSD!==0?`<div style="font-size:12px;font-family:var(--mono);margin-bottom:8px;
-            color:${pTotalUSD>=0?'#16a34a':'#dc2626'}">
-            누적 ${pTotalUSD>=0?'+':''}${Math.round(pTotalUSD).toLocaleString()} USD
-            (${pTotalPct>=0?'+':''}${pTotalPct}%) · ✅${pSuccess.length} 🛑${pStop.length} ⏰${pExpiry.length} ❌${pNoBuy.length}
-          </div>`:''}
-
-          <!-- 트레이드 리스트 -->
-          <div style="display:flex;flex-direction:column;gap:4px;max-height:340px;overflow-y:auto">
-            ${period.slice().reverse().map(t=>{
-              const sig = signalLog.find(a=>a.id===t.signalId||a.prediction?.id===t.signalId);
-              const figName = sig?.figureName || sig?.prediction?.figureName || '?';
-              const oc = t.outcome||'noData';
-              const pnlC = t.pnlPct>0?'#16a34a':t.pnlPct<0?'#dc2626':'#445577';
-              const dateStr = (t.buyDate||t.signalDate||t.recordedAt||'').split('T')[0];
-              return `
-              <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;
-                background:${bgMap[oc]||'#f5f5f5'};border-radius:3px;
-                border-left:3px solid ${colorMap[oc]||'#888'};flex-wrap:wrap">
-                <span style="font-size:11px;color:#445577;font-family:var(--mono);min-width:80px">${dateStr}</span>
-                <span style="font-size:12px;font-weight:bold;color:#2563eb;font-family:var(--mono);min-width:44px">${t.ticker}</span>
-                <span style="font-size:11px;color:#556677;flex:1;min-width:60px">${figName}</span>
-                <span style="font-size:13px">${badgeMap[oc]||'⏳'}</span>
-                ${t.buyPrice!=null?`
-                <span style="font-size:11px;color:#445577;font-family:var(--mono)">
-                  ${fmtUSD(t.buyPrice)}→${t.sellPrice!=null?fmtUSD(t.sellPrice):'-'}
-                </span>`:''}
-                ${t.dipDays!=null?`<span style="font-size:10px;color:#7c3aed">P1:${t.dipDays}일</span>`:''}
-                ${t.actualHoldDays!=null?`<span style="font-size:10px;color:#059669">P2:${t.actualHoldDays}일</span>`:''}
-                ${t.pnlPct!=null?`<span style="font-size:12px;font-weight:bold;color:${pnlC};
-                  font-family:var(--mono);margin-left:auto">${t.pnlPct>0?'+':''}${t.pnlPct}%</span>`:''}
-              </div>`;
-            }).join('')}
-          </div>`;
-        })()}
-      </div>`:''}
+      <!-- 선택기간 필터 (id=sim-period-body 로 JS에서 채움) -->
+      ${simTotal>0 ? '<div style="margin-top:12px" id="sim-period-section"></div>' : ''}
       `}
     </div>
 
@@ -5204,6 +5107,116 @@ function renderLearnDashboard() {
     const el = document.getElementById('tab-learn');
     if(el) el.innerHTML = '<div style="padding:30px;text-align:center;color:#dc2626;font-family:sans-serif"><div style="font-size:30px;margin-bottom:10px">⚠️</div><div style="font-size:13px">대시보드 로딩 오류 — 콘솔에서 상세 확인</div><div style="font-size:12px;color:#445577;margin-top:6px">Error: '+e.message+'</div><button onclick="renderLearnDashboard()" style="margin-top:12px;padding:6px 14px;border:1px solid #2563eb;background:transparent;color:#2563eb;cursor:pointer;border-radius:3px;font-size:12px">다시 시도</button></div>';
   }
+  // 선택 기간 필터 렌더링 (별도 함수 호출)
+  setTimeout(renderSimPeriod, 0);
+}
+
+// ── 선택기간 필터 + 트레이드 리스트 (중첩 템플릿 분리)
+function renderSimPeriod() {
+  const el = document.getElementById('sim-period-section');
+  if(!el) return;
+  const simTrades = learnData.simTrades || [];
+  if(!simTrades.length) { el.innerHTML = ''; return; }
+  const cfg = learnData.simConfig || {};
+  const capital = cfg.capitalPerTrade || 10000;
+  const fromStr = localStorage.getItem('ir_sim_filter_from') || '';
+  const toStr   = localStorage.getItem('ir_sim_filter_to') || '';
+  const fromD = fromStr ? new Date(fromStr) : null;
+  const toD   = toStr   ? new Date(toStr + 'T23:59:59') : null;
+  const period = simTrades.filter(function(t) {
+    const d = new Date(t.recordedAt || t.signalDate || '');
+    if(isNaN(d)) return false;
+    if(fromD && d < fromD) return false;
+    if(toD   && d > toD)   return false;
+    return true;
+  });
+
+  const badgeMap = {success:'✅', stopLoss:'🛑', expiry:'⏰', noBuy:'❌'};
+  const colorMap = {success:'#16a34a', stopLoss:'#dc2626', expiry:'#2563eb', noBuy:'#888'};
+  const bgMap    = {success:'#f0fdf4', stopLoss:'#fff0f0', expiry:'#f0f4ff', noBuy:'#f5f5f5'};
+
+  // 기간 통계
+  const pBought  = period.filter(function(t){ return t.outcome!=='noBuy'&&t.outcome!=='noData'; });
+  const pSuccess = period.filter(function(t){ return t.outcome==='success'; });
+  const pStop    = period.filter(function(t){ return t.outcome==='stopLoss'; });
+  const pExpiry  = period.filter(function(t){ return t.outcome==='expiry'; });
+  const pNoBuy   = period.filter(function(t){ return t.outcome==='noBuy'; });
+  const pPnlList = pBought.filter(function(t){ return t.pnlPct!=null; }).map(function(t){ return t.pnlPct; });
+  const pAvgPnl  = pPnlList.length>0 ? Math.round(pPnlList.reduce(function(s,v){return s+v;},0)/pPnlList.length*10)/10 : null;
+  const pTotalUSD = pPnlList.reduce(function(s,v){ return s+Math.round(capital*v/100*100)/100; }, 0);
+  const pTotalPct = pBought.length>0 ? Math.round(pTotalUSD/(capital*pBought.length)*1000)/10 : null;
+  const pBuyRate  = period.length>0 ? Math.round(pBought.length/period.length*100) : null;
+  const pSuccRate = pBought.length>0 ? Math.round(pSuccess.length/pBought.length*100) : null;
+
+  // 카드 색상 헬퍼
+  function rc(rate, t1, t2) { return rate>=t1?'#16a34a':rate>=t2?'#fbbf24':'#dc2626'; }
+
+  // 필터 UI 구성
+  let html = '<div style="padding:10px 12px;background:#f8f9fc;border:1px solid #c0c8e0;border-radius:4px">';
+  html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">';
+  html += '<span style="font-size:12px;color:#445577;font-weight:bold">📅 선택 기간</span>';
+  html += '<input type="date" id="spf-from" value="'+fromStr+'" onchange="localStorage.setItem(\'ir_sim_filter_from\',this.value);renderSimPeriod()" style="font-size:12px;padding:3px 6px;border:1px solid #c0c8e0;border-radius:3px;background:#fff;color:#1a2340">';
+  html += '<span style="font-size:12px;color:#445577">~</span>';
+  html += '<input type="date" id="spf-to" value="'+toStr+'" onchange="localStorage.setItem(\'ir_sim_filter_to\',this.value);renderSimPeriod()" style="font-size:12px;padding:3px 6px;border:1px solid #c0c8e0;border-radius:3px;background:#fff;color:#1a2340">';
+  html += '<button onclick="localStorage.removeItem(\'ir_sim_filter_from\');localStorage.removeItem(\'ir_sim_filter_to\');renderSimPeriod()" style="font-size:11px;padding:3px 8px;border:1px solid #c0c8e0;background:#fff;color:#445577;border-radius:3px;cursor:pointer">전체</button>';
+  html += '</div>';
+
+  if(!period.length) {
+    html += '<div style="font-size:12px;color:#8899aa">선택 기간에 거래 없음</div></div>';
+    el.innerHTML = html;
+    return;
+  }
+
+  // 요약 카드 4개
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px">';
+  var cards = [
+    ['기간 시도', period.length+'건', '#445577'],
+    ['매수성공', pBuyRate!=null?pBuyRate+'%':'N/A', rc(pBuyRate,60,30)],
+    ['목표달성', pSuccRate!=null?pSuccRate+'%':'N/A', rc(pSuccRate,60,30)],
+    ['기간수익', pAvgPnl!=null?(pAvgPnl>0?'+':'')+pAvgPnl+'%':'N/A', pAvgPnl>0?'#16a34a':pAvgPnl<0?'#dc2626':'#445577']
+  ];
+  for(var i=0;i<cards.length;i++) {
+    html += '<div style="padding:6px;background:#fff;border-radius:3px;border:1px solid #c0c8e044;text-align:center">';
+    html += '<div style="font-size:10px;color:#445577;margin-bottom:2px">'+cards[i][0]+'</div>';
+    html += '<div style="font-size:13px;font-weight:bold;color:'+cards[i][2]+';font-family:var(--mono)">'+cards[i][1]+'</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // 누적 P&L
+  if(pTotalUSD!==0) {
+    var pnlColor = pTotalUSD>=0?'#16a34a':'#dc2626';
+    var sign = pTotalUSD>=0?'+':'';
+    html += '<div style="font-size:12px;font-family:var(--mono);margin-bottom:8px;color:'+pnlColor+'">';
+    html += '누적 '+sign+Math.round(pTotalUSD).toLocaleString()+' USD';
+    html += ' ('+(pTotalPct>=0?'+':'')+pTotalPct+'%)';
+    html += ' · ✅'+pSuccess.length+' 🛑'+pStop.length+' ⏰'+pExpiry.length+' ❌'+pNoBuy.length;
+    html += '</div>';
+  }
+
+  // 트레이드 리스트
+  html += '<div style="display:flex;flex-direction:column;gap:4px;max-height:340px;overflow-y:auto">';
+  var rows = period.slice().reverse();
+  for(var j=0;j<rows.length;j++) {
+    var t = rows[j];
+    var sig = signalLog.find(function(a){ return a.id===t.signalId||a.prediction&&a.prediction.id===t.signalId; });
+    var figName = (sig&&(sig.figureName||sig.prediction&&sig.prediction.figureName))||'?';
+    var oc = t.outcome||'noData';
+    var pnlC = t.pnlPct>0?'#16a34a':t.pnlPct<0?'#dc2626':'#445577';
+    var dateStr = (t.buyDate||t.signalDate||t.recordedAt||'').split('T')[0];
+    html += '<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:'+(bgMap[oc]||'#f5f5f5')+';border-radius:3px;border-left:3px solid '+(colorMap[oc]||'#888')+';flex-wrap:wrap">';
+    html += '<span style="font-size:11px;color:#445577;font-family:var(--mono);min-width:80px">'+dateStr+'</span>';
+    html += '<span style="font-size:12px;font-weight:bold;color:#2563eb;font-family:var(--mono);min-width:44px">'+(t.ticker||'')+'</span>';
+    html += '<span style="font-size:11px;color:#556677;flex:1;min-width:60px">'+figName+'</span>';
+    html += '<span style="font-size:13px">'+(badgeMap[oc]||'⏳')+'</span>';
+    if(t.buyPrice!=null) html += '<span style="font-size:11px;color:#445577;font-family:var(--mono)">'+fmtUSD(t.buyPrice)+'→'+(t.sellPrice!=null?fmtUSD(t.sellPrice):'-')+'</span>';
+    if(t.dipDays!=null) html += '<span style="font-size:10px;color:#7c3aed">P1:'+t.dipDays+'일</span>';
+    if(t.actualHoldDays!=null) html += '<span style="font-size:10px;color:#059669">P2:'+t.actualHoldDays+'일</span>';
+    if(t.pnlPct!=null) html += '<span style="font-size:12px;font-weight:bold;color:'+pnlC+';font-family:var(--mono);margin-left:auto">'+(t.pnlPct>0?'+':'')+t.pnlPct+'%</span>';
+    html += '</div>';
+  }
+  html += '</div></div>';
+  el.innerHTML = html;
 }
 
 // ── ML 차트 (Chart.js)
