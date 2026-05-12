@@ -313,19 +313,7 @@ console.log('✅ Firebase 연결 완료');
     <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
     시그널 기록
   </button>
-  <button class="nav-btn" onclick="switchTab('map',this)">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
-    인물 연관맵
-  </button>
-  <button class="nav-btn" onclick="switchTab('pattern',this)">
-    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-    과거 패턴
-  </button>
-  <button class="nav-btn" onclick="switchTab('news',this)">
-    <svg viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg>
-    실시간 뉴스
-  </button>
-  <button class="nav-btn" onclick="switchTab('trade',this)">
+<button class="nav-btn" onclick="switchTab('trade',this)">
     <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
     수익 추적
   </button>
@@ -343,9 +331,6 @@ console.log('✅ Firebase 연결 완료');
   <div class="tab" id="tab-filter"></div>
   <div class="tab" id="tab-log"></div>
   <div class="tab" id="tab-sim"></div>
-  <div class="tab" id="tab-map"></div>
-  <div class="tab" id="tab-pattern"></div>
-  <div class="tab" id="tab-news"></div>
   <div class="tab" id="tab-trade"></div>
   <div class="tab" id="tab-history"></div>
 </div>
@@ -2528,7 +2513,6 @@ async function runBackfill() {
   if(state.currentTab==='sim') renderSim();
   if(state.currentTab==='learn') renderLearnDashboard();
   if(state.currentTab==='filter') renderFilter();
-  if(state.currentTab==='news') renderNews();
 }
 
 // ── fetchMockNews 완전 제거 (실제 뉴스만 사용)
@@ -2596,8 +2580,7 @@ async function runNewsCheck() {
     save();
     updateNotifBadge();
     updateNewsStatus(newCount>0?'new':'ok');
-    if(state.currentTab==='news') renderNews();
-    if(state.currentTab==='radar') renderRadar();
+      if(state.currentTab==='radar') renderRadar();
   } catch(e) {
     updateNewsStatus('ok');
   }
@@ -2769,9 +2752,6 @@ function render(name){
       case 'filter': renderFilter(); break;
       case 'log': renderLog(); break;
       case 'sim': renderSim(); break;
-      case 'map': renderMap(); break;
-      case 'pattern': renderPattern(); break;
-      case 'news': renderNews(); break;
       case 'trade': renderTrade(); break;
       case 'history': renderHistory(); break;
     }
@@ -4038,67 +4018,6 @@ function renderSim(){
 }
 
 
-function renderMap(){
-  const figs = getSortedFigs().filter(f=>f.rel&&f.rel.length>0);
-  document.getElementById('tab-map').innerHTML = `
-    <div class="sec">인물 연관성 맵 — 동맹·갈등·협력</div>
-    
-    <div class="card" style="margin-bottom:14px;border-left:3px solid #4a9eff">
-      <div style="font-size:13px;color:#2563eb;margin-bottom:8px">루이 활용 가이드</div>
-      ${[
-        ['갈등 발생 감지','갈등 인물 공통 섹터 종목 즉시 모니터링'],
-        ['연출 갈등 판단','갈등→급락→3주 내 화해→회복 반복 = 연출 의심'],
-        ['협력 강화 감지','협력 강화 → 공통 섹터 긍정 신호'],
-      ].map(([t,d])=>`
-        <div style="display:flex;gap:10px;margin-bottom:5px">
-          <span style="font-size:13px;color:#2563eb;min-width:100px;font-family:sans-serif">${t}</span>
-          <span style="font-size:13px;color:#556677;font-family:sans-serif">${d}</span>
-        </div>`).join('')}
-    </div>
-
-    ${figs.map(fig=>`
-      <div class="card" style="margin-bottom:10px;border-top:2px solid ${fig.color}">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          ${avatar(fig)}
-          <span style="font-size:13px;color:#1a2340;font-family:sans-serif">${fig.name}</span>
-          <span style="margin-left:auto;font-size:18px;font-weight:bold;color:${fig.color};font-family:var(--mono)">${fig.inf}</span>
-        </div>
-        ${fig.rel.map(rel=>{
-          const target = state.figs.find(f=>f.id===rel.to);
-          if(!target) return '';
-          const rc = rel.type==='동맹'?'#16a34a':rel.type==='갈등'?'#dc2626':rel.type==='협력'?'#60a5fa':'#fbbf24';
-          const commonSecs = [...new Set([...fig.sec,...(target.sec||[])])].slice(0,3);
-          return `
-          <div style="padding:10px 12px;background:#eef0f8;border:1px solid ${rc}22;
-            border-left:3px solid ${rc};border-radius:3px;margin-bottom:6px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:${rel.type==='갈등'?8:0}px">
-              ${tag(rel.type,rc,true)}
-              <span style="font-size:13px;color:#aab;font-family:sans-serif">${target.name}</span>
-              <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
-                <div style="height:3px;width:50px;background:#e8ecf5;border-radius:1px">
-                  <div style="height:100%;width:${rel.str}%;background:${rc};border-radius:1px"></div>
-                </div>
-                <span style="font-size:12px;color:${rc};font-family:var(--mono)">${rel.str}</span>
-              </div>
-            </div>
-            ${rel.type==='갈등'?`
-            <div>
-              <div style="font-size:13px;color:#445577;margin-bottom:4px">갈등 시 피해 예상</div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap">
-                ${commonSecs.map(s=>{
-                  const sd=SM[s]; if(!sd) return '';
-                  return `<div style="font-size:13px;padding:2px 7px;background:${sd.color}15;
-                    border:1px solid ${sd.color}33;color:${sd.color};border-radius:2px">
-                    ${sd.label} · ${sd.d[0]?.t}</div>`;
-                }).join('')}
-              </div>
-            </div>`:''}
-          </div>`;
-        }).join('')}
-      </div>`).join('')}
-  `;
-}
-
 // ═══════════════════════════════════════
 // CLOCK + INIT
 // ═══════════════════════════════════════
@@ -4108,382 +4027,6 @@ function updateClock(){
     now.toLocaleString('ko-KR',{hour12:false,month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 }
 
-// ═══════════════════════════════════════
-// RENDER: PATTERN
-// ═══════════════════════════════════════
-function renderPattern(){
-  const figs = getSortedFigs();
-  const selPat = PATTERNS[state.selFigId] || PATTERNS[1];
-  const selFig = figs.find(f=>f.id===state.selFigId) || figs[0];
-
-  document.getElementById('tab-pattern').innerHTML = `
-    <div class="sec">과거 패턴 분석 — 영향력 점수 보정 기반</div>
-
-    <!-- 인물 선택 -->
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
-      ${Object.entries(PATTERNS).map(([id,p])=>{
-        const fig=figs.find(f=>f.id===+id);
-        if(!fig) return '';
-        const active = +id===state.selFigId;
-        return `
-        <button onclick="state.selFigId=${id};renderPattern()" style="
-          display:flex;align-items:center;gap:7px;padding:7px 12px;
-          border:1px solid ${active?p.color:'#d0d4e8'};
-          background:${active?p.color+'15':'transparent'};
-          border-radius:3px;cursor:pointer;font-family:var(--mono)">
-          <div style="width:22px;height:22px;border-radius:50%;
-            background:${p.color}22;border:1px solid ${p.color}55;
-            display:flex;align-items:center;justify-content:center;
-            font-size:13px;color:${p.color};font-weight:bold">${fig.avatar}</div>
-          <span style="font-size:13px;color:${active?p.color:'#556677'}">${fig.name.split(' ')[1]||fig.name.split(' ')[0]}</span>
-        </button>`;
-      }).join('')}
-    </div>
-
-    ${selPat ? `
-    <!-- 인물 패턴 헤더 -->
-    <div style="padding:14px 16px;background:${selPat.color}0d;
-      border:1px solid ${selPat.color}33;border-left:3px solid ${selPat.color};
-      border-radius:4px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <span style="font-size:16px;font-weight:bold;color:${selPat.color};font-family:sans-serif">${selPat.name}</span>
-        <div style="display:flex;gap:8px;margin-left:auto">
-          <div style="text-align:center">
-            <div style="font-size:13px;color:#445577;margin-bottom:2px">패턴신뢰도</div>
-            <div style="font-size:18px;font-weight:bold;color:${selPat.color};font-family:var(--mono)">${selPat.patternScore}</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:13px;color:#445577;margin-bottom:2px">점수보정</div>
-            <div style="font-size:18px;font-weight:bold;color:${selPat.patternBonus>0?'#16a34a':selPat.patternBonus<0?'#dc2626':'#445577'};font-family:var(--mono)">
-              ${selPat.patternBonus>0?'+':''}${selPat.patternBonus}
-            </div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:13px;color:#445577;margin-bottom:2px">보정후점수</div>
-            <div style="font-size:18px;font-weight:bold;color:${selPat.color};font-family:var(--mono)">
-              ${Math.min(100,(selFig.inf||0)+(selPat.patternBonus||0))}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div style="font-size:13px;color:#556677;font-family:sans-serif;line-height:1.6">${selPat.overallPattern}</div>
-    </div>
-
-    <!-- 패턴 목록 -->
-    <div class="sec">시그니처 패턴 (${selPat.signaturePatterns.length}개)</div>
-    ${selPat.signaturePatterns.map(sp=>{
-      const typeColor = sp.type==='연출의심'?'#ff4444':
-                        sp.type==='내부자거래의심'?'#ff4444':
-                        sp.type==='의도적조작의심'?'#ff8c00':
-                        sp.type==='지정학패턴'?'#fbbf24':'#16a34a';
-      const isOpp = sp.avgDropPct > 0;
-      return `
-      <div class="card" style="margin-bottom:12px;border-top:2px solid ${typeColor}">
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
-          <div style="flex:1">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">
-              <span style="font-size:13px;color:#1a2340;font-family:sans-serif;font-weight:bold">${sp.name}</span>
-              <span style="font-size:13px;padding:2px 7px;border-radius:2px;
-                border:1px solid ${typeColor}44;background:${typeColor}15;color:${typeColor}">${sp.type}</span>
-              <span style="font-size:13px;color:#445577">${sp.frequency}</span>
-            </div>
-            <div style="font-size:13px;color:#556677;font-family:sans-serif;line-height:1.6">${sp.description}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;min-width:80px;text-align:center">
-            <div style="background:#eef0f8;border:1px solid #c0c8e0;border-radius:3px;padding:5px 8px">
-              <div style="font-size:13px;color:#445577">평균 충격</div>
-              <div style="font-size:15px;font-weight:bold;color:${isOpp?'#dc2626':'#16a34a'};font-family:var(--mono)">
-                ${sp.avgDropPct>0?'-':''}${Math.abs(sp.avgDropPct)}%
-              </div>
-            </div>
-            <div style="background:#eef0f8;border:1px solid #c0c8e0;border-radius:3px;padding:5px 8px">
-              <div style="font-size:13px;color:#445577">순수효과</div>
-              <div style="font-size:15px;font-weight:bold;color:#fbbf24;font-family:var(--mono)">
-                ${sp.avgPureEffect>0?'-':''}${Math.abs(sp.avgPureEffect)}%
-              </div>
-            </div>
-            ${sp.avgRecoveryDays>0?`
-            <div style="background:#eef0f8;border:1px solid #c0c8e0;border-radius:3px;padding:5px 8px">
-              <div style="font-size:13px;color:#445577">평균회복</div>
-              <div style="font-size:15px;font-weight:bold;color:#60a5fa;font-family:var(--mono)">${sp.avgRecoveryDays}일</div>
-            </div>`:''}
-          </div>
-        </div>
-
-        <!-- 실제 사례 -->
-        <div style="margin-bottom:10px">
-          <div style="font-size:12px;color:#445577;margin-bottom:6px;letter-spacing:1px">▶ 실제 사례</div>
-          ${sp.examples.map(ex=>`
-            <div style="display:flex;align-items:center;gap:10px;padding:6px 10px;
-              background:#eef0f8;border-radius:3px;margin-bottom:4px">
-              <span style="font-size:12px;color:#445577;font-family:var(--mono);min-width:80px">${ex.date}</span>
-              <span style="flex:1;font-size:13px;color:#aab;font-family:sans-serif">${ex.event}</span>
-              <span style="font-size:13px;font-weight:bold;color:${ex.drop>0?'#dc2626':'#16a34a'};font-family:var(--mono)">
-                ${ex.drop>0?'-':''}${Math.abs(ex.drop)}%
-              </span>
-              ${ex.recovery>0?`<span style="font-size:12px;color:#60a5fa;font-family:var(--mono)">${ex.recovery}일 회복</span>`:''}
-            </div>`).join('')}
-        </div>
-
-        <!-- 시그널 및 액션 -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="padding:8px 10px;background:#f0fdf4;border:1px solid #16a34a33;border-radius:3px">
-            <div style="font-size:13px;color:#16a34a;margin-bottom:4px;letter-spacing:1px">📡 감지 시그널</div>
-            <div style="font-size:13px;color:#aab;font-family:sans-serif;line-height:1.5">${sp.signal}</div>
-          </div>
-          <div style="padding:8px 10px;background:#1a0a00;border:1px solid #ff8c0033;border-radius:3px">
-            <div style="font-size:13px;color:#ff8c00;margin-bottom:4px;letter-spacing:1px">⚡ 감지 시 액션</div>
-            <div style="font-size:13px;color:#aab;font-family:sans-serif;line-height:1.5">${sp.actionOnDetect}</div>
-          </div>
-        </div>
-
-        <!-- 의심도 바 -->
-        <div style="margin-top:10px;display:flex;align-items:center;gap:10px">
-          <span style="font-size:12px;color:#445577;min-width:60px">조작의심도</span>
-          <div style="flex:1;height:4px;background:#e8ecf5;border-radius:2px">
-            <div style="height:100%;width:${sp.suspicion}%;
-              background:${sp.suspicion>=80?'#ff4444':sp.suspicion>=50?'#ff8c00':'#16a34a'};
-              border-radius:2px"></div>
-          </div>
-          <span style="font-size:13px;color:${sp.suspicion>=80?'#ff4444':sp.suspicion>=50?'#ff8c00':'#16a34a'};
-            font-family:var(--mono);min-width:30px">${sp.suspicion}%</span>
-        </div>
-      </div>`;
-    }).join('')}
-
-    <!-- 전체 패턴 요약표 -->
-    <div style="margin-top:20px">
-      <div class="sec">전체 인물 패턴 요약</div>
-      ${Object.entries(PATTERNS).map(([id,p])=>{
-        const fig=figs.find(f=>f.id===+id);
-        if(!fig) return '';
-        const topPat = p.signaturePatterns.sort((a,b)=>b.suspicion-a.suspicion)[0];
-        return `
-        <div class="card card-border-l" style="border-left-color:${p.color};margin-bottom:8px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:28px;height:28px;border-radius:50%;
-              background:${p.color}1a;border:1px solid ${p.color}44;
-              display:flex;align-items:center;justify-content:center;
-              font-size:12px;color:${p.color};font-weight:bold;flex-shrink:0">${fig.avatar}</div>
-            <div style="flex:1">
-              <div style="font-size:13px;color:#1a2340;font-family:sans-serif">${p.name}</div>
-              <div style="font-size:12px;color:#556677;font-family:sans-serif;margin-top:2px">${topPat?.name||'—'}</div>
-            </div>
-            <div style="display:flex;gap:10px">
-              <div style="text-align:center">
-                <div style="font-size:13px;color:#445577">신뢰도</div>
-                <div style="font-size:13px;color:${p.color};font-family:var(--mono);font-weight:bold">${p.patternScore}</div>
-              </div>
-              <div style="text-align:center">
-                <div style="font-size:13px;color:#445577">보정</div>
-                <div style="font-size:13px;color:${p.patternBonus>0?'#16a34a':'#dc2626'};font-family:var(--mono);font-weight:bold">
-                  ${p.patternBonus>0?'+':''}${p.patternBonus}
-                </div>
-              </div>
-              <div style="text-align:center">
-                <div style="font-size:13px;color:#445577">최고의심</div>
-                <div style="font-size:13px;color:${topPat?.suspicion>=80?'#ff4444':'#ff8c00'};font-family:var(--mono);font-weight:bold">
-                  ${topPat?.suspicion||0}%
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>
-    ` : `<div style="text-align:center;padding:40px;color:#445577">이 인물의 패턴 데이터가 없습니다</div>`}
-  `;
-}
-
-function forceNewsCheck(){
-  lastNewsCheck = 0;
-  runNewsCheck();
-}
-
-function renderNews(){
-  const apiAlerts = state.alerts.filter(a=>a.fromAPI);
-  const hasKey = GNEWS_KEY !== 'GNEWS_KEY_HERE';
-
-  // 학습 통계 계산
-  const totalLearned = learnData.newsCount;
-  const figLearned = Object.entries(learnData.figStats)
-    .map(([id,fs])=>({id:+id,fig:state.figs.find(f=>f.id===+id),fs}))
-    .filter(x=>x.fig&&x.fs.totalNews>0)
-    .sort((a,b)=>b.fs.totalNews-a.fs.totalNews);
-
-  document.getElementById('tab-news').innerHTML = `
-    <div class="sec">실시간 뉴스 + 누적 학습 시스템</div>
-
-    <!-- GNews 키 입력 -->
-    ${!hasKey?`
-    <div style="padding:14px;background:#fffbf0;border:1px solid #ff8c0044;
-      border-radius:4px;margin-bottom:14px">
-      <div style="font-size:13px;color:#ff8c00;margin-bottom:8px;font-family:sans-serif">
-        ⚡ GNews API 키 입력 시 실시간 뉴스 활성화
-      </div>
-      <div style="font-size:13px;color:#556677;margin-bottom:10px;font-family:sans-serif;line-height:1.6">
-        1. <a href="https://gnews.io" target="_blank" style="color:#2563eb">gnews.io</a> 접속 → 무료 가입 → API Key 복사<br>
-        2. 아래에 붙여넣기 → 저장
-      </div>
-      <div style="display:flex;gap:8px">
-        <input id="gnews-key-input" placeholder="GNews API Key 입력..."
-          style="flex:1;background:#e8ecf5;border:1px solid #b0b8d0;color:#2563eb;
-          padding:8px 12px;font-size:13px;border-radius:3px;font-family:var(--mono)">
-        <button onclick="saveGNewsKey()" style="padding:8px 16px;border:1px solid #16a34a;
-          background:#f0fdf4;color:#16a34a;font-size:13px;cursor:pointer;
-          border-radius:3px;font-family:var(--mono);white-space:nowrap">저장 + 시작</button>
-      </div>
-      <div style="margin-top:8px;font-size:12px;color:#445577">
-        현재는 데모 뉴스로 학습 중 — 키 입력 시 실제 뉴스 수집 시작
-      </div>
-    </div>`:`
-    <div style="padding:8px 14px;background:#f0fdf4;border:1px solid #16a34a33;
-      border-radius:3px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
-      <span style="color:#16a34a;font-size:12px">✅</span>
-      <span style="font-size:13px;color:#16a34a;font-family:sans-serif">GNews API 연결됨 — 실시간 뉴스 수집 중</span>
-      <button onclick="forceNewsCheck()" style="margin-left:auto;padding:4px 12px;
-        border:1px solid #4a9eff;background:#eff4ff;color:#2563eb;
-        font-size:12px;cursor:pointer;border-radius:2px;font-family:var(--mono)">🔄 지금 수집</button>
-    </div>`}
-
-    <!-- 누적 학습 현황 -->
-    <div class="sec">🧠 누적 학습 현황 — ${totalLearned}건 분석 완료</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
-      <div style="padding:10px;background:#eef0f8;border:1px solid #c0c8e0;border-radius:3px;text-align:center">
-        <div style="font-size:22px;font-weight:bold;color:#2563eb;font-family:var(--mono)">${totalLearned}</div>
-        <div style="font-size:12px;color:#445577">총 학습 뉴스</div>
-      </div>
-      <div style="padding:10px;background:#eef0f8;border:1px solid #c0c8e0;border-radius:3px;text-align:center">
-        <div style="font-size:22px;font-weight:bold;color:#ff4444;font-family:var(--mono)">${apiAlerts.filter(a=>a.maxScore>=70).length}</div>
-        <div style="font-size:12px;color:#445577">즉시포착 신호</div>
-      </div>
-      <div style="padding:10px;background:#eef0f8;border:1px solid #c0c8e0;border-radius:3px;text-align:center">
-        <div style="font-size:22px;font-weight:bold;color:#fbbf24;font-family:var(--mono)">${Object.keys(learnData.figStats).length}</div>
-        <div style="font-size:12px;color:#445577">학습된 인물</div>
-      </div>
-    </div>
-
-    <!-- 인물별 학습 현황 -->
-    ${figLearned.length>0?`
-    <div style="margin-bottom:14px">
-      <div class="sec">인물별 학습 통계 (영향력 점수 자동 보정 중)</div>
-      ${figLearned.map(({id,fig,fs})=>{
-        const negRatio = Math.round(fs.negCount/Math.max(fs.totalNews,1)*100);
-        const bonus = learnData.patternAdjust[id]||0;
-        const topSectors = Object.entries(fs.sectorHits||{})
-          .sort((a,b)=>b[1]-a[1]).slice(0,2).map(([s])=>s);
-        return `
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;
-          background:#eef0f8;border:1px solid #c0c8e0;border-radius:3px;margin-bottom:6px">
-          <div style="width:26px;height:26px;border-radius:50%;
-            background:${fig.color}1a;border:1px solid ${fig.color}44;
-            display:flex;align-items:center;justify-content:center;
-            font-size:13px;color:${fig.color};font-weight:bold;flex-shrink:0">${fig.avatar}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:13px;color:#1a2340;font-family:sans-serif">${fig.name}</div>
-            <div style="display:flex;gap:8px;margin-top:3px;flex-wrap:wrap">
-              <span style="font-size:12px;color:#445577">수집 <span style="color:#2563eb">${fs.totalNews}건</span></span>
-              <span style="font-size:12px;color:#445577">부정 <span style="color:#dc2626">${negRatio}%</span></span>
-              ${topSectors.map(s=>`<span style="font-size:13px;padding:1px 5px;
-                background:${SM[s]?.color||'#888'}15;color:${SM[s]?.color||'#888'};
-                border:1px solid ${SM[s]?.color||'#888'}33;border-radius:2px">${SM[s]?.label||s}</span>`).join('')}
-            </div>
-          </div>
-          <div style="text-align:center;flex-shrink:0">
-            <div style="font-size:12px;color:#445577;margin-bottom:2px">점수 보정</div>
-            <div style="font-size:14px;font-weight:bold;font-family:var(--mono);
-              color:${bonus>0?'#16a34a':'#445577'}">
-              ${bonus>0?'+':''}${bonus}
-            </div>
-          </div>
-          <div style="text-align:center;flex-shrink:0">
-            <div style="font-size:12px;color:#445577;margin-bottom:2px">현재 점수</div>
-            <div style="font-size:16px;font-weight:bold;font-family:var(--mono);color:${fig.color}">
-              ${fig.inf}
-            </div>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`:''}
-
-    <!-- 뉴스 피드 -->
-    <div class="sec">최신 뉴스 피드 (${apiAlerts.length}건)</div>
-    ${apiAlerts.length===0?`
-      <div style="text-align:center;padding:30px;color:#445577;font-size:13px;font-family:sans-serif">
-        🔄 뉴스 수집 중...<br>
-        <span style="font-size:12px;color:#334">잠시 후 자동으로 업데이트됩니다</span>
-      </div>`:''}
-    ${apiAlerts.map(a=>{
-      const sc=a.maxScore||0;
-      const scColor=sc>=70?'#ff4444':sc>=45?'#ff8c00':sc>=25?'#fbbf24':'#445577';
-      const sentColor=a.sentiment<-1?'#dc2626':a.sentiment>1?'#16a34a':'#fbbf24';
-      return `
-      <div style="padding:12px 14px;margin-bottom:8px;background:#eef0f8;
-        border:1px solid ${sc>=70?'#ff444433':sc>=45?'#ff8c0022':'#d0d4e8'};
-        border-left:3px solid ${scColor};border-radius:3px">
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
-          <div style="width:24px;height:24px;border-radius:50%;flex-shrink:0;
-            background:${a.figureColor||'#888'}1a;border:1px solid ${a.figureColor||'#888'}44;
-            display:flex;align-items:center;justify-content:center;
-            font-size:7px;color:${a.figureColor||'#888'};font-weight:bold">${a.figureAvatar||'?'}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:13px;color:#1a2340;font-family:sans-serif;
-              line-height:1.5;margin-bottom:5px">${a.title}
-              ${a.isDemo?`<span style="font-size:13px;color:#445577;margin-left:4px">[데모]</span>`:''}
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-              <span style="font-size:12px;color:#445577">${a.source}</span>
-              <span style="font-size:12px;color:#334">·</span>
-              <span style="font-size:12px;color:#445577">${a.time}</span>
-              ${a.apiTag?`<span style="font-size:13px;padding:1px 5px;border-radius:2px;
-                background:${a.apiTag==='Currents'?'#4a9eff22':'#fbbf24' +'22'};
-                color:${a.apiTag==='Currents'?'#2563eb':'#fbbf24'};
-                border:1px solid ${a.apiTag==='Currents'?'#4a9eff44':'#fbbf2444'}">${a.apiTag}</span>`:''}
-              <span style="font-size:12px;color:${sentColor}">${a.sentimentLabel||'🟡 중립'}</span>
-              ${a.figureName?`<span style="font-size:12px;color:${a.figureColor}">${a.figureName.split(' ')[0]}</span>`:''}
-            </div>
-          </div>
-          ${sc>0?`<div style="text-align:center;flex-shrink:0">
-            <div style="font-size:18px;font-weight:bold;color:${scColor};font-family:var(--mono);line-height:1">${sc}</div>
-            <div style="font-size:7px;color:#445577">기회점수</div>
-          </div>`:''}
-        </div>
-        ${a.topTickers?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">
-          ${splitTk(a.topTickers).map(t=>`
-            <span style="font-size:12px;padding:2px 7px;background:#eff4ff;
-              border:1px solid #4a9eff33;color:#2563eb;border-radius:2px;
-              font-family:var(--mono)">${t}</span>`).join('')}
-        </div>`:''}
-        ${(a.sectors?.length)?`<div style="display:flex;gap:4px;flex-wrap:wrap">
-          ${a.sectors.map(s=>{const sd=SM[s];if(!sd)return'';
-            return`<span style="font-size:13px;padding:1px 6px;background:${sd.color}15;
-              border:1px solid ${sd.color}33;color:${sd.color};border-radius:2px">${sd.label}</span>`;
-          }).join('')}
-        </div>`:''}
-        ${a.url&&a.url!=='#'?`<a href="${a.url}" target="_blank"
-          style="display:inline-block;margin-top:6px;font-size:12px;color:#2563eb;text-decoration:none">
-          원문 보기 →</a>`:''}
-      </div>`;
-    }).join('')}
-
-    <!-- 학습 초기화 버튼 -->
-    <div style="margin-top:20px;padding:10px 14px;background:#eef0f8;
-      border:1px solid #c0c8e0;border-radius:3px;display:flex;align-items:center;gap:10px">
-      <span style="font-size:13px;color:#445577;font-family:sans-serif">학습 데이터 초기화</span>
-      <button onclick="resetLearn()" style="margin-left:auto;padding:5px 12px;
-        border:1px solid #f87171;background:transparent;color:#dc2626;
-        font-size:12px;cursor:pointer;border-radius:2px;font-family:var(--mono)">초기화</button>
-    </div>
-  `;
-}
-
-function saveGNewsKey(){
-  const key = document.getElementById('gnews-key-input')?.value?.trim();
-  if(!key){alert('키를 입력해주세요');return;}
-  // 키를 localStorage에 저장 후 페이지 갱신
-  localStorage.setItem('ir_gnews_key', key);
-  alert('✅ GNews API 키 저장 완료!\n페이지를 새로고침하면 실시간 뉴스가 수집됩니다.');
-}
 
 function resetLearn(){
   if(!confirm('학습 데이터를 초기화할까요?')) return;
@@ -5964,8 +5507,7 @@ window.onload = function(){
               }
             }
 
-            if(state.currentTab==='news') renderNews();
-            console.log(`🔄 실시간 동기화: 새 뉴스 ${newFromFB.length}건`);
+                      console.log(`🔄 실시간 동기화: 새 뉴스 ${newFromFB.length}건`);
           }
         }
 
