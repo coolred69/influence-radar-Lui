@@ -282,7 +282,7 @@ console.log('✅ Firebase 연결 완료');
     background:#fbbf24;box-shadow:0 0 8px #fbbf24;flex-shrink:0;animation:pulse 1.5s infinite"></div>
   <span id="news-status-txt" style="font-size:13px;color:#fbbf24;font-family:var(--mono)">초기화 중...</span>
   <span id="fb-status" style="font-size:12px;color:#334;font-family:var(--mono);display:none">🔥 FB 연결 중...</span>
-  <button onclick="forceNewsCheck()" style="margin-left:auto;font-size:12px;padding:3px 10px;
+  <button onclick="lastNewsCheck=0;runNewsCheck()" style="margin-left:auto;font-size:12px;padding:3px 10px;
     border:1px solid #b0b8d0;background:transparent;color:#334466;
     cursor:pointer;border-radius:2px;font-family:var(--mono)">🔄 지금 수집</button>
 </div>
@@ -4099,7 +4099,7 @@ function resetLearn(){
   if(!confirm('학습 데이터를 초기화할까요?')) return;
   learnData = {figStats:{},sectorStats:{},newsCount:0,lastUpdated:null,patternAdjust:{}};
   saveLearn();
-  renderNews();
+  renderLearnDashboard();
 }
 
 
@@ -5365,7 +5365,7 @@ function hitRate2insight(hitRate, avgDrop, days) {
 }
 
 function buildDesktopNav(){
-  const tabs = [['radar','레이더'],['stocks','종목'],['filter','기회필터'],['log','발언로그'],['sim','시뮬레이터'],['map','연관맵']];
+  const tabs = [['radar','레이더'],['stocks','종목'],['filter','기회필터'],['log','발언로그'],['sim','시뮬레이터']];
   document.getElementById('tab-nav-desktop').innerHTML = tabs.map(([k,l])=>`
     <button class="btn dsk-tab-btn" data-tab="${k}" onclick="switchTab('${k}',null)"
       style="border-color:${k==='radar'?'#2563eb':'#d0d4e8'};
