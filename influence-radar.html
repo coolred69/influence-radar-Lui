@@ -3665,15 +3665,14 @@ function calcSignalAccuracy(a) {
     const dollarDiffPct = expectedBuyPrice>0 ? Math.round(dollarDiff/expectedBuyPrice*1000)/10 : 0;
     // 적중 기준: 방향 맞고 오차 60% 이내
     const sameDir = (actualChange<0&&predicted<0)||(actualChange>0&&predicted>0);
-    const hit = sameDir && Math.abs(actualChange-predicted)<=Math.abs(predicted)*0.6;
     const usedResult = !!(pred.priceAtResult?.[t]);
     // 딥바이 시뮬 기록 참조 (simTrades에서 매칭)
     const simRecord = (learnData.simTrades||[]).find(tr=>tr.signalId===pred.id&&tr.ticker===t);
     const outcome = simRecord?.outcome || null;
     const simPnl = simRecord?.pnlPct ?? null;
     const dipPrice2 = simRecord?.dipPrice ?? Math.round(signalPrice*(1-(pred.avgDrop||10)/100)*100)/100;
-    const profitable = outcome === 'success';
-    const hit = profitable;
+    // 딥바이 성공 여부를 hit 기준으로 사용
+    const hit = outcome === 'success';
     return {t,signalPrice,evalPrice,actualChange,predicted,expectedBuyPrice,dollarDiff,dollarDiffPct,
       hit,simPnl,dipPrice:dipPrice2,outcome,usedResult,
       buyDate:simRecord?.buyDate,sellDate:simRecord?.sellDate,sellType:simRecord?.sellType,
