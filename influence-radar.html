@@ -3958,7 +3958,7 @@ function renderSim(){
               <span style="font-size:14px;font-weight:bold;color:${hc};font-family:var(--mono)">
                 목표달성 ${acc.hitRate}%</span>
               <span style="font-size:12px;color:#445577">(${acc.hitCount}/${acc.total}종목)</span>
-              ${acc.noBuy>0?`<span style="font-size:12px;color:#ff8c00;margin-left:6px">매입실패 ${acc.noBuy}건</span>`:''}
+              ${acc.noBuy>0?`<span style="font-size:12px;color:#ff8c00;margin-left:6px">매수실패 ${acc.noBuy}건</span>`:''}
               ${acc.avgSimPnl!=null?`<span style="font-size:13px;font-weight:bold;color:${acc.avgSimPnl>0?'#16a34a':'#dc2626'};font-family:var(--mono);margin-left:8px">평균 ${acc.avgSimPnl>0?'+':''}${acc.avgSimPnl}%</span>`:''}
 
             </div>
@@ -4021,7 +4021,7 @@ function renderSim(){
                     </div>
                     <span style="font-size:12px;color:#334">→</span>
                     <div style="display:flex;flex-direction:column;gap:1px">
-                      <span style="font-size:7px;color:#334;letter-spacing:0.5px">예상매입가</span>
+                      <span style="font-size:7px;color:#334;letter-spacing:0.5px">예상매수가</span>
                       <span style="font-size:13px;color:#fbbf24;font-family:var(--mono)">${fmtUSD(r.expectedBuyPrice)}</span>
                     </div>
                     <span style="font-size:12px;color:#334">→</span>
@@ -4723,7 +4723,7 @@ function renderLearnDashboard() {
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
         ${[
           ['총 시도', simTotal+'건', '#445577'],
-          ['매입성공', buyRate!=null?buyRate+'%':'N/A', buyRate>=60?'#16a34a':buyRate>=30?'#fbbf24':'#dc2626'],
+          ['매수성공', buyRate!=null?buyRate+'%':'N/A', buyRate>=60?'#16a34a':buyRate>=30?'#fbbf24':'#dc2626'],
           ['목표달성', successRate!=null?successRate+'%':'N/A', successRate>=60?'#16a34a':successRate>=30?'#fbbf24':'#dc2626'],
           ['누적수익', avgPnl!=null?(avgPnl>0?'+':'')+avgPnl+'%':'N/A', avgPnl>0?'#16a34a':avgPnl<0?'#dc2626':'#445577'],
         ].map(([l,v,c])=>`
@@ -4741,7 +4741,7 @@ function renderLearnDashboard() {
         <span style="font-size:12px;background:#f0f4ff;border:1px solid #2563eb33;padding:3px 8px;border-radius:12px;color:#2563eb">
           ⏰ 기간만료 ${simExpiry.length}건</span>
         <span style="font-size:12px;background:#f5f5f5;border:1px solid #88889933;padding:3px 8px;border-radius:12px;color:#888">
-          ❌ 매입실패 ${simNoBuy.length}건</span>
+          ❌ 매수실패 ${simNoBuy.length}건</span>
       </div>
       <!-- 누적 P&L -->
       ${pnlList.length>0?`
@@ -4759,7 +4759,7 @@ function renderLearnDashboard() {
           (${totalPnlPct>=0?'+':''}${totalPnlPct}%)
         </div>
         <div style="margin-left:auto;text-align:right;display:flex;flex-direction:column;gap:2px">
-          ${avgDipDays!=null?`<div style="font-size:10px;color:#7c3aed">📡 P1 평균 ${avgDipDays}일 소요${avgDipTiming!=null?` <span style="color:${Math.abs(avgDipTiming)<=2?'#16a34a':'#ff8c00'}">(기간오차${avgDipTiming>0?'+':''}${avgDipTiming}일)</span>`:''}${avgBuyPriceDiff!=null?` · 매입가오차 <span style="color:${Math.abs(avgBuyPriceDiff)<=1?'#16a34a':Math.abs(avgBuyPriceDiff)<=3?'#fbbf24':'#dc2626'}">${avgBuyPriceDiff>0?'+':''}${avgBuyPriceDiff}%</span>`:''}</div>`:''}
+          ${avgDipDays!=null?`<div style="font-size:10px;color:#7c3aed">📡 P1 평균 ${avgDipDays}일 소요${avgDipTiming!=null?` <span style="color:${Math.abs(avgDipTiming)<=2?'#16a34a':'#ff8c00'}">(기간오차${avgDipTiming>0?'+':''}${avgDipTiming}일)</span>`:''}${avgBuyPriceDiff!=null?` · 매수가오차 <span style="color:${Math.abs(avgBuyPriceDiff)<=1?'#16a34a':Math.abs(avgBuyPriceDiff)<=3?'#fbbf24':'#dc2626'}">${avgBuyPriceDiff>0?'+':''}${avgBuyPriceDiff}%</span>`:''}</div>`:''}
           ${avgHoldDays!=null?`<div style="font-size:10px;color:#059669">📈 P2 평균 ${avgHoldDays}일 보유${avgTiming!=null?` <span style="color:${Math.abs(avgTiming)<=3?'#16a34a':'#ff8c00'}">(기간오차${avgTiming>0?'+':''}${avgTiming}일)</span>`:''}${avgTargetDiff!=null?` · 매도가오차 <span style="color:${Math.abs(avgTargetDiff)<=1?'#16a34a':Math.abs(avgTargetDiff)<=3?'#fbbf24':'#dc2626'}">${avgTargetDiff>0?'+':''}${avgTargetDiff}%</span>`:''}</div>`:''}
         </div>
       </div>`:''}
