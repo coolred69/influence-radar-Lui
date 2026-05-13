@@ -1470,7 +1470,7 @@ learnData = Object.assign({
   studyResults: [],
   simTrades: [],        // 가상 투자 거래 내역 누적
   simConfig: {          // 가상 투자 설정
-    stopLossPct: 5,     // 딥가 대비 추가 하락 손절 %
+    stopLossPct: 3,     // 딥가 대비 추가 하락 손절 %
     recoveryPct: 3,     // 딥가 대비 회복 목표 % (3 = 딥가+3%에서 익절)
     capitalPerTrade: 10000, // 종목당 가상 투자금 (USD)
   },
@@ -1777,7 +1777,7 @@ async function fetchPriceSeries(ticker, startDate, endDate) {
 // 전략: 딥가(예측 하락가) 도달 시 매입 → 목표가(신호가 회복) 또는 손절 또는 기간만료 청산
 function simulateTrade(ticker, series, pred) {
   const cfg = learnData.simConfig || {};
-  const stopLossPct = cfg.stopLossPct ?? 5;
+  const stopLossPct = cfg.stopLossPct ?? 3;
   const signalPrice = pred.priceAtSignal?.[ticker] || 0;
   if(!signalPrice || !series?.length) return {outcome:'noData', ticker};
 
@@ -4478,7 +4478,7 @@ function renderLearnDashboard() {
         <div style="display:flex;align-items:center;gap:6px">
           <span style="font-size:12px;color:#445577">손절%</span>
           <input id="sim-stoploss-input" type="number" min="1" max="50" step="0.5"
-            value="${cfg.stopLossPct||5}"
+            value="${cfg.stopLossPct||3}"
             style="width:48px;padding:4px 6px;border:1px solid #fbbf24;border-radius:3px;
               font-size:12px;font-family:var(--mono);background:#fff;color:#1a2340;text-align:center">
           <span style="font-size:12px;color:#445577">익절%</span>
