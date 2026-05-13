@@ -2065,14 +2065,14 @@ function simulateTrade(ticker, series, pred) {
         buyPrice = close;
       }
     } else {
-      // 손절 우선 체크
+      // 손절 우선 체크 — limit order 기준으로 stopLossPrice에서 체결
       if(close <= stopLossPrice) {
-        sellDate = date; sellPrice = close; sellType = 'stopLoss';
+        sellDate = date; sellPrice = stopLossPrice; sellType = 'stopLoss';
         break;
       }
-      // 목표가 도달
+      // 목표가 도달 — limit order 기준으로 sellTarget 가격에서 체결
       if(close >= sellTarget) {
-        sellDate = date; sellPrice = close; sellType = 'target';
+        sellDate = date; sellPrice = sellTarget; sellType = 'target';
         break;
       }
     }
