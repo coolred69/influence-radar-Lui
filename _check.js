@@ -1616,13 +1616,25 @@ function saveLearn(){
 }
 
 // ── 예측 결과 저장 + 학습 반영
-function recordStudyResult(alert, accResult) {
+function recordStudyResult(alert, accResult, force = false) {
   if(!alert.prediction||!accResult?.isPast||accResult.noData) return;
   const pred = alert.prediction;
 
-  // 이미 저장된 결과면 스킵
-  const alreadyRecorded = learnData.studyResults.find(r=>r.signalId===pred.id);
-  if(alreadyRecorded) return;
+  // 이미 저장된 결과면 스킵 (force 시 기존 항목 제거 후 재기록)
+  const existingIdx = learnData.studyResults.findIndex(r=>r.signalId===pred.id);
+  if(existingIdx >= 0) {
+    if(!force) return;
+    // force: 기존 통계에서 차감 후 제거
+    const old = learnData.studyResults[existingIdx];
+    const ss2 = learnData.studyStats;
+    ss2.totalHits = Math.max(0, (ss2.totalHits||0) - (old.hitCount||0));
+    ss2.totalCases = Math.max(0, (ss2.totalCases||0) - (old.totalCases||0));
+    if(old.figureId && ss2.figAccuracy?.[old.figureId]) {
+      ss2.figAccuracy[old.figureId].hits = Math.max(0, ss2.figAccuracy[old.figureId].hits - (old.hitCount||0));
+      ss2.figAccuracy[old.figureId].cases = Math.max(0, ss2.figAccuracy[old.figureId].cases - (old.totalCases||0));
+    }
+    learnData.studyResults.splice(existingIdx, 1);
+  }
 
   const signalDate = new Date(alert.id||Date.now());
   const expectedDate = new Date(pred.expectedDate);
@@ -1976,7 +1988,7 @@ async function runSimForAlert(alert, statusEl, forceResim = false) {
     total: results.length, avgSimPnl,
   };
 
-  recordStudyResult(alert, accResult);
+  recordStudyResult(alert, accResult, forceResim);
   return tradeRecords.length;
 }
 
@@ -4487,7 +4499,7 @@ function renderLearnDashboard() {
       border-radius:4px;margin-bottom:10px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
         <div style="font-size:13px;color:#b45309;font-weight:bold;font-family:sans-serif">
-          💰 가상 투자 누적 성과 (딥바이 전략)
+          💰 가상 투자 누적 성과 (하락: 딥바이 · 상승: 즉시매수)
         </div>
         <div style="display:flex;align-items:center;gap:6px">
           <span style="font-size:12px;color:#445577">손절%</span>
@@ -4725,7 +4737,7 @@ function renderLearnDashboard() {
     <!-- B. 인물별 예측 정확도 + 시뮬 P&L -->
     ${figStats.length>0?`
     <div style="margin-bottom:14px">
-      <div class="sec">인물별 예측 정확도 (SHORT 시뮬 기준)</div>
+      <div class="sec">인물별 예측 정확도 (시뮬 성과 기준)</div>
       ${figStats.map(({fig,rate,hits,cases,avgPnl})=>{
         const rc = rate>=70?'#16a34a':rate>=40?'#fbbf24':'#dc2626';
         const pc = avgPnl==null?'#888':avgPnl>0?'#16a34a':'#dc2626';
@@ -4746,13 +4758,13 @@ function renderLearnDashboard() {
           <span style="font-size:12px;font-weight:bold;color:${pc};font-family:var(--mono);width:52px;text-align:right" title="평균 시뮬 수익률">${pnlTxt}</span>
         </div>`;
       }).join('')}
-      <div style="font-size:11px;color:#8899aa;padding:4px 12px">※ SHORT 시뮬: 신호가 공매도→결과가 환매 기준 평균 수익률</div>
+      <div style="font-size:11px;color:#8899aa;padding:4px 12px">※ 시뮬 성과: 하락신호 딥바이 · 상승신호 즉시매수 기준 평균 수익률</div>
     </div>`:''}
 
     <!-- B. 섹터별 적중률 + 시뮬 P&L -->
     ${secStats.length>0?`
     <div style="margin-bottom:14px">
-      <div class="sec">섹터별 예측 정확도 (SHORT 시뮬 기준)</div>
+      <div class="sec">섹터별 예측 정확도 (시뮬 성과 기준)</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
         ${secStats.map(({sec,sd,rate,cases,avgPnl})=>{
           const rc = rate>=70?'#16a34a':rate>=40?'#fbbf24':'#dc2626';
