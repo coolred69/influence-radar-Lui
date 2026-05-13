@@ -4575,10 +4575,11 @@ function renderLearnDashboard() {
           el.textContent='테스트 중...';
           const url=(document.getElementById('ml-api-input').value||'').trim().replace(/\\/$/,'');
           try{
-            const r=await fetch(url+'/health',{signal:AbortSignal.timeout(5000)});
+            const r=await fetch(url+'/',{signal:AbortSignal.timeout(5000)});
             const d=await r.json();
-            el.textContent=d.model_loaded?'✅ 연결됨 · 모델 로드 완료':'⚠️ 연결됨 · 모델 없음 (재학습 필요)';
-            el.style.color=d.model_loaded?'#16a34a':'#fbbf24';
+            const loaded=d.model_loaded||d.model_trained||false;
+            el.textContent=loaded?'✅ 연결됨 · 모델 로드 완료':'⚠️ 연결됨 · 모델 없음 (재학습 필요)';
+            el.style.color=loaded?'#16a34a':'#fbbf24';
           }catch(e){el.textContent='❌ 연결 실패';el.style.color='#dc2626';}
         })()"
           style="padding:7px 12px;border:1px solid #445577;background:transparent;
