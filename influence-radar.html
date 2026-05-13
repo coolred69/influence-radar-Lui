@@ -2218,9 +2218,7 @@ async function resimAllPast() {
     if(!a.prediction?.expectedDate) return false;
     if(new Date(a.prediction.expectedDate) >= now) return false; // 기일 미도달
     if(!a.prediction?.priceAtSignal || !Object.keys(a.prediction.priceAtSignal).length) return false;
-    // simTrades에 없는 것만
-    const already = (learnData.simTrades||[]).find(tr => tr.signalId === a.prediction?.id);
-    return !already;
+    return true; // 기존 simTrades 포함 전체 강제 재계산
   });
 
   if(targets.length === 0) {
@@ -2235,7 +2233,7 @@ async function resimAllPast() {
 
   let done = 0;
   for(const alert of targets) {
-    const n = await runSimForAlert(alert, el, false);
+    const n = await runSimForAlert(alert, el, true); // 강제 재계산
     if(n) {
       done++;
       saveSignalLog();
