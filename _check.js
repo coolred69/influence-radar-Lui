@@ -1781,7 +1781,7 @@ function simulateTrade(ticker, series, pred) {
   const signalPrice = pred.priceAtSignal?.[ticker] || 0;
   if(!signalPrice || !series?.length) return {outcome:'noData', ticker};
 
-  const avgDrop = pred.avgDrop || 10;
+  const avgDrop = pred.avgDrop || 5;
   const dipPrice   = Math.round(signalPrice * (1 - avgDrop / 100) * 100) / 100;  // 예측 매입가
   const recoveryPct = cfg.recoveryPct ?? 3;
   const sellTarget = Math.round(dipPrice * (1 + recoveryPct / 100) * 100) / 100; // 딥가+recovery%에서 익절
@@ -1943,7 +1943,7 @@ async function runSimForAlert(alert, statusEl, forceResim = false) {
       : Math.round(((resultPrices[r.ticker]||r.signalPrice) - r.signalPrice) / r.signalPrice * 1000) / 10;
     return {
       t: r.ticker, signalPrice: r.signalPrice, resultPrice: r.sellPrice||resultPrices[r.ticker],
-      actualChange, predicted: -(pred.avgDrop||10),
+      actualChange, predicted: -(pred.avgDrop||5),
       simPnl: r.pnlPct||0, dipPrice: r.dipPrice,
       profitable: r.outcome==='success', hit: r.outcome==='success',
       outcome: r.outcome, buyDate: r.buyDate, sellDate: r.sellDate,
@@ -3432,7 +3432,7 @@ function calcSignalAccuracy(a) {
     const evalPrice = pred.priceAtResult?.[t] || livePrices[t]?.price || 0; // 정적PRICES 제외-실데이터만
     if(!signalPrice||!evalPrice) return null;
     const actualChange = Math.round((evalPrice-signalPrice)/signalPrice*1000)/10;
-    const predicted = -(pred.avgDrop||10);
+    const predicted = -(pred.avgDrop||5);
     const expectedBuyPrice = Math.round(signalPrice*(1+predicted/100)*100)/100;
     const dollarDiff = Math.round((evalPrice-expectedBuyPrice)*100)/100;
     const dollarDiffPct = expectedBuyPrice>0 ? Math.round(dollarDiff/expectedBuyPrice*1000)/10 : 0;
@@ -3443,7 +3443,7 @@ function calcSignalAccuracy(a) {
     const simRecord = (learnData.simTrades||[]).find(tr=>tr.signalId===pred.id&&tr.ticker===t);
     const outcome = simRecord?.outcome || null;
     const simPnl = simRecord?.pnlPct ?? null;
-    const dipPrice2 = simRecord?.dipPrice ?? Math.round(signalPrice*(1-(pred.avgDrop||10)/100)*100)/100;
+    const dipPrice2 = simRecord?.dipPrice ?? Math.round(signalPrice*(1-(pred.avgDrop||5)/100)*100)/100;
     // 딥바이 성공 여부를 hit 기준으로 사용
     const hit = outcome === 'success';
     return {t,signalPrice,evalPrice,actualChange,predicted,expectedBuyPrice,dollarDiff,dollarDiffPct,
