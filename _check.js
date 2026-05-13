@@ -1774,23 +1774,37 @@ async function fetchPriceSeries(ticker, startDate, endDate) {
 }
 
 // 가상 매매 시뮬레이션 엔진
-// 전략: 딥가(예측 하락가) 도달 시 매입 → 목표가(신호가 회복) 또는 손절 또는 기간만료 청산
+// 하락신호: 딥가 도달 시 매입 → 익절/손절/기간만료
+// 상승신호: 신호 당일 즉시 매입 → 목표가(+recoveryPct%) 또는 손절(-stopLossPct%)
 function simulateTrade(ticker, series, pred) {
   const cfg = learnData.simConfig || {};
   const stopLossPct = cfg.stopLossPct ?? 3;
+  const recoveryPct = cfg.recoveryPct ?? 3;
   const signalPrice = pred.priceAtSignal?.[ticker] || 0;
   if(!signalPrice || !series?.length) return {outcome:'noData', ticker};
 
   const avgDrop = pred.avgDrop || 5;
-  const dipPrice   = Math.round(signalPrice * (1 - avgDrop / 100) * 100) / 100;  // 예측 매입가
-  const recoveryPct = cfg.recoveryPct ?? 3;
-  const sellTarget = Math.round(dipPrice * (1 + recoveryPct / 100) * 100) / 100; // 딥가+recovery%에서 익절
-  const stopLossPrice = Math.round(dipPrice * (1 - stopLossPct / 100) * 100) / 100; // 손절가
+  const isBullish = avgDrop < 0; // 상승신호 여부
 
-  const signalDate = series[0]?.date || null; // 시리즈 시작일 = 시그널 기준일
+  let dipPrice, sellTarget, stopLossPrice;
 
-  let state = 'waiting'; // waiting | holding
-  let buyDate = null, buyPrice = null;
+  if(isBullish) {
+    // 상승신호: 신호가 즉시 매수, 목표 = 신호가+recoveryPct%, 손절 = 신호가-stopLossPct%
+    dipPrice      = signalPrice; // 즉시 매수 기준가
+    sellTarget    = Math.round(signalPrice * (1 + recoveryPct / 100) * 100) / 100;
+    stopLossPrice = Math.round(signalPrice * (1 - stopLossPct / 100) * 100) / 100;
+  } else {
+    // 하락신호: 딥가 대기 매수
+    dipPrice      = Math.round(signalPrice * (1 - avgDrop / 100) * 100) / 100;
+    sellTarget    = Math.round(dipPrice * (1 + recoveryPct / 100) * 100) / 100;
+    stopLossPrice = Math.round(dipPrice * (1 - stopLossPct / 100) * 100) / 100;
+  }
+
+  const signalDate = series[0]?.date || null;
+
+  let state = isBullish ? 'holding' : 'waiting'; // 상승신호는 첫날 바로 보유
+  let buyDate = isBullish ? signalDate : null;
+  let buyPrice = isBullish ? signalPrice : null;
   let sellDate = null, sellPrice = null, sellType = null;
 
   for(const {date, close} of series) {
