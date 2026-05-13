@@ -1,19 +1,5 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Influence Radar">
-<meta name="theme-color" content="#ffffff">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="Influence Radar">
-<title>Influence Radar 3.0</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-<!-- PWA 매니페스트 (인라인) -->
-<script>
+
 const MANIFEST = {
   name: "Influence Radar",
   short_name: "I-Radar",
@@ -38,128 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
   link.rel = 'manifest'; link.href = manifestURL;
   document.head.appendChild(link);
 });
-</script>
 
-<!-- Apple 홈화면 아이콘 -->
-<link rel="icon" type="image/x-icon" href="./favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
-<link rel="icon" type="image/svg+xml" href="./favicon.svg">
-<link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
-<style>
-:root{
-  --bg:#ffffff;--panel:#f2f4f8;--border:#d0d4e8;--text:#0a0a1a;--dim:#556;
-  --bright:#000000;--red:#e03030;--orange:#d97706;--yellow:#b45309;
-  --green:#16a34a;--blue:#2563eb;--mono:'Courier New',monospace;
-  --fs-base:15px;--fs-sm:13px;--fs-xs:12px;--fs-tiny:11px;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:var(--mono);
-  min-height:100vh;overflow-x:hidden;font-size:var(--fs-base)}
-/* ── HEADER */
-#header{position:fixed;top:0;left:0;right:0;z-index:200;
-  background:#ffffff;border-bottom:2px solid #c0c8e0;
-  padding:10px 16px;display:flex;align-items:center;justify-content:space-between;
-  height:52px}
-.live-dot{width:9px;height:9px;border-radius:50%;background:var(--red);
-  box-shadow:0 0 8px var(--red);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-@keyframes slideDown{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
-@keyframes installPulse{0%,100%{box-shadow:0 0 0 0 #2563eb44}50%{box-shadow:0 0 0 8px #2563eb00}}
-.header-title{font-size:13px;letter-spacing:3px;color:#0a0a1a;font-weight:800;text-transform:uppercase;font-weight:700}
-.header-time{font-size:12px;color:#2563eb;font-weight:700}
-/* ── TAB NAV (상단 스크롤형) */
-#nav{position:sticky;top:87px;z-index:190;
-  background:#f0f2fa;border-bottom:2px solid #c0c8e0;
-  display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;gap:0}
-#nav::-webkit-scrollbar{display:none}
-.nav-btn{flex-shrink:0;display:flex;flex-direction:row;align-items:center;
-  justify-content:center;gap:8px;cursor:pointer;border:none;
-  background:transparent;color:#1a1a3a;font-size:14px;font-weight:600;
-  font-weight:700;letter-spacing:0.5px;transition:all .15s;padding:0 20px;height:48px;
-  font-family:var(--mono);border-bottom:3px solid transparent;white-space:nowrap}
-.nav-btn.active{color:#1a1a3a;border-bottom-color:#2563eb;background:#e8edf8}
-.nav-btn:hover{color:#1a1a3a;background:#e0e6f5}
-.nav-btn svg{width:16px;height:16px;stroke-width:1.5;fill:none;stroke:currentColor;flex-shrink:0}
-/* ── CONTENT */
-#content{min-height:100vh;padding-bottom:20px}
-.tab{display:none;padding:16px}
-.tab.active{display:block}
-/* ── CARDS */
-.card{background:var(--panel);border:1px solid var(--border);border-radius:4px;
-  padding:12px;margin-bottom:10px}
-.card-border-l{border-left-width:3px;border-left-style:solid}
-/* ── SECTION TITLE */
-.sec{font-size:12px;color:#0a0a1a;letter-spacing:2px;text-transform:uppercase;
-  font-weight:800;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #c0c8e0}
-/* ── BARS */
-.bar-wrap{width:100%;height:3px;background:#d0d4e8;border-radius:2px;overflow:hidden}
-.bar-fill{height:100%;border-radius:2px;transition:width .8s ease}
-/* ── TAGS */
-.tag{display:inline-block;font-size:13px;padding:2px 7px;border-radius:2px;
-  border:1px solid;white-space:nowrap;font-weight:600}
-/* ── FIGURE ROW */
-.fig-row{display:flex;align-items:center;gap:10px;padding:12px;
-  border-bottom:1px solid #d0d4e8;cursor:pointer;
-  border-left:3px solid transparent;transition:background .1s}
-.fig-row:hover{background:#e8edf8}
-.fig-row.selected{border-left-color:var(--sel-color,var(--blue))}
-.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-size:13px;font-weight:bold;flex-shrink:0}
-/* ── GRID */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-/* ── FORM */
-input,select,textarea{background:#ffffff;border:1px solid #b0b8d0;
-  color:#0a0a1a;padding:7px 10px;font-size:13px;border-radius:3px;
-  font-family:var(--mono);width:100%}
-input[type=range]{background:none;border:none;padding:4px 0}
-label{font-size:12px;color:#0a0a1a;font-weight:700;display:block;margin-bottom:4px;
-  letter-spacing:1px;font-weight:700}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:8px 16px;border-radius:3px;font-size:12px;cursor:pointer;
-  font-family:var(--mono);letter-spacing:1px;border:1px solid;transition:background .1s}
-.btn-blue{border-color:var(--blue);background:#eff4ff;color:var(--blue)}
-.btn-green{border-color:var(--green);background:#f0fdf4;color:var(--green)}
-.btn-red{border-color:var(--red);background:#fff0f0;color:var(--red)}
-/* ── ALERT BADGE */
-.alert-badge{position:absolute;top:-4px;right:-4px;background:var(--red);
-  color:#ffffff;font-weight:700;font-size:12px;text-shadow:0 0 3px rgba(0,0,0,0.4);width:16px;height:16px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center}
-/* ── NOTIF PANEL */
-#notif-panel{position:fixed;top:52px;left:0;right:0;z-index:500;
-  max-height:75vh;overflow-y:auto;display:none;
-  box-shadow:0 8px 32px rgba(0,0,0,0.15);border-bottom:2px solid #c0c8e0}
-.notif-item{padding:10px 16px;background:#fffbf0;border-bottom:1px solid #fcd34d55;
-  display:flex;gap:10px;align-items:flex-start;font-size:12px}
-/* ── SCORE BIG */
-.score-big{font-size:28px;font-weight:bold;font-family:var(--mono);line-height:1}
-/* ── PURE EFFECT */
-.pure-effect{padding:8px 10px;border-radius:3px;background:#eef0f8;margin-top:6px}
-/* ── MOBILE DETAIL SHEET */
-#detail-sheet{position:fixed;bottom:58px;left:0;right:0;background:var(--panel);
-  border-top:1px solid var(--border);z-index:100;
-  max-height:70vh;overflow-y:auto;transform:translateY(100%);
-  transition:transform .3s ease;border-radius:12px 12px 0 0}
-#detail-sheet.open{transform:translateY(0)}
-.sheet-handle{width:40px;height:4px;background:var(--border);border-radius:2px;
-  margin:10px auto 0}
-/* ── TEMP COLORS */
-.temp-hot{color:#dc2626}.temp-warm{color:#ea580c}.temp-cool{color:#b45309}.temp-cold{color:var(--blue)}
-/* ── OPP COLORS */
-.opp-red{color:#dc2626}.opp-orange{color:#d97706}.opp-yellow{color:#b45309}.opp-grey{color:#778}
-/* ── RESPONSIVE DESKTOP */
-@media(min-width:768px){
-  .grid2{grid-template-columns:repeat(3,1fr)}
-  .nav-btn{font-size:12px;padding:0 22px;height:46px}
-}
-#tab-nav-desktop{display:none}
-</style>
-</head>
 
-<!-- Firebase SDK -->
-<script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js';
 import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, serverTimestamp }
   from 'https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js';
@@ -242,112 +108,8 @@ window.fbInitFCM = async function() {
 window.db = db;
 window.fbReady = true;
 console.log('✅ Firebase 연결 완료');
-</script>
-<body>
 
-<!-- HEADER -->
-<div id="header">
-  <div style="display:flex;align-items:center;gap:10px">
-    <div class="live-dot" id="live-dot"></div>
-    <span class="header-title">Influence Radar</span>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px">
-    <button id="install-btn" onclick="installApp()" style="display:none;
-      font-size:13px;padding:5px 11px;border-radius:3px;cursor:pointer;
-      border:1px solid #4a9eff;background:#eff4ff;color:#2563eb;
-      font-family:var(--mono);align-items:center;gap:5px;white-space:nowrap">
-      📲 홈화면 추가
-    </button>
-    <div style="position:relative;cursor:pointer" onclick="toggleNotif()">
-      <svg width="20" height="20" fill="none" stroke="#aab" stroke-width="1.5" viewBox="0 0 24 24">
-        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
-      </svg>
-      <div class="alert-badge" id="notif-count" style="display:none">0</div>
-    </div>
-    <span class="header-time" id="clock"></span>
-  </div>
-</div>
 
-<!-- DESKTOP TAB NAV -->
-<div id="tab-nav-desktop"></div>
-
-<!-- NOTIFICATION PANEL -->
-<div id="notif-panel"></div>
-
-<!-- NEWS STATUS BAR -->
-<div id="news-bar" style="background:#ffffff;border-bottom:1px solid #c0c8e0;
-  padding:5px 16px;display:flex;align-items:center;gap:10px;
-  position:sticky;top:52px;z-index:195;height:35px">
-  <div id="news-status-dot" style="width:7px;height:7px;border-radius:50%;
-    background:#fbbf24;box-shadow:0 0 8px #fbbf24;flex-shrink:0;animation:pulse 1.5s infinite"></div>
-  <span id="news-status-txt" style="font-size:13px;color:#fbbf24;font-family:var(--mono)">초기화 중...</span>
-  <span id="fb-status" style="font-size:12px;color:#334;font-family:var(--mono);display:none">🔥 FB 연결 중...</span>
-  <button onclick="lastNewsCheck=0;runNewsCheck()" style="margin-left:auto;font-size:12px;padding:3px 10px;
-    border:1px solid #b0b8d0;background:transparent;color:#334466;
-    cursor:pointer;border-radius:2px;font-family:var(--mono)">🔄 지금 수집</button>
-</div>
-
-<!-- TAB NAV (상단 스크롤) -->
-<nav id="nav">
-  <button class="nav-btn active" onclick="switchTab('radar',this)">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.93 4.93l2.12 2.12m9.9 9.9l2.12 2.12M4.93 19.07l2.12-2.12m9.9-9.9l2.12-2.12"/></svg>
-    영향력 레이더
-  </button>
-  <button class="nav-btn" onclick="switchTab('learn',this)">
-    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-    학습 대시보드
-  </button>
-  <button class="nav-btn" onclick="switchTab('stocks',this)">
-    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    종목 분석
-  </button>
-  <button class="nav-btn" onclick="switchTab('filter',this)">
-    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-    종목 발굴
-  </button>
-  <button class="nav-btn" onclick="switchTab('log',this)">
-    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-    발언 로그
-  </button>
-  <button class="nav-btn" onclick="switchTab('sim',this)">
-    <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-    시그널 기록
-  </button>
-<button class="nav-btn" onclick="switchTab('trade',this)">
-    <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-    수익 추적
-  </button>
-  <button class="nav-btn" onclick="switchTab('history',this)">
-    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-    종목 히스토리
-  </button>
-</nav>
-
-<!-- CONTENT -->
-<div id="content">
-  <div class="tab active" id="tab-radar"></div>
-  <div class="tab" id="tab-learn"></div>
-  <div class="tab" id="tab-stocks"></div>
-  <div class="tab" id="tab-filter"></div>
-  <div class="tab" id="tab-log"></div>
-  <div class="tab" id="tab-sim"></div>
-  <div class="tab" id="tab-trade"></div>
-  <div class="tab" id="tab-history"></div>
-</div>
-
-<!-- DESKTOP TAB NAV (hidden) -->
-<div id="tab-nav-desktop"></div>
-
-<!-- MOBILE DETAIL SHEET -->
-<div id="detail-sheet">
-  <div class="sheet-handle"></div>
-  <div id="detail-content" style="padding:16px"></div>
-  <div style="padding:12px 16px">
-    <button class="btn btn-blue" style="width:100%" onclick="closeSheet()">닫기</button>
-  </div>
-</div>
-
-<script>
 // ── Ticker 타입 안전 분할 helper (string | array 모두 처리)
 function splitTk(val) {
   if (!val) return [];
@@ -5734,6 +5496,3 @@ window.onload = function(){
     }
   }, 2000);
 };
-</script>
-</body>
-</html>
