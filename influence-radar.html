@@ -4884,7 +4884,7 @@ function renderLearnDashboard() {
           el.textContent='재학습 전송 중...';el.style.color='#2563eb';
           const r=await mlTrain(learnData.studyResults||[]);
           if(r?.status==='ok'){
-            el.textContent='✅ 재학습 완료: '+r.total_signals+'건 · MAE $'+r.buy_mae;
+            el.textContent='✅ 재학습 완료: '+r.total_signals+'건 · MAE ±'+(r.buy_mae??'null')+'%p';
             el.style.color='#16a34a';
           } else if(r?.error) {
             el.textContent='⚠️ '+r.error;el.style.color='#fbbf24';
