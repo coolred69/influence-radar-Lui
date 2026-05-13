@@ -4628,12 +4628,16 @@ function renderLearnDashboard() {
   const simNoBuy = simTrades.filter(t=>t.outcome==='noBuy');
   const buyRate = simTotal>0 ? Math.round(simBought.length/simTotal*100) : null;
   const successRate = simBought.length>0 ? Math.round(simSuccess.length/simBought.length*100) : null;
-  const pnlList = simBought.filter(t=>t.pnlPct!=null).map(t=>t.pnlPct);
+  // 확정 거래(target+stopLoss)만 실현 P&L 계산 — expiry 제외
+  const realizedTrades = simTrades.filter(t=>(t.outcome==='success'||t.outcome==='stopLoss')&&t.pnlPct!=null);
+  const expiryTrades = simTrades.filter(t=>t.outcome==='expiry'&&t.pnlPct!=null);
+  const pnlList = realizedTrades.map(t=>t.pnlPct);
   const avgPnl = pnlList.length>0 ? Math.round(pnlList.reduce((s,v)=>s+v,0)/pnlList.length*10)/10 : null;
-  // 단리 누적 수익 (종목당 $10000 기준)
+  const avgExpiryPnl = expiryTrades.length>0 ? Math.round(expiryTrades.reduce((s,t)=>s+t.pnlPct,0)/expiryTrades.length*10)/10 : null;
+  // 단리 누적 수익 (종목당 $10000 기준, 확정거래만)
   const capital = cfg.capitalPerTrade || 10000;
   const totalPnlUSD = pnlList.reduce((s,v)=>s+Math.round(capital*v/100*100)/100, 0);
-  const totalPnlPct = simBought.length>0 ? Math.round(totalPnlUSD/(capital*simBought.length)*1000)/10 : null;
+  const totalPnlPct = realizedTrades.length>0 ? Math.round(totalPnlUSD/(capital*realizedTrades.length)*1000)/10 : null;
   // 기간 정보
   const firstDate = simTrades.length>0 ? simTrades[0].signalDate?.split('T')[0] : null;
   const lastDate = simTrades.length>0 ? simTrades[simTrades.length-1].recordedAt?.split('T')[0] : null;
@@ -4786,7 +4790,7 @@ function renderLearnDashboard() {
           ['총 시도', simTotal+'건', '#445577'],
           ['매수성공', buyRate!=null?buyRate+'%':'N/A', buyRate>=60?'#16a34a':buyRate>=30?'#fbbf24':'#dc2626'],
           ['목표달성', successRate!=null?successRate+'%':'N/A', successRate>=60?'#16a34a':successRate>=30?'#fbbf24':'#dc2626'],
-          ['누적수익', avgPnl!=null?(avgPnl>0?'+':'')+avgPnl+'%':'N/A', avgPnl>0?'#16a34a':avgPnl<0?'#dc2626':'#445577'],
+          ['실현수익', avgPnl!=null?(avgPnl>0?'+':'')+avgPnl+'%':(realizedTrades.length===0&&expiryTrades.length>0?'미실현만':'N/A'), avgPnl>0?'#16a34a':avgPnl<0?'#dc2626':'#445577'],
         ].map(([l,v,c])=>`
           <div style="padding:8px;background:#fff;border-radius:3px;border:1px solid #fbbf2433;text-align:center">
             <div style="font-size:10px;color:#445577;margin-bottom:3px">${l}</div>
@@ -4803,6 +4807,8 @@ function renderLearnDashboard() {
           ⏰ 기간만료 ${simExpiry.length}건</span>
         <span style="font-size:12px;background:#f5f5f5;border:1px solid #88889933;padding:3px 8px;border-radius:12px;color:#888">
           ❌ 매수실패 ${simNoBuy.length}건</span>
+        ${avgExpiryPnl!=null?`<span style="font-size:12px;background:#f0f4ff;border:1px solid #2563eb22;padding:3px 8px;border-radius:12px;color:#2563eb">
+          📊 미실현(만료) 평균 ${avgExpiryPnl>0?'+':''}${avgExpiryPnl}%</span>`:''}
       </div>
       <!-- 누적 P&L -->
       ${pnlList.length>0?`
