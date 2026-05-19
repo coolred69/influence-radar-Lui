@@ -2104,8 +2104,8 @@ async function getSPYMarketStatus() {
   try {
     const p2 = Math.floor(now / 1000);
     const p1 = p2 - 86400 * 220; // 220일치
-    const url = https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&period1=&period2=;
-    const proxy = https://api.allorigins.win/raw?url=;
+    const url = "https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&period1=" + p1 + "&period2=" + p2;
+    const proxy = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
     const res = await fetch(proxy, {signal: AbortSignal.timeout(8000)});
     const json = await res.json();
     const closes = json?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v => v != null) || [];
