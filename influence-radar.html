@@ -1708,9 +1708,12 @@ learnData = Object.assign({
   studyResults: [],
   simTrades: [],        // 가상 투자 거래 내역 누적
   simConfig: {          // 가상 투자 설정
-    stopLossPct: 3,     // 딥가 대비 추가 하락 손절 %
-    recoveryPct: 3,     // 딥가 대비 회복 목표 % (3 = 딥가+3%에서 익절)
+    stopLossPct: 3,     // 딥가 대비 하드 손절 %
+    recoveryPct: 3,     // (레거시 호환용, 트레일링 모드에서는 미사용)
     capitalPerTrade: 10000, // 종목당 가상 투자금 (USD)
+    trailingPct: 8,     // 트레일링 스탑 기본값 % (고점 대비 하락 시 매도)
+    useTrailing: true,  // true = 트레일링 스탑 모드
+    trailingByFig: {},  // 인물별 학습된 최적 trailing % { figId: {avgOptimal, count, sum} }
   },
 }, learnData);
 
@@ -2025,106 +2028,142 @@ async function fetchPriceSeries(ticker, startDate, endDate) {
 
 // 가상 매매 시뮬레이션 엔진
 // 하락신호: 딥가 도달 시 매입 → 익절/손절/기간만료
-// 상승신호: 신호 당일 즉시 매입 → 목표가(+recoveryPct%) 또는 손절(-stopLossPct%)
+// ── 인물별 학습된 최적 트레일링 % 반환 (데이터 부족 시 기본값)
+function getLearnedTrailingPct(figId) {
+  const cfg = learnData.simConfig || {};
+  const defaultPct = cfg.trailingPct ?? 8;
+  const byFig = cfg.trailingByFig || {};
+  const stats = byFig[figId];
+  // 3건 이상 데이터 있을 때만 학습값 사용
+  if(!stats || stats.count < 3) return defaultPct;
+  const learned = Math.round(stats.sum / stats.count * 10) / 10;
+  // 2%~25% 범위 클램핑
+  return Math.min(25, Math.max(2, learned));
+}
+
+// ── 트레일링 스탑 학습 업데이트: 거래 결과에서 최적 trailing % 역산 후 누적
+function updateTrailingLearn(figId, optimalTrailingPct) {
+  if(!figId || optimalTrailingPct == null || optimalTrailingPct <= 0) return;
+  const cfg = learnData.simConfig;
+  if(!cfg.trailingByFig) cfg.trailingByFig = {};
+  if(!cfg.trailingByFig[figId]) cfg.trailingByFig[figId] = {count:0, sum:0, avgOptimal:cfg.trailingPct??8};
+  const s = cfg.trailingByFig[figId];
+  s.count++;
+  s.sum += optimalTrailingPct;
+  s.avgOptimal = Math.round(s.sum / s.count * 10) / 10;
+}
+
+// ── 가상 매매 시뮬레이션 엔진 (트레일링 스탑 방식)
+// 하락신호: 딥가 도달 시 매입 → 트레일링 스탑 또는 하드 손절
+// 상승신호: 신호 당일 즉시 매입 → 트레일링 스탑 또는 하드 손절
 function simulateTrade(ticker, series, pred) {
   const cfg = learnData.simConfig || {};
   const stopLossPct = cfg.stopLossPct ?? 3;
-  const recoveryPct = cfg.recoveryPct ?? 3;
+  const figId = pred.figureId || 'default';
+
+  // 인물별 학습된 트레일링 % (없으면 기본 8%)
+  const trailingPct = getLearnedTrailingPct(figId);
+
   const signalPrice = pred.priceAtSignal?.[ticker] || 0;
   if(!signalPrice || !series?.length) return {outcome:'noData', ticker};
 
   const avgDrop = pred.avgDrop || 5;
   const isBullish = avgDrop < 0; // 상승신호 여부
 
-  let dipPrice, sellTarget, stopLossPrice;
+  let dipPrice, stopLossPrice;
 
   if(isBullish) {
-    // 상승신호: 신호가 즉시 매수, 목표 = 신호가+recoveryPct%, 손절 = 신호가-stopLossPct%
-    dipPrice      = signalPrice; // 즉시 매수 기준가
-    sellTarget    = Math.round(signalPrice * (1 + recoveryPct / 100) * 100) / 100;
+    dipPrice      = signalPrice;
     stopLossPrice = Math.round(signalPrice * (1 - stopLossPct / 100) * 100) / 100;
   } else {
-    // 하락신호: 딥가 대기 매수
     dipPrice      = Math.round(signalPrice * (1 - avgDrop / 100) * 100) / 100;
-    sellTarget    = Math.round(dipPrice * (1 + recoveryPct / 100) * 100) / 100;
     stopLossPrice = Math.round(dipPrice * (1 - stopLossPct / 100) * 100) / 100;
   }
 
   const signalDate = series[0]?.date || null;
 
-  let state = isBullish ? 'holding' : 'waiting'; // 상승신호는 첫날 바로 보유
+  let state = isBullish ? 'holding' : 'waiting';
   let buyDate = isBullish ? signalDate : null;
   let buyPrice = isBullish ? signalPrice : null;
+  let peakPrice = isBullish ? signalPrice : null; // 고점 추적 (트레일링 기준)
   let sellDate = null, sellPrice = null, sellType = null;
 
   for(const {date, close} of series) {
     if(state === 'waiting') {
       if(close <= dipPrice) {
-        state = 'holding';
-        buyDate = date;
+        state    = 'holding';
+        buyDate  = date;
         buyPrice = close;
+        peakPrice = close; // 매수 시점 고점 초기화
       }
     } else {
-      // 손절 우선 체크 — limit order 기준으로 stopLossPrice에서 체결
+      // 고점 갱신
+      if(close > peakPrice) peakPrice = close;
+
+      // ① 하드 손절 우선 (고점 추적 이전에 급락 방어)
       if(close <= stopLossPrice) {
         sellDate = date; sellPrice = stopLossPrice; sellType = 'stopLoss';
         break;
       }
-      // 목표가 도달 — limit order 기준으로 sellTarget 가격에서 체결
-      if(close >= sellTarget) {
-        sellDate = date; sellPrice = sellTarget; sellType = 'target';
+      // ② 트레일링 스탑: 고점 대비 trailingPct% 하락 시 매도
+      const trailingFloor = Math.round(peakPrice * (1 - trailingPct / 100) * 100) / 100;
+      if(close <= trailingFloor) {
+        sellDate = date; sellPrice = Math.max(close, stopLossPrice); sellType = 'trailing';
         break;
       }
     }
   }
 
   if(state === 'waiting') {
-    // 딥가 미도달 — 매입 실패
     const lowestClose = Math.min(...series.map(s=>s.close));
     return {
-      outcome: 'noBuy', ticker, signalPrice, dipPrice, sellTarget, stopLossPrice,
+      outcome: 'noBuy', ticker, signalPrice, dipPrice, stopLossPrice,
       lowestClose, lowestGap: Math.round((lowestClose - dipPrice) / dipPrice * 1000) / 10,
-      signalDate,
+      signalDate, trailingPct,
     };
   }
 
-  // 기간만료 청산 (목표/손절 미도달)
+  // 기간만료 청산 (트레일링/손절 미도달)
   if(!sellDate) {
     const last = series[series.length - 1];
     sellDate = last.date; sellPrice = last.close; sellType = 'expiry';
   }
 
-  const pnlPct = Math.round((sellPrice - buyPrice) / buyPrice * 1000) / 10;
+  const pnlPct   = Math.round((sellPrice - buyPrice) / buyPrice * 1000) / 10;
+  const peakPct  = peakPrice ? Math.round((peakPrice - buyPrice) / buyPrice * 1000) / 10 : 0;
 
-  // Phase 1: 시그널 → 매입 (딥가 도달 기간)
-  const dipDays = signalDate && buyDate
-    ? Math.round((new Date(buyDate) - new Date(signalDate)) / 86400000)
+  // 최적 트레일링 % 역산: 고점 → 실제 매도가 낙폭 (학습용)
+  // 의미: "이 낙폭%를 트리거로 썼으면 최대 수익에서 이 지점에서 청산됐을 것"
+  const optimalTrailingPct = (peakPrice && peakPrice > buyPrice && sellPrice < peakPrice)
+    ? Math.round((peakPrice - sellPrice) / peakPrice * 1000) / 10
     : null;
-  const predDipDays = pred.dipDays || null; // 예측 딥 도달 기간 (설정된 경우)
-  const dipTimingError = (dipDays !== null && predDipDays !== null)
-    ? dipDays - predDipDays : null; // 양수=예상보다 늦게 도달
 
-  // Phase 2: 매입 → 매도 (보유 기간)
-  const expectedDays = pred.recoveryDays || 7;
+  // 트레일링 학습 데이터 누적 (expiry/trailing 결과만, stopLoss 제외)
+  if(sellType !== 'stopLoss' && optimalTrailingPct != null) {
+    updateTrailingLearn(figId, optimalTrailingPct);
+  }
+
+  // Phase 1: 시그널 → 매입
+  const dipDays = signalDate && buyDate
+    ? Math.round((new Date(buyDate) - new Date(signalDate)) / 86400000) : null;
+  const predDipDays     = pred.dipDays || null;
+  const dipTimingError  = (dipDays !== null && predDipDays !== null) ? dipDays - predDipDays : null;
+
+  // Phase 2: 매입 → 매도
+  const expectedDays   = pred.recoveryDays || 7;
   const actualHoldDays = Math.round((new Date(sellDate) - new Date(buyDate)) / 86400000);
-  const timingDiff = actualHoldDays - expectedDays; // 양수=예상보다 오래걸림
-
-  // 가격 오차
-  // Phase 1 가격: 실제 매입가 vs 예측 딥가 (buyPrice <= dipPrice 이므로 보통 음수)
-  const buyPriceDiff = Math.round((buyPrice - dipPrice) / dipPrice * 1000) / 10;
-  // Phase 2 가격: 실제 매도가 vs 목표가
-  const targetDiff = Math.round((sellPrice - sellTarget) / sellTarget * 1000) / 10;
+  const timingDiff     = actualHoldDays - expectedDays;
+  const buyPriceDiff   = Math.round((buyPrice - dipPrice) / dipPrice * 1000) / 10;
 
   return {
-    outcome: sellType === 'target' ? 'success' : sellType === 'stopLoss' ? 'stopLoss' : 'expiry',
-    ticker, signalPrice, dipPrice, sellTarget, stopLossPrice,
+    outcome: sellType === 'trailing' ? 'success' : sellType === 'stopLoss' ? 'stopLoss' : 'expiry',
+    ticker, signalPrice, dipPrice, stopLossPrice,
+    trailingPct, peakPrice, peakPct, optimalTrailingPct,
     signalDate, buyDate, buyPrice, sellDate, sellPrice, sellType,
-    // Phase 1: 시그널→매입
     dipDays, predDipDays, dipTimingError,
-    buyPriceDiff,   // 실제매입가 vs 예측딥가 (%)
-    // Phase 2: 매입→매도
+    buyPriceDiff,
     pnlPct, actualHoldDays, expectedDays, timingDiff,
-    targetDiff,     // 실제매도가 vs 목표가 (%)
+    targetDiff: peakPct, // 트레일링 방식: 고점 수익률을 targetDiff 대용으로 기록
   };
 }
 
@@ -4100,10 +4139,11 @@ function renderSim(){
                         오차${r.timingDiff>0?'+':''}${r.timingDiff}일)</span>`
                         :r.expectedDays!=null?'<span>)</span>':''}
                       <span style="color:#334;margin-left:2px">|</span>
-                      <span style="color:#556677">목표가 ${fmtUSD(r.signalPrice)}</span>
-                      ${r.sellDate&&r.sellPrice!=null?`<span style="color:${r.outcome==='success'?'#16a34a':r.outcome==='stopLoss'?'#dc2626':'#ff8c00'};font-weight:bold">→ 실제 ${fmtUSD(r.sellPrice)}</span>`:''}
-                      ${r.targetDiff!=null?`<span style="color:${Math.abs(r.targetDiff)<=1?'#16a34a':Math.abs(r.targetDiff)<=3?'#fbbf24':'#dc2626'}">
-                        (${r.targetDiff>0?'+':''}${r.targetDiff}%)</span>`:''}
+                      ${r.peakPrice!=null?`<span style="color:#7c3aed;font-weight:bold">고점 ${fmtUSD(r.peakPrice)}</span>`:''}
+                      ${r.peakPct!=null?`<span style="color:#7c3aed">(+${r.peakPct}%)</span>`:''}
+                      ${r.trailingPct!=null?`<span style="color:#0369a1">📉 트레일링${r.trailingPct}%</span>`:''}
+                      ${r.sellDate&&r.sellPrice!=null?`<span style="color:${r.outcome==='success'?'#16a34a':r.outcome==='stopLoss'?'#dc2626':'#ff8c00'};font-weight:bold">→ 매도 ${fmtUSD(r.sellPrice)}</span>`:''}
+                      ${r.sellType?`<span style="font-size:10px;color:#666">(${r.sellType==='trailing'?'트레일링':r.sellType==='stopLoss'?'손절':r.sellType==='expiry'?'기간만료':''})</span>`:''}
                       ${r.simPnl!=null?`<span style="color:${r.simPnl>0?'#16a34a':'#dc2626'};font-weight:bold;margin-left:6px">
                         순수익${r.simPnl>0?'+':''}${r.simPnl}%</span>`:''}
                     </div>
@@ -4600,11 +4640,15 @@ function resetAndResim() {
 }
 
 function saveSimConfig() {
-  const slPct = parseFloat(document.getElementById('sim-stoploss-input')?.value);
-  const recPct = parseFloat(document.getElementById('sim-recovery-input')?.value);
+  const slPct       = parseFloat(document.getElementById('sim-stoploss-input')?.value);
+  const trailingPct = parseFloat(document.getElementById('sim-trailing-input')?.value);
   learnData.simConfig = learnData.simConfig || {};
   if(!isNaN(slPct) && slPct > 0 && slPct <= 50) learnData.simConfig.stopLossPct = slPct;
-  if(!isNaN(recPct) && recPct > 0 && recPct <= 50) learnData.simConfig.recoveryPct = recPct;
+  if(!isNaN(trailingPct) && trailingPct > 0 && trailingPct <= 30) {
+    learnData.simConfig.trailingPct = trailingPct;
+    // 기본값 변경 시 학습 데이터가 없는 인물 기준값도 리셋
+    console.log(`[트레일링] 기본값 변경: ${trailingPct}%`);
+  }
   saveLearn();
   const el = document.getElementById('sim-stoploss-saved');
   if(el) { el.textContent = '✅ 저장됨'; setTimeout(()=>{el.textContent='';},2000); }
@@ -4765,17 +4809,18 @@ function renderLearnDashboard() {
         <div style="font-size:13px;color:#b45309;font-weight:bold;font-family:sans-serif">
           💰 가상 투자 누적 성과 (하락: 딥바이 · 상승: 즉시매수)
         </div>
-        <div style="display:flex;align-items:center;gap:6px">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span style="font-size:12px;color:#445577">손절%</span>
           <input id="sim-stoploss-input" type="number" min="1" max="50" step="0.5"
             value="${cfg.stopLossPct||3}"
             style="width:48px;padding:4px 6px;border:1px solid #fbbf24;border-radius:3px;
               font-size:12px;font-family:var(--mono);background:#fff;color:#1a2340;text-align:center">
-          <span style="font-size:12px;color:#445577">익절%</span>
-          <input id="sim-recovery-input" type="number" min="0.5" max="50" step="0.5"
-            value="${cfg.recoveryPct||3}"
-            style="width:48px;padding:4px 6px;border:1px solid #16a34a;border-radius:3px;
+          <span style="font-size:12px;color:#445577">트레일링%</span>
+          <input id="sim-trailing-input" type="number" min="1" max="30" step="0.5"
+            value="${cfg.trailingPct||8}"
+            style="width:48px;padding:4px 6px;border:1px solid #0369a1;border-radius:3px;
               font-size:12px;font-family:var(--mono);background:#fff;color:#1a2340;text-align:center">
+          <span style="font-size:10px;color:#8899aa">(기본값 · 인물별 자동 학습)</span>
           <button onclick="saveSimConfig()"
             style="padding:4px 10px;border:1px solid #b45309;background:transparent;
               color:#b45309;font-size:12px;cursor:pointer;border-radius:3px">저장</button>
@@ -4789,7 +4834,7 @@ function renderLearnDashboard() {
         ${[
           ['총 시도', simTotal+'건', '#445577'],
           ['매수성공', buyRate!=null?buyRate+'%':'N/A', buyRate>=60?'#16a34a':buyRate>=30?'#fbbf24':'#dc2626'],
-          ['목표달성', successRate!=null?successRate+'%':'N/A', successRate>=60?'#16a34a':successRate>=30?'#fbbf24':'#dc2626'],
+          ['트레일링 성공', successRate!=null?successRate+'%':'N/A', successRate>=60?'#16a34a':successRate>=30?'#fbbf24':'#dc2626'],
           ['실현수익', avgPnl!=null?(avgPnl>0?'+':'')+avgPnl+'%':(realizedTrades.length===0&&expiryTrades.length>0?'미실현만':'N/A'), avgPnl>0?'#16a34a':avgPnl<0?'#dc2626':'#445577'],
         ].map(([l,v,c])=>`
           <div style="padding:8px;background:#fff;border-radius:3px;border:1px solid #fbbf2433;text-align:center">
@@ -4800,7 +4845,7 @@ function renderLearnDashboard() {
       <!-- 상세 분류 -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
         <span style="font-size:12px;background:#f0fdf4;border:1px solid #16a34a33;padding:3px 8px;border-radius:12px;color:#16a34a">
-          ✅ 목표달성 ${simSuccess.length}건</span>
+          ✅ 트레일링 성공 ${simSuccess.length}건</span>
         <span style="font-size:12px;background:#fff0f0;border:1px solid #dc262633;padding:3px 8px;border-radius:12px;color:#dc2626">
           🛑 손절 ${simStopLoss.length}건</span>
         <span style="font-size:12px;background:#f0f4ff;border:1px solid #2563eb33;padding:3px 8px;border-radius:12px;color:#2563eb">
@@ -4831,7 +4876,28 @@ function renderLearnDashboard() {
         </div>
       </div>`:''}
       ${firstDate?`<div style="font-size:11px;color:#8899aa;margin-top:6px">
-        전체 기간: ${firstDate} ~ ${lastDate||'현재'} · 손절 ${cfg.stopLossPct||5}% · 익절 ${cfg.recoveryPct||3}% (딥가 대비)</div>`:''}
+        전체 기간: ${firstDate} ~ ${lastDate||'현재'} · 하드손절 ${cfg.stopLossPct||3}% · 트레일링 기본 ${cfg.trailingPct||8}% (고점 대비)</div>`:''}
+
+      <!-- 인물별 학습된 트레일링 % 현황 -->
+      ${Object.keys(cfg.trailingByFig||{}).length>0?`
+      <div style="margin-top:10px;padding:8px 10px;background:#f0f7ff;border:1px solid #0369a133;border-radius:4px">
+        <div style="font-size:11px;color:#0369a1;font-weight:bold;margin-bottom:6px">
+          📉 인물별 학습된 트레일링 % (데이터 3건 이상 시 자동 적용)
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${Object.entries(cfg.trailingByFig||{}).map(([figId,s])=>{
+            const fig = state.figs.find(f=>f.id===+figId);
+            const learned = Math.round(s.sum/s.count*10)/10;
+            const isActive = s.count >= 3;
+            return `<div style="padding:4px 8px;background:${isActive?'#e0f0ff':'#f5f5f5'};
+              border:1px solid ${isActive?'#0369a1':'#ccc'};border-radius:3px;font-size:11px">
+              <span style="color:#1a2340">${fig?.name||figId}</span>
+              <span style="color:#0369a1;font-weight:bold;margin-left:4px">${learned}%</span>
+              <span style="color:#8899aa;margin-left:2px">(${s.count}건${isActive?'·적용중':'·학습중'})</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`:''}
 
       <!-- 선택기간 필터 (id=sim-period-body 로 JS에서 채움) -->
       ${simTotal>0 ? '<div style="margin-top:12px" id="sim-period-section"></div>' : ''}
@@ -5700,93 +5766,4 @@ window.onload = function(){
         console.log(`✅ 수익 추적 ${state.trades.length}건 복원`);
       }
 
-      // 발언 로그 — Firebase가 더 많으면 덮어씀
-      if((fbData.logs||[]).length > state.logs.length) {
-        state.logs = fbData.logs;
-        localStorage.setItem('ir_logs', JSON.stringify(state.logs));
-      }
-
-      // 뉴스 알림 — URL 기준으로 병합 (중복 제거)
-      if((fbData.alerts||[]).length > 0) {
-        const localUrls = new Set(state.alerts.map(a=>a.url||a.id));
-        const newFromFB = (fbData.alerts||[]).filter(a=>!localUrls.has(a.url||a.id));
-        if(newFromFB.length > 0) {
-          state.alerts = [...newFromFB, ...state.alerts]
-            .sort((a,b)=>b.id-a.id)
-            .slice(0,200);
-          localStorage.setItem('ir_alerts', JSON.stringify(state.alerts));
-          updateNotifBadge();
-          // 새 시그널 있으면 배너 표시
-          const newSignals = newFromFB.filter(a=>a.fromAPI&&(a.score||a.maxScore||0)>=45);
-          if(newSignals.length>0) {
-            const s = newSignals[0];
-            const lvl = getSignalLevel(s.score||s.maxScore||45);
-            showSignalBanner(lvl, s.title?.slice(0,50)||'', s.figureName||'', s.tickers||s.topTickers||'');
-          }
-          console.log(`✅ Firebase에서 새 뉴스 ${newFromFB.length}건 동기화`);
-        }
-      }
-
-      // 누적 학습 — 더 많이 학습된 쪽 사용
-      if((fbData.learnData?.newsCount||0) > learnData.newsCount) {
-        learnData = fbData.learnData;
-        localStorage.setItem('ir_learn', JSON.stringify(learnData));
-      }
-
-      renderRadar();
-      updateNotifBadge();
-      updateNewsStatus('ok');
-    }
-
-    // 실시간 동기화 — 다른 기기에서 뉴스 수집 시 즉시 반영
-    if(window.fbListen) {
-      window.fbListen((data) => {
-        // 발언 로그 업데이트
-        if((data.logs||[]).length > state.logs.length) {
-          state.logs = data.logs;
-          localStorage.setItem('ir_logs', JSON.stringify(state.logs));
-          if(state.currentTab==='log') renderLog();
-        }
-
-        // 뉴스 알림 실시간 병합
-        if((data.alerts||[]).length > 0) {
-          const localUrls = new Set(state.alerts.map(a=>a.url||a.id));
-          const newFromFB = (data.alerts||[]).filter(a=>!localUrls.has(a.url||a.id));
-          if(newFromFB.length > 0) {
-            state.alerts = [...newFromFB, ...state.alerts]
-              .sort((a,b)=>b.id-a.id)
-              .slice(0,200);
-            localStorage.setItem('ir_alerts', JSON.stringify(state.alerts));
-            updateNotifBadge();
-
-            // 새 시그널 배너 + 팝업
-            const newSignals = newFromFB.filter(a=>a.fromAPI&&(a.score||a.maxScore||0)>=45);
-            for(const s of newSignals.slice(0,1)) {
-              const sc = s.score||s.maxScore||45;
-              const lvl = getSignalLevel(sc);
-              showSignalBanner(lvl, s.title?.slice(0,50)||'', s.figureName||'', s.tickers||s.topTickers||'');
-              // 상세 팝업
-              const fig = state.figs.find(f=>f.id===s.figureId);
-              if(fig) {
-                setTimeout(()=>{
-                  showSignalDetail(fig, s, s.sectors||[], s.tickers||s.topTickers||'', sc);
-                }, 0);
-              }
-            }
-
-                      console.log(`🔄 실시간 동기화: 새 뉴스 ${newFromFB.length}건`);
-          }
-        }
-
-        // 누적 학습 동기화
-        if((data.learnData?.newsCount||0) > learnData.newsCount) {
-          learnData = data.learnData;
-          localStorage.setItem('ir_learn', JSON.stringify(learnData));
-        }
-      });
-    }
-  }, 2000);
-};
-</script>
-</body>
-</html>
+      // 발언 로
