@@ -2287,7 +2287,7 @@ async function runSimForAlert(alert, statusEl, forceResim = false) {
   if(learnData.simConfig?.marketFilter) {
     const spy = await getSPYMarketStatus();
     if(spy && !spy.isBull) {
-      console.log(📉 장세필터: SPY {spy.price} < MA200 {spy.ma200} — 매수 차단);
+      console.log("📉 장세필터: SPY " + spy.price + " < MA200 " + spy.ma200 + " -- 매수 차단");
       return { skipped: true, reason: 'marketFilter', spyPrice: spy.price, ma200: spy.ma200 };
     }
   }
