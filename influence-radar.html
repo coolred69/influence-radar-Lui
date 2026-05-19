@@ -757,6 +757,23 @@ const PRICES = {
   LMT:480,  RTX:128,  NOC:510,   PLTR:95,  HII:220,
 };
 
+// 종목별 변동성 기반 최소 손절% 테이블 (일평균 변동성 × 2)
+const STOCK_VOL = {
+  NVDA:8, AMD:8, TSLA:10, COIN:12, MSTR:15, RIOT:15, CLSK:12,
+  MSFT:5, GOOGL:5, AAPL:5, AMZN:5, INTC:6,
+  JPM:5,  BAC:5,  GS:6,   V:4,    SCHW:5,
+  LMT:5,  RTX:6,  NOC:5,  HII:6,  PLTR:7,  RKLB:10,
+  XOM:4,  CVX:4,  OXY:6,  HAL:6,  SLB:5,   FSLR:8,
+  IBIT:9, ARM:9,  ASML:6, AMAT:6, TSM:6,
+  TSLA:10,RIVN:15,
+};
+
+// 섹터 분류: 뉴스 방향과 실제 주가 반응이 반대인 섹터 정의
+const DEFENSE_TICKERS = new Set(['LMT','RTX','NOC','HII','PLTR','RKLB']);
+const ENERGY_TICKERS  = new Set(['XOM','CVX','OXY','HAL','SLB','FSLR']);
+const AI_TICKERS      = new Set(['NVDA','AMD','MSFT','GOOGL','ARM','ASML','AMAT','TSM','INTC']);
+const CRYPTO_TICKERS  = new Set(['COIN','IBIT','MSTR','RIOT','CLSK','SQ']);
+
 // 실시간 현재가 캐시
 let livePrices = JSON.parse(localStorage.getItem('ir_live_prices') || '{}');
 let priceUpdatedAt = localStorage.getItem('ir_price_updated') || null;
@@ -2134,17 +2151,46 @@ function simulateTrade(ticker, series, pred) {
   const signalPrice = series[0]?.close || pred.priceAtSignal?.[ticker] || 0;
   if(!signalPrice) return {outcome:'noData', ticker};
 
-  const avgDrop = pred.avgDrop || 5;
-  const isBullish = avgDrop < 0; // 상승신호 여부
+  const rawAvgDrop = pred.avgDrop || 5;
+
+  // ── 섹터별 신호 방향 보정 (주식 신 판단)
+  // 전쟁/지정학 뉴스 → 방위주는 실제 상승 / 에너지주도 상승
+  // 시스템이 "하락 예상"으로 분류해도 섹터 특성상 반전 처리
+  let avgDrop = rawAvgDrop;
+  if(DEFENSE_TICKERS.has(ticker) && rawAvgDrop > 3) {
+    // 방위주: 지정학 충격 뉴스는 실제 호재 → 즉시매수 방향으로 전환
+    avgDrop = -Math.abs(rawAvgDrop) * 0.5;
+  } else if(ENERGY_TICKERS.has(ticker) && rawAvgDrop > 5) {
+    // 에너지주: 전쟁/긴장 뉴스는 유가 상승 → 호재
+    avgDrop = -Math.abs(rawAvgDrop) * 0.4;
+  }
+
+  const isBullish = avgDrop < 0;
+
+  // ── 변동성 기반 손절% (종목별 최소값 보장)
+  const volStop = STOCK_VOL[ticker] || stopLossPct;
+  const effStopLoss = Math.max(stopLossPct, volStop); // 학습값 vs 종목 변동성 중 큰 값
+
+  // ── MA20 추세 필터: 상승 추세면 비현실적 딥 기다리지 않음
+  const ma20 = series.length >= 20
+    ? Math.round(series.slice(-20).reduce((s,d)=>s+d.close,0) / 20 * 100) / 100
+    : null;
+  const inUptrend = ma20 && signalPrice > ma20 * 1.02; // 2% 이상 위 = 강한 상승 추세
+
+  let dipPct = Math.abs(avgDrop);
+  if(inUptrend && !isBullish && dipPct > 5) {
+    // 상승 추세 중 과도한 하락 대기는 현실성 없음 → 5% 이내로 제한
+    dipPct = 5;
+  }
 
   let dipPrice, stopLossPrice;
 
   if(isBullish) {
     dipPrice      = signalPrice;
-    stopLossPrice = Math.round(signalPrice * (1 - stopLossPct / 100) * 100) / 100;
+    stopLossPrice = Math.round(signalPrice * (1 - effStopLoss / 100) * 100) / 100;
   } else {
-    dipPrice      = Math.round(signalPrice * (1 - avgDrop / 100) * 100) / 100;
-    stopLossPrice = Math.round(dipPrice * (1 - stopLossPct / 100) * 100) / 100;
+    dipPrice      = Math.round(signalPrice * (1 - dipPct / 100) * 100) / 100;
+    stopLossPrice = Math.round(dipPrice * (1 - effStopLoss / 100) * 100) / 100;
   }
 
   const signalDate = series[0]?.date || null;
