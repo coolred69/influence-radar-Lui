@@ -1732,6 +1732,7 @@ learnData = Object.assign({
     useTrailing: true,  // true = 트레일링 스탑 모드
     trailingByFig: {},  // 인물별 학습된 최적 trailing % { figId: {avgOptimal, count, sum} }
     stopLossByFig: {},  // 인물별 학습된 최적 손절 % { figId: {avgOptimal, count, sum} }
+    tickerCorrelation: {},// 인물×종목 상관관계 학습 { "figId_ticker": {signals,hits,sumMove,score} }
     patternAccuracy: {},// 발언 패턴별 정확도 { patId: {hit, total, sumPnl} }
     marketFilter: true, // true = 장세필터 (SPY 200일선 아래면 매수차단)
     spyMA200Cache: null,// { ma200, price, checkedAt } 24h 캐시
@@ -2097,6 +2098,31 @@ function updateStopLossLearn(figId, optimalPct) {
   s.avgOptimal = Math.round(s.sum / s.count * 10) / 10;
 }
 
+// ── 인물×종목 상관관계 점수 조회 (5건 미만이면 중립 0.5 반환)
+function getTickerCorrelation(figId, ticker) {
+  const key = figId + '_' + ticker;
+  const d = (learnData.simConfig?.tickerCorrelation || {})[key];
+  if (!d || d.signals < 5) return 0.5; // 데이터 부족 = 중립
+  return Math.round(d.score * 100) / 100;
+}
+
+// ── 인물×종목 상관관계 학습 업데이트
+function updateTickerCorrelation(figId, ticker, isHit, pnlPct) {
+  if (!figId || !ticker) return;
+  const key = figId + '_' + ticker;
+  const cfg = learnData.simConfig;
+  if (!cfg.tickerCorrelation) cfg.tickerCorrelation = {};
+  if (!cfg.tickerCorrelation[key]) cfg.tickerCorrelation[key] = {signals:0, hits:0, sumMove:0, score:0.5};
+  const d = cfg.tickerCorrelation[key];
+  d.signals++;
+  if (isHit) d.hits++;
+  d.sumMove = Math.round((d.sumMove + (pnlPct||0)) * 10) / 10;
+  // 점수 = 적중률 × 평균수익 보정 (음수 수익이면 패널티)
+  const hitRate = d.hits / d.signals;
+  const avgMove = d.sumMove / d.signals;
+  d.score = Math.round(Math.max(0, Math.min(1, hitRate * (1 + avgMove / 20))) * 100) / 100;
+}
+
 // ── 발언 패턴별 정확도 업데이트
 function updatePatternAccuracy(patternId, isHit, pnlPct) {
   if(!patternId) return;
@@ -2145,6 +2171,12 @@ function simulateTrade(ticker, series, pred) {
   const figId = pred.figureId || 'default';
   const stopLossPct = getLearnedStopLossPct(figId); // 인물별 학습된 손절% (없으면 기본 3%)
   const trailingPct = getLearnedTrailingPct(figId);  // 인물별 학습된 트레일링% (없으면 기본 8%)
+
+  // ── 상관관계 필터: 5건 이상 데이터에서 점수 0.2 미만이면 스킵
+  const corrScore = getTickerCorrelation(figId, ticker);
+  if (corrScore < 0.2) {
+    return {outcome:'lowCorr', ticker, figId, corrScore};
+  }
 
   // 시그널가: Yahoo 실제 종가(series[0]) 우선 사용, fallback만 priceAtSignal
   if(!series?.length) return {outcome:'noData', ticker};
@@ -2267,6 +2299,9 @@ function simulateTrade(ticker, series, pred) {
   const patId = pred.patternId || pred.patternName || null;
   const isHit = sellType === 'trailing';
   updatePatternAccuracy(patId, isHit, pnlPct);
+
+  // 인물×종목 상관관계 학습
+  updateTickerCorrelation(figId, ticker, isHit, pnlPct);
 
   // Phase 1: 시그널 → 매입
   const dipDays = signalDate && buyDate
