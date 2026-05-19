@@ -1714,6 +1714,10 @@ learnData = Object.assign({
     trailingPct: 8,     // 트레일링 스탑 기본값 % (고점 대비 하락 시 매도)
     useTrailing: true,  // true = 트레일링 스탑 모드
     trailingByFig: {},  // 인물별 학습된 최적 trailing % { figId: {avgOptimal, count, sum} }
+    stopLossByFig: {},  // 인물별 학습된 최적 손절 % { figId: {avgOptimal, count, sum} }
+    patternAccuracy: {},// 발언 패턴별 정확도 { patId: {hit, total, sumPnl} }
+    marketFilter: true, // true = 장세필터 (SPY 200일선 아래면 매수차단)
+    spyMA200Cache: null,// { ma200, price, checkedAt } 24h 캐시
   },
 }, learnData);
 
@@ -2053,16 +2057,77 @@ function updateTrailingLearn(figId, optimalTrailingPct) {
   s.avgOptimal = Math.round(s.sum / s.count * 10) / 10;
 }
 
+// ── 인물별 학습된 최적 손절 % 반환
+function getLearnedStopLossPct(figId) {
+  const cfg = learnData.simConfig || {};
+  const defaultPct = cfg.stopLossPct ?? 3;
+  const byFig = cfg.stopLossByFig || {};
+  const stats = byFig[figId];
+  if(!stats || stats.count < 3) return defaultPct;
+  const learned = Math.round(stats.sum / stats.count * 10) / 10;
+  return Math.min(15, Math.max(1, learned));
+}
+
+// ── 손절% 학습 업데이트
+function updateStopLossLearn(figId, optimalPct) {
+  if(!figId || optimalPct == null || optimalPct <= 0) return;
+  const cfg = learnData.simConfig;
+  if(!cfg.stopLossByFig) cfg.stopLossByFig = {};
+  if(!cfg.stopLossByFig[figId]) cfg.stopLossByFig[figId] = {count:0, sum:0, avgOptimal: cfg.stopLossPct??3};
+  const s = cfg.stopLossByFig[figId];
+  s.count++;
+  s.sum += optimalPct;
+  s.avgOptimal = Math.round(s.sum / s.count * 10) / 10;
+}
+
+// ── 발언 패턴별 정확도 업데이트
+function updatePatternAccuracy(patternId, isHit, pnlPct) {
+  if(!patternId) return;
+  const cfg = learnData.simConfig;
+  if(!cfg.patternAccuracy) cfg.patternAccuracy = {};
+  if(!cfg.patternAccuracy[patternId]) cfg.patternAccuracy[patternId] = {hit:0, total:0, sumPnl:0};
+  const p = cfg.patternAccuracy[patternId];
+  p.total++;
+  if(isHit) p.hit++;
+  p.sumPnl = Math.round((p.sumPnl + pnlPct) * 10) / 10;
+}
+
+// ── SPY 200일 이평선 장세 필터 (24h 캐시)
+async function getSPYMarketStatus() {
+  const cfg = learnData.simConfig || {};
+  const cache = cfg.spyMA200Cache;
+  const now = Date.now();
+  // 24시간 캐시
+  if(cache && cache.checkedAt && (now - cache.checkedAt) < 24*60*60*1000) {
+    return cache;
+  }
+  try {
+    const p2 = Math.floor(now / 1000);
+    const p1 = p2 - 86400 * 220; // 220일치
+    const url = https://query1.finance.yahoo.com/v8/finance/chart/SPY?interval=1d&period1=&period2=;
+    const proxy = https://api.allorigins.win/raw?url=;
+    const res = await fetch(proxy, {signal: AbortSignal.timeout(8000)});
+    const json = await res.json();
+    const closes = json?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(v => v != null) || [];
+    if(closes.length < 200) return null;
+    const ma200 = Math.round(closes.slice(-200).reduce((a,b)=>a+b,0) / 200 * 100) / 100;
+    const price = Math.round(closes[closes.length-1] * 100) / 100;
+    const result = { ma200, price, isBull: price > ma200, checkedAt: now };
+    learnData.simConfig.spyMA200Cache = result;
+    saveLearn();
+    return result;
+  } catch(e) {
+    return null; // 조회 실패 시 필터 미적용
+  }
+}
 // ── 가상 매매 시뮬레이션 엔진 (트레일링 스탑 방식)
 // 하락신호: 딥가 도달 시 매입 → 트레일링 스탑 또는 하드 손절
 // 상승신호: 신호 당일 즉시 매입 → 트레일링 스탑 또는 하드 손절
 function simulateTrade(ticker, series, pred) {
   const cfg = learnData.simConfig || {};
-  const stopLossPct = cfg.stopLossPct ?? 3;
   const figId = pred.figureId || 'default';
-
-  // 인물별 학습된 트레일링 % (없으면 기본 8%)
-  const trailingPct = getLearnedTrailingPct(figId);
+  const stopLossPct = getLearnedStopLossPct(figId); // 인물별 학습된 손절% (없으면 기본 3%)
+  const trailingPct = getLearnedTrailingPct(figId);  // 인물별 학습된 트레일링% (없으면 기본 8%)
 
   // 시그널가: Yahoo 실제 종가(series[0]) 우선 사용, fallback만 priceAtSignal
   if(!series?.length) return {outcome:'noData', ticker};
@@ -2145,6 +2210,18 @@ function simulateTrade(ticker, series, pred) {
     updateTrailingLearn(figId, optimalTrailingPct);
   }
 
+  // 손절% 최적값 역산: 실제 최저가와 매수가의 차이
+  const lowestInHolding = Math.min(...series.filter((_,i)=>i>=series.findIndex(d=>d.date===buyDate)).map(s=>s.close));
+  const optimalStopLoss = buyPrice ? Math.round((buyPrice - lowestInHolding) / buyPrice * 1000) / 10 : null;
+  if(optimalStopLoss != null && optimalStopLoss > 0) {
+    updateStopLossLearn(figId, optimalStopLoss);
+  }
+
+  // 발언 패턴별 정확도 업데이트
+  const patId = pred.patternId || pred.patternName || null;
+  const isHit = sellType === 'trailing';
+  updatePatternAccuracy(patId, isHit, pnlPct);
+
   // Phase 1: 시그널 → 매입
   const dipDays = signalDate && buyDate
     ? Math.round((new Date(buyDate) - new Date(signalDate)) / 86400000) : null;
@@ -2205,6 +2282,15 @@ async function runSimForAlert(alert, statusEl, forceResim = false) {
   const signalDate = new Date(alert.id || alert.signalDate || pred.createdAt || now);
   const tickers = splitTk(pred.tickers).slice(0, 3);
   const seriesMap = {};
+
+  // ── 장세 필터: SPY 200일선 아래면 매수 차단 (설정 활성화 시)
+  if(learnData.simConfig?.marketFilter) {
+    const spy = await getSPYMarketStatus();
+    if(spy && !spy.isBull) {
+      console.log(📉 장세필터: SPY {spy.price} < MA200 {spy.ma200} — 매수 차단);
+      return { skipped: true, reason: 'marketFilter', spyPrice: spy.price, ma200: spy.ma200 };
+    }
+  }
 
   for(const ticker of tickers) {
     const series = await fetchPriceSeries(ticker, signalDate.toISOString(), pred.expectedDate);
