@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -2064,8 +2064,10 @@ function simulateTrade(ticker, series, pred) {
   // 인물별 학습된 트레일링 % (없으면 기본 8%)
   const trailingPct = getLearnedTrailingPct(figId);
 
-  const signalPrice = pred.priceAtSignal?.[ticker] || 0;
-  if(!signalPrice || !series?.length) return {outcome:'noData', ticker};
+  // 시그널가: Yahoo 실제 종가(series[0]) 우선 사용, fallback만 priceAtSignal
+  if(!series?.length) return {outcome:'noData', ticker};
+  const signalPrice = series[0]?.close || pred.priceAtSignal?.[ticker] || 0;
+  if(!signalPrice) return {outcome:'noData', ticker};
 
   const avgDrop = pred.avgDrop || 5;
   const isBullish = avgDrop < 0; // 상승신호 여부
