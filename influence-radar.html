@@ -5766,4 +5766,94 @@ window.onload = function(){
         console.log(`✅ 수익 추적 ${state.trades.length}건 복원`);
       }
 
-      // 발언 로
+      // 발언 로그 — Firebase가 더 많으면 덮어씀
+      if((fbData.logs||[]).length > state.logs.length) {
+        state.logs = fbData.logs;
+        localStorage.setItem('ir_logs', JSON.stringify(state.logs));
+      }
+
+      // 뉴스 알림 — URL 기준으로 병합 (중복 제거)
+      if((fbData.alerts||[]).length > 0) {
+        const localUrls = new Set(state.alerts.map(a=>a.url||a.id));
+        const newFromFB = (fbData.alerts||[]).filter(a=>!localUrls.has(a.url||a.id));
+        if(newFromFB.length > 0) {
+          state.alerts = [...newFromFB, ...state.alerts]
+            .sort((a,b)=>b.id-a.id)
+            .slice(0,200);
+          localStorage.setItem('ir_alerts', JSON.stringify(state.alerts));
+          updateNotifBadge();
+          // 새 시그널 있으면 배너 표시
+          const newSignals = newFromFB.filter(a=>a.fromAPI&&(a.score||a.maxScore||0)>=45);
+          if(newSignals.length>0) {
+            const s = newSignals[0];
+            const lvl = getSignalLevel(s.score||s.maxScore||45);
+            showSignalBanner(lvl, s.title?.slice(0,50)||'', s.figureName||'', s.tickers||s.topTickers||'');
+          }
+          console.log(`✅ Firebase에서 새 뉴스 ${newFromFB.length}건 동기화`);
+        }
+      }
+
+      // 누적 학습 — 더 많이 학습된 쪽 사용
+      if((fbData.learnData?.newsCount||0) > learnData.newsCount) {
+        learnData = fbData.learnData;
+        localStorage.setItem('ir_learn', JSON.stringify(learnData));
+      }
+
+      renderRadar();
+      updateNotifBadge();
+      updateNewsStatus('ok');
+    }
+
+    // 실시간 동기화 — 다른 기기에서 뉴스 수집 시 즉시 반영
+    if(window.fbListen) {
+      window.fbListen((data) => {
+        // 발언 로그 업데이트
+        if((data.logs||[]).length > state.logs.length) {
+          state.logs = data.logs;
+          localStorage.setItem('ir_logs', JSON.stringify(state.logs));
+          if(state.currentTab==='log') renderLog();
+        }
+
+        // 뉴스 알림 실시간 병합
+        if((data.alerts||[]).length > 0) {
+          const localUrls = new Set(state.alerts.map(a=>a.url||a.id));
+          const newFromFB = (data.alerts||[]).filter(a=>!localUrls.has(a.url||a.id));
+          if(newFromFB.length > 0) {
+            state.alerts = [...newFromFB, ...state.alerts]
+              .sort((a,b)=>b.id-a.id)
+              .slice(0,200);
+            localStorage.setItem('ir_alerts', JSON.stringify(state.alerts));
+            updateNotifBadge();
+
+            // 새 시그널 배너 + 팝업
+            const newSignals = newFromFB.filter(a=>a.fromAPI&&(a.score||a.maxScore||0)>=45);
+            for(const s of newSignals.slice(0,1)) {
+              const sc = s.score||s.maxScore||45;
+              const lvl = getSignalLevel(sc);
+              showSignalBanner(lvl, s.title?.slice(0,50)||'', s.figureName||'', s.tickers||s.topTickers||'');
+              // 상세 팝업
+              const fig = state.figs.find(f=>f.id===s.figureId);
+              if(fig) {
+                setTimeout(()=>{
+                  showSignalDetail(fig, s, s.sectors||[], s.tickers||s.topTickers||'', sc);
+                }, 0);
+              }
+            }
+
+            if(state.currentTab==='news') renderNews();
+            console.log(`🔄 실시간 동기화: 새 뉴스 ${newFromFB.length}건`);
+          }
+        }
+
+        // 누적 학습 동기화
+        if((data.learnData?.newsCount||0) > learnData.newsCount) {
+          learnData = data.learnData;
+          localStorage.setItem('ir_learn', JSON.stringify(learnData));
+        }
+      });
+    }
+  }, 2000);
+};
+</script>
+</body>
+</html>
