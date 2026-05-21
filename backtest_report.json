@@ -1,0 +1,165 @@
+{
+  "timestamp": "2026-05-18T03:34:04.382935",
+  "period": "2023-01-10 to 2023-10-30",
+  "results": {
+    "total_signals": 10,
+    "correct_predictions": 10,
+    "accuracy": 100.0,
+    "by_person": {
+      "Jensen Huang": {
+        "total": 2,
+        "correct": 2,
+        "avg_accuracy": 1.0,
+        "signals": [
+          {
+            "date": "2023-01-10",
+            "ticker": "NVDA",
+            "accuracy": 1.0
+          },
+          {
+            "date": "2023-06-10",
+            "ticker": "NVDA",
+            "accuracy": 1.0
+          }
+        ],
+        "accuracy_pct": 100.0
+      },
+      "Jerome Powell": {
+        "total": 3,
+        "correct": 3,
+        "avg_accuracy": 1.0,
+        "signals": [
+          {
+            "date": "2023-02-03",
+            "ticker": "^DXY",
+            "accuracy": 1.0
+          },
+          {
+            "date": "2023-07-25",
+            "ticker": "^DXY",
+            "accuracy": 1.0
+          },
+          {
+            "date": "2023-10-30",
+            "ticker": "^DXY",
+            "accuracy": 1.0
+          }
+        ],
+        "accuracy_pct": 100.0
+      },
+      "Satya Nadella": {
+        "total": 2,
+        "correct": 2,
+        "avg_accuracy": 1.0,
+        "signals": [
+          {
+            "date": "2023-03-15",
+            "ticker": "MSFT",
+            "accuracy": 1.0
+          },
+          {
+            "date": "2023-08-14",
+            "ticker": "MSFT",
+            "accuracy": 1.0
+          }
+        ],
+        "accuracy_pct": 100.0
+      },
+      "Elon Musk": {
+        "total": 2,
+        "correct": 2,
+        "avg_accuracy": 1.0,
+        "signals": [
+          {
+            "date": "2023-04-22",
+            "ticker": "TSLA",
+            "accuracy": 1.0
+          },
+          {
+            "date": "2023-09-22",
+            "ticker": "TSLA",
+            "accuracy": 1.0
+          }
+        ],
+        "accuracy_pct": 100.0
+      },
+      "Nancy Pelosi": {
+        "total": 1,
+        "correct": 1,
+        "avg_accuracy": 1.0,
+        "signals": [
+          {
+            "date": "2023-05-18",
+            "ticker": "AAPL",
+            "accuracy": 1.0
+          }
+        ],
+        "accuracy_pct": 100.0
+      }
+    },
+    "by_sector": {
+      "AI/GPU": {
+        "total": 2,
+        "correct": 2,
+        "avg_accuracy": 1.0,
+        "signals": [
+          1.0,
+          1.0
+        ],
+        "accuracy_pct": 100.0
+      },
+      "Macro/Rates": {
+        "total": 3,
+        "correct": 3,
+        "avg_accuracy": 1.0,
+        "signals": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "accuracy_pct": 100.0
+      },
+      "Cloud/AI": {
+        "total": 2,
+        "correct": 2,
+        "avg_accuracy": 1.0,
+        "signals": [
+          1.0,
+          1.0
+        ],
+        "accuracy_pct": 100.0
+      },
+      "Auto/Energy": {
+        "total": 2,
+        "correct": 2,
+        "avg_accuracy": 1.0,
+        "signals": [
+          1.0,
+          1.0
+        ],
+        "accuracy_pct": 100.0
+      },
+      "Tech/Finance": {
+        "total": 1,
+        "correct": 1,
+        "avg_accuracy": 1.0,
+        "signals": [
+          1.0
+        ],
+        "accuracy_pct": 100.0
+      }
+    },
+    "price_metrics": {
+      "correct_predictions": 10,
+      "accuracy_pct": 100.0,
+      "avg_buy_error_pct": 0.21,
+      "avg_sell_error_pct": 0.31,
+      "buy_mape": 0.21,
+      "sell_mape": 0.31
+    },
+    "date_metrics": {},
+    "avg_return": 11.79,
+    "max_return": 18.03,
+    "min_return": 3.03
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "trained_at": "2026-05-18T03:34:04.139049",
+  "feature_names": [
+    "influence_score",
+    "signal_strength",
+    "sector",
+    "sentiment",
+    "news_frequency",
+    "cross_validation_count"
+  ],
+  "scaler_info": {
+    "X_mean": [
+      0.898,
+      0.843,
+      2.8,
+      0.7,
+      4.2,
+      3.0
+    ],
+    "X_std": [
+      0.03655133376499413,
+      0.04561797891182817,
+      1.2489995996796797,
+      0.45825756949558405,
+      1.469693845669907,
+      0.0
+    ]
+  },
+  "total_signals": 10
+}
