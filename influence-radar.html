@@ -2068,11 +2068,12 @@ function getLearnedTrailingPct(figId) {
   const defaultPct = cfg.trailingPct ?? 8;
   const byFig = cfg.trailingByFig || {};
   const stats = byFig[figId];
-  // 3건 이상 데이터 있을 때만 학습값 사용
-  if(!stats || stats.count < 3) return defaultPct;
-  const learned = Math.round(stats.sum / stats.count * 10) / 10;
-  // 2%~25% 범위 클램핑
-  return Math.min(25, Math.max(2, learned));
+  if(!stats || stats.count === 0) return defaultPct;
+  const learned = stats.sum / stats.count;
+  // 데이터 건수에 따라 학습값 비중 증가 (10건에서 100%)
+  const weight = Math.min(1, stats.count / 10);
+  const blended = defaultPct * (1 - weight) + learned * weight;
+  return Math.min(25, Math.max(2, Math.round(blended * 10) / 10));
 }
 
 // ── 트레일링 스탑 학습 업데이트: 거래 결과에서 최적 trailing % 역산 후 누적
