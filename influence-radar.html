@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -428,6 +428,15 @@ const SM = {
   DEFENSE:{label:"방위·우주",color:"#8b5cf6",temp:82,
     d:[{t:"LMT",n:"Lockheed Martin",f:80,mc:"130B",note:"F-35·미사일"},{t:"RTX",n:"RTX",f:77,mc:"150B",note:"레이더·미사일"},{t:"NOC",n:"Northrop",f:76,mc:"70B",note:"스텔스·우주"}],
     i:[{t:"PLTR",n:"Palantir",f:72,mc:"200B",note:"군사AI"},{t:"RKLB",n:"Rocket Lab",f:63,mc:"10B",note:"발사체"},{t:"HII",n:"Huntington Ingalls",f:70,mc:"10B",note:"해군함정"}]},
+  HEALTHCARE:{label:"의료·바이오",color:"#ec4899",temp:60,
+    d:[{t:"LLY",n:"Eli Lilly",f:88,mc:"750B",note:"비만약 독주"},{t:"UNH",n:"UnitedHealth",f:82,mc:"450B",note:"최대보험사"},{t:"JNJ",n:"J&J",f:79,mc:"390B",note:"의료복합기업"}],
+    i:[{t:"MRNA",n:"Moderna",f:58,mc:"15B",note:"mRNA플랫폼"},{t:"PFE",n:"Pfizer",f:60,mc:"160B",note:"대형제약"},{t:"ISRG",n:"Intuitive Surgical",f:85,mc:"180B",note:"수술로봇"}]},
+  RETAIL:{label:"소비·유통",color:"#f97316",temp:52,
+    d:[{t:"AMZN",n:"Amazon",f:90,mc:"2.1T",note:"이커머스1위"},{t:"WMT",n:"Walmart",f:85,mc:"700B",note:"오프라인1위"},{t:"COST",n:"Costco",f:88,mc:"400B",note:"멤버십유통"}],
+    i:[{t:"TGT",n:"Target",f:72,mc:"55B",note:"중가유통"},{t:"HD",n:"Home Depot",f:80,mc:"370B",note:"홈인테리어"},{t:"MCD",n:"McDonald's",f:83,mc:"210B",note:"패스트푸드"}]},
+  REALESTATE:{label:"부동산·리츠",color:"#14b8a6",temp:44,
+    d:[{t:"PLD",n:"Prologis",f:82,mc:"100B",note:"물류창고REIT"},{t:"AMT",n:"American Tower",f:78,mc:"90B",note:"통신타워REIT"},{t:"EQIX",n:"Equinix",f:84,mc:"80B",note:"데이터센터REIT"}],
+    i:[{t:"SPG",n:"Simon Property",f:70,mc:"55B",note:"쇼핑몰REIT"},{t:"O",n:"Realty Income",f:74,mc:"50B",note:"월배당REIT"},{t:"WELL",n:"Welltower",f:75,mc:"70B",note:"헬스케어REIT"}]},
 };
 
 // ═══════════════════════════════════════
@@ -772,7 +781,10 @@ const STOCK_VOL = {
 const DEFENSE_TICKERS = new Set(['LMT','RTX','NOC','HII','PLTR','RKLB']);
 const ENERGY_TICKERS  = new Set(['XOM','CVX','OXY','HAL','SLB','FSLR']);
 const AI_TICKERS      = new Set(['NVDA','AMD','MSFT','GOOGL','ARM','ASML','AMAT','TSM','INTC']);
-const CRYPTO_TICKERS  = new Set(['COIN','IBIT','MSTR','RIOT','CLSK','SQ']);
+const CRYPTO_TICKERS     = new Set(['COIN','IBIT','MSTR','RIOT','CLSK','SQ']);
+const HEALTHCARE_TICKERS = new Set(['JNJ','UNH','LLY','PFE','MRNA','ABBV','TMO','ABT','MDT','ISRG']);
+const RETAIL_TICKERS     = new Set(['AMZN','WMT','TGT','COST','HD','MCD','SBUX','NKE','LOW']);
+const REALESTATE_TICKERS = new Set(['AMT','PLD','EQIX','SPG','O','VNQ','IYR','WELL','DLR']);
 
 // 실시간 현재가 캐시
 let livePrices = JSON.parse(localStorage.getItem('ir_live_prices') || '{}');
@@ -1571,7 +1583,7 @@ const CURRENTS_KEY = 'tWNp1egV25PGsljlScRHuk03eryF64K38n8GSBMhgh2cwzlD';
 
 // ML_API_URL은 항상 localStorage에서 실시간으로 읽음
 function getMLApiUrl() {
-  return localStorage.getItem('ir_ml_api_url') || '';
+  return localStorage.getItem('ir_ml_api_url') || 'https://influence-radar-lui.onrender.com';
 }
 
 // ── 서버 영구 저장/복원 (캐시 삭제에도 데이터 보존)
@@ -5097,15 +5109,15 @@ function renderLearnDashboard() {
         </button>
         <button onclick="(async()=>{
           const el=document.getElementById('ml-api-status');
-          el.textContent='테스트 중...';
+          el.textContent='테스트 중... (최대 30초)';el.style.color='#2563eb';
           const url=(document.getElementById('ml-api-input').value||'').trim().replace(/\\/$/,'');
           try{
-            const r=await fetch(url+'/',{signal:AbortSignal.timeout(5000)});
+            const r=await fetch(url+'/',{signal:AbortSignal.timeout(30000)});
             const d=await r.json();
             const loaded=d.model_loaded||d.model_trained||false;
             el.textContent=loaded?'✅ 연결됨 · 모델 로드 완료':'⚠️ 연결됨 · 모델 없음 (재학습 필요)';
             el.style.color=loaded?'#16a34a':'#fbbf24';
-          }catch(e){el.textContent='❌ 연결 실패';el.style.color='#dc2626';}
+          }catch(e){el.textContent='❌ 연결 실패 ('+e.message+')';el.style.color='#dc2626';}
         })()"
           style="padding:7px 12px;border:1px solid #445577;background:transparent;
             color:#445577;font-size:12px;cursor:pointer;border-radius:3px;white-space:nowrap">
@@ -5857,6 +5869,20 @@ window.onload = function(){
     }
   }, 4000);
 
+
+  // ── ML API 자동 워밍업 (슬립 방지) ──
+  (function mlWarmup() {
+    const url = getMLApiUrl();
+    if (!url) return;
+    // 페이지 로드 2초 후 백그라운드 핑 (응답 무시)
+    setTimeout(() => {
+      fetch(url + '/', { signal: AbortSignal.timeout(60000) }).catch(() => {});
+    }, 2000);
+    // 이후 8분마다 keepalive 핑
+    setInterval(() => {
+      fetch(url + '/', { signal: AbortSignal.timeout(60000) }).catch(() => {});
+    }, 8 * 60 * 1000);
+  })();
   // 실시간 현재가 업데이트 (15분마다)
   updateAllPrices().then(()=>{
     if(state.currentTab==='filter') renderFilter();
