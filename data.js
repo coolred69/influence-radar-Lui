@@ -1,24 +1,28 @@
 // ═══════════════════════════════════════
 // DATA.JS — 인물·섹터·패턴·초기로그 데이터
 // 수정은 이 파일만 건드릴 것
+// 마지막 백테스트: 2025.06 / T+3 기준 / 28이벤트 69티커
+// 전체 적중률 40.6% | Trump +6.85% | Musk +9.01% (기댓값)
+// 마지막 백테스트: 2025.06 / T+3 기준 / 28이벤트 69티커
+// 전체 적중률 40.6% | Trump +6.85% | Musk +9.01% (기댓값)
 // ═══════════════════════════════════════
 
 const FIGS = [
   {id:1,name:"Donald Trump",avatar:"DT",country:"🇺🇸",title:"미국 대통령",color:"#ff4444",
    twitter:"realDonaldTrump", googleAlert:"Donald Trump",
-   inf:100,base:100,susp:95,chType:"소셜직접형",
+   inf:100,base:100,susp:95,hitRate:47,evPct:6.9,chType:"소셜직접형",
    ch:["Truth Social @realDonaldTrump","백악관 기자회견","행정명령"],
    sec:["TRADE","ENERGY","CRYPTO","DEFENSE","FINANCE","RETAIL","HEALTHCARE"],
    rel:[{to:2,type:"동맹",str:85},{to:4,type:"갈등",str:90}]},
   {id:2,name:"Elon Musk",avatar:"EM",country:"🇺🇸",title:"Tesla·xAI CEO",color:"#ff8c00",
    twitter:"elonmusk", googleAlert:"Elon Musk",
-   inf:97,base:97,susp:88,chType:"소셜직접형",
+   inf:97,base:97,susp:88,hitRate:46,evPct:9.0,chType:"소셜직접형",
    ch:["X @elonmusk","Tesla 실적발표","제품 키노트"],
    sec:["AI","EV","CRYPTO","SPACE","ROBOT"],
    rel:[{to:1,type:"동맹",str:85},{to:5,type:"협력",str:72}]},
   {id:3,name:"Jerome Powell",avatar:"JP",country:"🇺🇸",title:"연준 의장",color:"#4a9eff",
    twitter:null, googleAlert:"Federal Reserve",
-   inf:91,base:91,susp:28,chType:"기관성명형",
+   inf:86,base:86,susp:28,hitRate:25,evPct:-0.3,chType:"기관성명형",
    ch:["FOMC 성명 (일정고정)","의회 증언","잭슨홀 연설"],
    sec:["FINANCE","BOND","GOLD","REALESTATE"],rel:[]},
   {id:4,name:"Xi Jinping",avatar:"XJ",country:"🇨🇳",title:"중국 국가주석",color:"#ef4444",
@@ -29,7 +33,7 @@ const FIGS = [
    rel:[{to:1,type:"갈등",str:90}]},
   {id:5,name:"Jensen Huang",avatar:"JH",country:"🇺🇸",title:"NVIDIA CEO",color:"#76b900",
    twitter:"jensenhuang", googleAlert:"Jensen Huang NVIDIA",
-   inf:84,base:84,susp:18,chType:"이벤트발표형",
+   inf:72,base:72,susp:18,hitRate:14,evPct:-2.8,chType:"이벤트발표형",
    ch:["GTC 컨퍼런스 (연1회)","분기 실적발표","X @jensenhuang"],
    sec:["AI","SEMICON","CLOUD","ROBOT"],
    rel:[{to:2,type:"협력",str:72}]},
@@ -60,13 +64,13 @@ const SM = {
     d:[{t:"NVDA",n:"NVIDIA",f:92,mc:"3.1T",note:"AI칩 독점"},{t:"MSFT",n:"Microsoft",f:88,mc:"3.0T",note:"OpenAI+Azure"},{t:"GOOGL",n:"Alphabet",f:85,mc:"2.0T",note:"Gemini·TPU"}],
     i:[{t:"SMCI",n:"Super Micro",f:72,mc:"30B",note:"AI서버"},{t:"ANET",n:"Arista",f:80,mc:"120B",note:"DC네트워크"},{t:"ARM",n:"ARM Holdings",f:76,mc:"140B",note:"칩설계"}]},
   SEMICON:{label:"반도체",color:"#a78bfa",temp:72,
-    d:[{t:"NVDA",n:"NVIDIA",f:92,mc:"3.1T",note:"GPU 독점"},{t:"AMD",n:"AMD",f:78,mc:"220B",note:"NVDA대안"},{t:"INTC",n:"Intel",f:52,mc:"90B",note:"구조조정中"}],
+    d:[{t:"NVDA",n:"NVIDIA",f:92,mc:"3.1T",note:"GPU 독점"},{t:"AMD",n:"AMD",f:50,mc:"220B",note:"NVDA대안"},{t:"INTC",n:"Intel",f:52,mc:"90B",note:"구조조정中"}],
     i:[{t:"ASML",n:"ASML",f:90,mc:"280B",note:"EUV독점"},{t:"AMAT",n:"Applied Materials",f:82,mc:"140B",note:"반도체장비"},{t:"TSM",n:"TSMC ADR",f:91,mc:"900B",note:"파운드리1위"}]},
   EV:{label:"전기차·로봇",color:"#ff8c00",temp:45,
-    d:[{t:"TSLA",n:"Tesla",f:61,mc:"800B",note:"브랜드리스크"},{t:"RIVN",n:"Rivian",f:44,mc:"15B",note:"적자지속"},{t:"LI",n:"Li Auto",f:71,mc:"25B",note:"중국내수"}],
+    d:[{t:"TSLA",n:"Tesla",f:88,mc:"800B",note:"브랜드리스크"},{t:"RIVN",n:"Rivian",f:44,mc:"15B",note:"적자지속"},{t:"LI",n:"Li Auto",f:71,mc:"25B",note:"중국내수"}],
     i:[{t:"ALB",n:"Albemarle",f:65,mc:"10B",note:"리튬원자재"},{t:"ON",n:"ON Semi",f:74,mc:"30B",note:"EV전력반도체"},{t:"APTV",n:"Aptiv",f:68,mc:"12B",note:"자율주행부품"}]},
   CRYPTO:{label:"크립토",color:"#f59e0b",temp:61,
-    d:[{t:"COIN",n:"Coinbase",f:65,mc:"55B",note:"미국최대거래소"},{t:"MSTR",n:"MicroStrategy",f:58,mc:"80B",note:"BTC레버리지"},{t:"IBIT",n:"iShares BTC ETF",f:70,mc:"—",note:"BTC직접노출"}],
+    d:[{t:"COIN",n:"Coinbase",f:92,mc:"55B",note:"미국최대거래소"},{t:"MSTR",n:"MicroStrategy",f:85,mc:"80B",note:"BTC레버리지"},{t:"IBIT",n:"iShares BTC ETF",f:70,mc:"—",note:"BTC직접노출"}],
     i:[{t:"RIOT",n:"Riot Platforms",f:51,mc:"4B",note:"BTC채굴"},{t:"SQ",n:"Block",f:67,mc:"40B",note:"크립토결제"},{t:"CLSK",n:"CleanSpark",f:53,mc:"3B",note:"BTC채굴"}]},
   ENERGY:{label:"에너지",color:"#ef4444",temp:79,
     d:[{t:"XOM",n:"ExxonMobil",f:74,mc:"490B",note:"원유메이저"},{t:"CVX",n:"Chevron",f:72,mc:"270B",note:"원유메이저"},{t:"OXY",n:"Occidental",f:68,mc:"48B",note:"Buffett보유"}],
@@ -75,8 +79,8 @@ const SM = {
     d:[{t:"JPM",n:"JPMorgan",f:85,mc:"700B",note:"미국최대은행"},{t:"BAC",n:"BofA",f:78,mc:"340B",note:"금리민감"},{t:"GS",n:"Goldman Sachs",f:82,mc:"180B",note:"M&A·트레이딩"}],
     i:[{t:"V",n:"Visa",f:88,mc:"600B",note:"결제인프라"},{t:"BRK.B",n:"Berkshire",f:86,mc:"1.0T",note:"Buffett펀드"},{t:"SCHW",n:"Schwab",f:74,mc:"130B",note:"리테일브로커"}]},
   CHINA_TECH:{label:"중국 테크",color:"#fbbf24",temp:38,
-    d:[{t:"BABA",n:"Alibaba",f:67,mc:"250B",note:"이커머스·클라우드"},{t:"BIDU",n:"Baidu",f:59,mc:"30B",note:"검색·AI"},{t:"PDD",n:"PDD Holdings",f:71,mc:"130B",note:"테무모회사"}],
-    i:[{t:"FXI",n:"China ETF",f:58,mc:"—",note:"중국대형주"},{t:"KWEB",n:"China Internet ETF",f:60,mc:"—",note:"인터넷ETF"},{t:"JD",n:"JD.com",f:62,mc:"45B",note:"이커머스"}]},
+    d:[{t:"BABA",n:"Alibaba",f:48,mc:"250B",note:"이커머스·클라우드"},{t:"BIDU",n:"Baidu",f:59,mc:"30B",note:"검색·AI"},{t:"PDD",n:"PDD Holdings",f:71,mc:"130B",note:"테무모회사"}],
+    i:[{t:"FXI",n:"China ETF",f:55,mc:"—",note:"중국대형주"},{t:"KWEB",n:"China Internet ETF",f:60,mc:"—",note:"인터넷ETF"},{t:"JD",n:"JD.com",f:62,mc:"45B",note:"이커머스"}]},
   ROBOT:{label:"로봇·자동화",color:"#10b981",temp:66,
     d:[{t:"TSLA",n:"Tesla(Optimus)",f:61,mc:"800B",note:"Optimus2027"},{t:"ISRG",n:"Intuitive Surgical",f:85,mc:"180B",note:"수술로봇"},{t:"ABB",n:"ABB Ltd",f:79,mc:"80B",note:"산업로봇"}],
     i:[{t:"NVDA",n:"NVIDIA",f:92,mc:"3.1T",note:"로봇AI두뇌"},{t:"TER",n:"Teradyne",f:74,mc:"15B",note:"로봇테스팅"},{t:"RKLB",n:"Rocket Lab",f:63,mc:"10B",note:"소형발사체"}]},
