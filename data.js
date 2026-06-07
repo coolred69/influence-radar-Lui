@@ -49,7 +49,7 @@ const FIGS = [
    ch:["X @sama","제품발표","의회 증언"],
    sec:["AI","CLOUD","SEMICON"],rel:[]},
   {id:9,name:"MBS",avatar:"MB",country:"🇸🇦",title:"사우디 왕세자",color:"#f97316",
-   twitter:null, googleAlert:"MBS Saudi Arabia",
+   twitter:null, googleAlert:"OPEC Saudi Arabia",
    inf:72,base:72,susp:55,chType:"정책발표형",
    ch:["OPEC+ 발표","사우디 국영미디어 SPA"],
    sec:["ENERGY","DEFENSE"],rel:[]},
