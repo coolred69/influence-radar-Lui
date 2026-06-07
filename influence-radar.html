@@ -282,6 +282,7 @@ console.log('✅ Firebase 연결 완료');
   <div id="news-status-dot" style="width:7px;height:7px;border-radius:50%;
     background:#fbbf24;box-shadow:0 0 8px #fbbf24;flex-shrink:0;animation:pulse 1.5s infinite"></div>
   <span id="news-status-txt" style="font-size:13px;color:#fbbf24;font-family:var(--mono)">초기화 중...</span>
+  <span id="rss-status-txt" style="font-size:12px;color:#2563eb;font-family:var(--mono)"></span>
   <span id="fb-status" style="font-size:12px;color:#334;font-family:var(--mono);display:none">🔥 FB 연결 중...</span>
   <button onclick="lastNewsCheck=0;runNewsCheck()" style="margin-left:auto;font-size:12px;padding:3px 10px;
     border:1px solid #b0b8d0;background:transparent;color:#334466;
@@ -2320,6 +2321,142 @@ async function fetchGNewsAPI(query, fromDate=null, toDate=null) {
   } catch(e) { return []; }
 }
 
+// ═══════════════════════════════════════
+// NITTER RSS + GOOGLE ALERTS RSS
+// ═══════════════════════════════════════
+
+// Nitter 인스턴스 fallback 리스트 (죽으면 다음으로)
+const NITTER_INSTANCES = [
+  'https://nitter.net',
+  'https://nitter.privacydev.net',
+  'https://nitter.poast.org',
+  'https://nitter.1d4.us',
+];
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+// 살아있는 Nitter 인스턴스 캐시 (1시간)
+let nitterAliveCache = {instance: null, checkedAt: 0};
+
+async function getAliveNitter() {
+  const now = Date.now();
+  if(nitterAliveCache.instance && now - nitterAliveCache.checkedAt < 60*60*1000) {
+    return nitterAliveCache.instance;
+  }
+  for(const inst of NITTER_INSTANCES) {
+    try {
+      const url = `${CORS_PROXY}${encodeURIComponent(inst+'/elonmusk/rss')}`;
+      const res = await fetch(url, {signal: AbortSignal.timeout(5000)});
+      if(res.ok) {
+        const text = await res.text();
+        if(text.includes('<rss') || text.includes('<feed')) {
+          nitterAliveCache = {instance: inst, checkedAt: now};
+          console.log('[Nitter] 살아있는 인스턴스:', inst);
+          return inst;
+        }
+      }
+    } catch(e) { /* 다음 시도 */ }
+  }
+  console.warn('[Nitter] 모든 인스턴스 응답 없음');
+  return null;
+}
+
+// Nitter RSS → articles 배열 변환
+async function fetchNitterRSS(twitterHandle) {
+  if(!twitterHandle) return [];
+  try {
+    const inst = await getAliveNitter();
+    if(!inst) return [];
+    const rssUrl = `${inst}/${twitterHandle}/rss`;
+    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(rssUrl)}`;
+    const res = await fetch(proxyUrl, {signal: AbortSignal.timeout(8000)});
+    if(!res.ok) return [];
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, 'text/xml');
+    const items = xml.querySelectorAll('item');
+    const articles = [];
+    items.forEach(item => {
+      const title = item.querySelector('title')?.textContent || '';
+      const link  = item.querySelector('link')?.textContent || '#';
+      const pubDate = item.querySelector('pubDate')?.textContent || '';
+      const desc  = item.querySelector('description')?.textContent || '';
+      // RT 제외, 너무 짧은 트윗 제외
+      if(title.startsWith('RT ') || title.length < 20) return;
+      articles.push({
+        title: title.replace(/<[^>]+>/g,'').trim(),
+        description: desc.replace(/<[^>]+>/g,'').trim(),
+        url: link,
+        publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+        source: {name: `X/@${twitterHandle}`},
+        apiSource: 'Nitter',
+      });
+    });
+    return articles.slice(0, 5);
+  } catch(e) {
+    console.warn('[Nitter] fetchNitterRSS 오류:', twitterHandle, e.message);
+    return [];
+  }
+}
+
+// Google Alerts RSS URL 저장소 (localStorage)
+function getGAlertUrls() {
+  try { return JSON.parse(localStorage.getItem('ir_galert_urls') || '{}'); } catch(e) { return {}; }
+}
+function saveGAlertUrls(obj) {
+  localStorage.setItem('ir_galert_urls', JSON.stringify(obj));
+}
+
+// Google Alerts RSS → articles 배열 변환
+async function fetchGoogleAlertRSS(figId) {
+  const urls = getGAlertUrls();
+  const rssUrl = urls[figId];
+  if(!rssUrl) return [];
+  try {
+    const proxyUrl = `${CORS_PROXY}${encodeURIComponent(rssUrl)}`;
+    const res = await fetch(proxyUrl, {signal: AbortSignal.timeout(8000)});
+    if(!res.ok) return [];
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, 'application/xml');
+    // Google Alerts는 Atom 형식
+    const entries = xml.querySelectorAll('entry');
+    const articles = [];
+    entries.forEach(entry => {
+      const title = entry.querySelector('title')?.textContent || '';
+      const link  = entry.querySelector('link')?.getAttribute('href') || '#';
+      const updated = entry.querySelector('updated')?.textContent || '';
+      const content = entry.querySelector('content')?.textContent || '';
+      articles.push({
+        title: title.replace(/<[^>]+>/g,'').trim(),
+        description: content.replace(/<[^>]+>/g,'').slice(0,200).trim(),
+        url: link,
+        publishedAt: updated || new Date().toISOString(),
+        source: {name: 'Google Alerts'},
+        apiSource: 'GoogleAlerts',
+      });
+    });
+    return articles.slice(0, 5);
+  } catch(e) {
+    console.warn('[GoogleAlerts] fetchGoogleAlertRSS 오류:', figId, e.message);
+    return [];
+  }
+}
+
+// Nitter + Google Alerts 병합 수집 (인물 1명)
+async function fetchRSSForFig(fig) {
+  const [nitter, galert] = await Promise.all([
+    fetchNitterRSS(fig.twitter),
+    fetchGoogleAlertRSS(fig.id),
+  ]);
+  // 중복 URL 제거 후 병합
+  const seen = new Set();
+  return [...nitter, ...galert].filter(a => {
+    if(seen.has(a.url)) return false;
+    seen.add(a.url);
+    return true;
+  });
+}
+
 // ── 백데이터 수집 (과거 1달 실제 뉴스)
 let backfillRunning = false;
 
@@ -2457,6 +2594,32 @@ async function fetchAllNews(query) {
 }
 
 
+// Nitter + Google Alerts RSS 전용 폴링 (15분마다)
+let lastNitterCheck = 0;
+
+async function runRSSCheck() {
+  const now = Date.now();
+  if(now - lastNitterCheck < 15*60*1000) return;
+  lastNitterCheck = now;
+
+  const allFigs = getSortedFigs().filter(f=>f.inf>=65);
+  let newCount = 0;
+  const statusEl = document.getElementById('rss-status-txt');
+  if(statusEl) statusEl.textContent = '📡 RSS 수집 중...';
+
+  for(const fig of allFigs) {
+    const articles = await fetchRSSForFig(fig);
+    if(articles.length) newCount += await processArticles(fig, articles, 'RSS');
+  }
+
+  if(statusEl) {
+    statusEl.textContent = newCount > 0
+      ? `📡 RSS ${newCount}건 신규`
+      : `📡 RSS OK (${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})})`;
+  }
+  if(newCount > 0) { updateNotifBadge(); if(state.currentTab==='radar') renderRadar(); save(); }
+}
+
 async function runNewsCheck() {
   const now = Date.now();
   if(now - lastNewsCheck < 60*60*1000) {
@@ -2496,6 +2659,9 @@ async function runNewsCheck() {
     const articles = await fetchGNewsAPI(query);
     newCount += await processArticles(fig, articles, 'GNews');
   }
+
+  // ③ RSS (Nitter + Google Alerts) — 병렬 즉시 실행
+  runRSSCheck();
 
   try {
     if(state.alerts.length>300) state.alerts=state.alerts.slice(0,300);
@@ -2636,8 +2802,11 @@ function updateNewsStatus(status){
 function startMonitor(){
   if(newsCheckInterval) clearInterval(newsCheckInterval);
   lastNewsCheck = 0; // 앱 시작 시 항상 즉시 수집
+  lastNitterCheck = 0;
   setTimeout(runNewsCheck, 1500);
+  setTimeout(runRSSCheck, 3000); // RSS 3초 후 첫 실행
   newsCheckInterval = setInterval(runNewsCheck, 60*60*1000);
+  setInterval(runRSSCheck, 15*60*1000); // RSS 15분마다
   setInterval(()=>{
     const now=new Date();
     if(now.getHours()===9&&now.getMinutes()===0){
@@ -3347,12 +3516,100 @@ function renderFilter(){
         </div>`:''}
       </div>`;
     }).join('')}
+
+    ${renderRSSSettingsHTML()}
   `;
   } catch(e) {
     console.error('[renderFilter]', e);
     const el = document.getElementById('tab-filter');
     if(el) el.innerHTML = '<div style="padding:30px;text-align:center;color:#dc2626;font-family:sans-serif">⚠️ 종목발굴 오류: '+e.message+'<br><button onclick="renderFilter()" style="margin-top:10px;padding:6px 14px;border:1px solid #2563eb;background:transparent;color:#2563eb;cursor:pointer;border-radius:3px">다시 시도</button></div>';
   }
+}
+
+// ── RSS 설정 UI (Google Alerts + Nitter 상태)
+function renderRSSSettingsHTML() {
+  const urls = getGAlertUrls();
+  const twitterFigs = FIGS.filter(f=>f.twitter);
+  const rows = FIGS.map(fig=>{
+    const hasAlert = !!urls[fig.id];
+    const hasNitter = !!fig.twitter;
+    return `
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #e8edf8">
+      <div style="width:28px;height:28px;border-radius:50%;background:${fig.color}22;
+        border:1px solid ${fig.color}55;display:flex;align-items:center;justify-content:center;
+        font-size:11px;font-weight:bold;color:${fig.color};flex-shrink:0">${fig.avatar}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;color:#0a0a1a">${fig.name}</div>
+        <div style="display:flex;gap:4px;margin-top:2px">
+          ${hasNitter
+            ? `<span style="font-size:10px;background:#f0fdf4;border:1px solid #16a34a33;
+                color:#16a34a;padding:1px 5px;border-radius:2px">📡 Nitter @${fig.twitter}</span>`
+            : `<span style="font-size:10px;background:#f5f5f5;border:1px solid #ccc;
+                color:#aaa;padding:1px 5px;border-radius:2px">X 없음</span>`
+          }
+          ${hasAlert
+            ? `<span style="font-size:10px;background:#f0fdf4;border:1px solid #16a34a33;
+                color:#16a34a;padding:1px 5px;border-radius:2px">🔔 Google Alerts 등록됨</span>`
+            : `<span style="font-size:10px;background:#fff8f0;border:1px solid #fbbf2444;
+                color:#b45309;padding:1px 5px;border-radius:2px">🔔 미등록</span>`
+          }
+        </div>
+      </div>
+      <input type="text" placeholder="Google Alerts RSS URL 붙여넣기"
+        id="galert-${fig.id}"
+        value="${urls[fig.id]||''}"
+        style="flex:2;font-size:11px;padding:4px 7px;border:1px solid #b0b8d0;
+          border-radius:3px;font-family:var(--mono);min-width:0;color:#0a0a1a">
+    </div>`;
+  }).join('');
+
+  return `
+  <div style="margin-top:16px;padding:12px 14px;background:#f8faff;
+    border:1px solid #c0c8e0;border-radius:4px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div>
+        <div class="sec" style="margin:0;border:none;padding:0;font-size:12px">
+          📡 RSS 피드 설정 — Nitter + Google Alerts
+        </div>
+        <div style="font-size:11px;color:#556;margin-top:3px">
+          Nitter: Twitter 있는 인물 자동 감시 · Google Alerts: 아래 URL 등록 후 저장
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="saveGAlertUrlsFromUI()"
+          style="padding:5px 12px;border:1px solid #16a34a;background:transparent;
+            color:#16a34a;font-size:12px;cursor:pointer;border-radius:3px;font-family:var(--mono)">
+          💾 저장
+        </button>
+        <button onclick="lastNitterCheck=0;runRSSCheck()"
+          style="padding:5px 12px;border:1px solid #2563eb;background:transparent;
+            color:#2563eb;font-size:12px;cursor:pointer;border-radius:3px;font-family:var(--mono)">
+          🔄 지금 수집
+        </button>
+      </div>
+    </div>
+    <div id="rss-status-txt" style="font-size:11px;color:#2563eb;margin-bottom:8px"></div>
+    <div style="font-size:11px;color:#556;background:#fffbf0;border:1px solid #fbbf2444;
+      border-radius:3px;padding:6px 10px;margin-bottom:10px">
+      💡 Google Alerts 설정 방법: <a href="https://www.google.com/alerts" target="_blank"
+        style="color:#2563eb">google.com/alerts</a> →
+      인물명 검색 → "RSS 피드" 옵션 선택 → URL 복사 → 아래 입력란에 붙여넣기 → 저장
+    </div>
+    ${rows}
+    <div id="galert-save-msg" style="font-size:12px;color:#16a34a;margin-top:8px"></div>
+  </div>`;
+}
+
+function saveGAlertUrlsFromUI() {
+  const urls = {};
+  FIGS.forEach(fig=>{
+    const el = document.getElementById('galert-'+fig.id);
+    if(el && el.value.trim()) urls[fig.id] = el.value.trim();
+  });
+  saveGAlertUrls(urls);
+  const msg = document.getElementById('galert-save-msg');
+  if(msg) { msg.textContent = '✅ 저장 완료'; setTimeout(()=>{msg.textContent='';},3000); }
+  renderFilter(); // 상태 뱃지 갱신
 }
 
 
