@@ -34,7 +34,7 @@ const FIGS = [
    sec:["AI","SEMICON","CLOUD","ROBOT"],
    rel:[{to:2,type:"협력",str:72}]},
   {id:6,name:"Warren Buffett",avatar:"WB",country:"🇺🇸",title:"Berkshire 회장",color:"#c084fc",
-   twitter:null, googleAlert:"Warren Buffett Berkshire",
+   twitter:null, googleAlert:"Warren Buffett",
    inf:82,base:82,susp:22,chType:"인터뷰형",
    ch:["연간 주주서한 (2월)","13F 공시","CNBC 인터뷰"],
    sec:["FINANCE","RETAIL","ENERGY","HEALTHCARE"],rel:[]},
