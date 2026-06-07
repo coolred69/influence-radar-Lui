@@ -17,7 +17,7 @@ const FIGS = [
    sec:["AI","EV","CRYPTO","SPACE","ROBOT"],
    rel:[{to:1,type:"동맹",str:85},{to:5,type:"협력",str:72}]},
   {id:3,name:"Jerome Powell",avatar:"JP",country:"🇺🇸",title:"연준 의장",color:"#4a9eff",
-   twitter:null, googleAlert:"Jerome Powell",
+   twitter:null, googleAlert:"Federal Reserve",
    inf:91,base:91,susp:28,chType:"기관성명형",
    ch:["FOMC 성명 (일정고정)","의회 증언","잭슨홀 연설"],
    sec:["FINANCE","BOND","GOLD","REALESTATE"],rel:[]},
