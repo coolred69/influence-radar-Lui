@@ -1,11 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=./influence-radar.html">
-<title>Influence Radar v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Influence Radar — 메인</title>
+<style>
+:root {
+  --bg: #0a0a1a;
+  --bg2: #0f0f2a;
+  --bg3: #141432;
+  --border: #1e1e4a;
+  --border2: #252560;
+  --text: #c8d8f0;
+  --text2: #8899bb;
+  --text3: #556677;
+  --accent: #2563eb;
+  --mono: 'Courier New', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+}
+.logo { font-size: 36px; margin-bottom: 6px; }
+.title { font-size: 22px; font-weight: 800; color: #e0f0ff; letter-spacing: -0.5px; margin-bottom: 4px; text-align: center; }
+.subtitle { font-size: 13px; color: var(--text3); margin-bottom: 40px; text-align: center; }
+.cards { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 400px; }
+.nav-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 20px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.nav-card:hover { border-color: var(--border2); background: var(--bg3); }
+.nav-card.us:hover { border-color: #3b82f6; }
+.nav-card.kr:hover { border-color: #16a34a; }
+.nav-icon { font-size: 36px; flex-shrink: 0; }
+.nav-info { flex: 1; }
+.nav-title { font-size: 17px; font-weight: 700; color: #e0f0ff; margin-bottom: 4px; }
+.nav-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
+.nav-badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: 700; margin-top: 6px; display: inline-block; }
+.badge-us { background: #1d3a8a; color: #93c5fd; }
+.badge-kr { background: #14402a; color: #6ee7b7; }
+.badge-new { background: #7c1d2a; color: #fca5a5; }
+.nav-arrow { font-size: 20px; color: var(--text3); flex-shrink: 0; }
+.version { margin-top: 40px; font-size: 11px; color: var(--text3); font-family: var(--mono); }
+</style>
 </head>
 <body>
-<script>location.replace('./influence-radar.html');</script>
+
+<div class="logo">📡</div>
+<div class="title">Influence Radar</div>
+<div class="subtitle">글로벌 시그널 탐지 & 한국 주식 스크리너</div>
+
+<div class="cards">
+  <a href="influence-radar.html" class="nav-card us">
+    <div class="nav-icon">🇺🇸</div>
+    <div class="nav-info">
+      <div class="nav-title">미국 주식 레이더</div>
+      <div class="nav-desc">Trump·Musk·Powell 등 글로벌 영향력자 발언 → 주식 시그널 자동 생성</div>
+      <span class="nav-badge badge-us">Influencer Radar</span>
+    </div>
+    <div class="nav-arrow">›</div>
+  </a>
+
+  <a href="korea-radar.html" class="nav-card kr">
+    <div class="nav-icon">🇰🇷</div>
+    <div class="nav-info">
+      <div class="nav-title">한국 주식 레이더</div>
+      <div class="nav-desc">거래량 급증 · 52주 돌파 직전 · 저평가 조합으로 올라가기 직전 종목 탐지</div>
+      <span class="nav-badge badge-kr">Quant Screener</span>
+      <span class="nav-badge badge-new" style="margin-left:5px">NEW</span>
+    </div>
+    <div class="nav-arrow">›</div>
+  </a>
+</div>
+
+<div class="version">v2.0 · 2026.06</div>
+
 </body>
 </html>
