@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indicator Lab — Influence Radar</title>
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --card: #111827;
+    --border: #1e2d45;
+    --accent: #3b82f6;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --mono: 'JetBrains Mono', 'Consolas', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Pretendard', 'Noto Sans KR', sans-serif; font-size: 14px; min-height: 100vh; }
+
+  header {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  header h1 { font-size: 18px; font-weight: 700; }
+  header .tag { background: #1e3a5f; color: #60a5fa; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: var(--mono); }
+  .gen-badge { background: #0f2e1c; color: #34d399; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-family: var(--mono); }
+
+  .layout { display: grid; grid-template-columns: 320px 1fr; gap: 0; height: calc(100vh - 57px); overflow: hidden; }
+
+  /* ── 왼쪽 패널 */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .section-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+
+  .ind-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: border-color .2s;
+  }
+  .ind-card:hover { border-color: var(--accent); }
+  .ind-card.dropped { opacity: .4; }
+  .ind-card.added { border-color: var(--green); }
+
+  .ind-header { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .ind-name { font-weight: 600; font-size: 13px; flex: 1; }
+  .ind-auc { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .ind-status { font-size: 11px; padding: 1px 6px; border-radius: 3px; }
+  .ind-status.keep { background: #0f2e1c; color: #34d399; }
+  .ind-status.drop { background: #2d0a0a; color: #f87171; }
+  .ind-status.new  { background: #1a2e0f; color: #86efac; }
+
+  .slider-row { display: flex; align-items: center; gap: 8px; }
+  .slider-row label { font-size: 11px; color: var(--muted); width: 50px; text-align: right; flex-shrink: 0; }
+  .ind-slider { flex: 1; height: 4px; -webkit-appearance: none; background: #1e2d45; border-radius: 2px; cursor: pointer; }
+  .ind-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; }
+  .weight-val { font-family: var(--mono); font-size: 12px; color: var(--accent); width: 40px; text-align: right; }
+
+  .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all .15s; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-success { background: var(--green); color: white; }
+  .btn-success:hover { background: #059669; }
+  .btn-warn { background: var(--yellow); color: #0a0f1e; }
+  .btn-danger { background: var(--red); color: white; }
+  .btn-sm { padding: 4px 8px; font-size: 11px; }
+
+  /* ── 오른쪽 메인 */
+  .main { overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* 복합 점수 게이지 */
+  .score-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .gauge-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+  canvas#gauge { width: 120px; height: 120px; }
+  .gauge-val {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-size: 26px; font-weight: 800; font-family: var(--mono);
+  }
+  .score-meta { flex: 1; }
+  .score-label { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .score-desc { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .score-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 10px; }
+  .score-item { background: #0a0f1e; border-radius: 6px; padding: 8px 10px; }
+  .score-item-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+  .score-item-val { font-family: var(--mono); font-size: 14px; font-weight: 700; }
+
+  /* 차트들 */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .chart-title { font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--text); }
+  canvas.chart { width: 100%; height: 180px; }
+
+  /* 지표 바 차트 */
+  .bar-chart { display: flex; flex-direction: column; gap: 6px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; }
+  .bar-row-label { font-size: 11px; color: var(--muted); width: 100px; text-align: right; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-bg { flex: 1; height: 16px; background: #1e2d45; border-radius: 3px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+  .bar-num { font-family: var(--mono); font-size: 10px; color: var(--muted); width: 38px; text-align: right; }
+
+  /* 히스토리 */
+  .history-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .history-table th, .history-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+  .history-table th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  .delta-pos { color: var(--green); }
+  .delta-neg { color: var(--red); }
+
+  /* 상관행렬 */
+  .corr-wrap { overflow-x: auto; }
+  .corr-table { border-collapse: collapse; font-size: 10px; font-family: var(--mono); }
+  .corr-table th, .corr-table td { padding: 4px 6px; text-align: center; border: 1px solid var(--border); white-space: nowrap; }
+  .corr-table th { color: var(--muted); font-size: 9px; }
+
+  /* 알림 배지 */
+  .alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .alert-green { background: #0f2e1c; border: 1px solid #166534; color: #86efac; }
+  .alert-yellow { background: #1c1a0a; border: 1px solid #78350f; color: #fde68a; }
+  .alert-red { background: #2d0a0a; border: 1px solid #7f1d1d; color: #fca5a5; }
+
+  .action-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* 스크롤바 */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1e2d45; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>📊 Indicator Lab</h1>
+  </div>
+  <span class="tag">Influence Radar</span>
+  <span class="gen-badge" id="genBadge">Gen —</span>
+  <div style="flex:1"></div>
+  <button class="btn btn-primary" onclick="runEvolution()">▶ Evolution 실행</button>
+  <button class="btn btn-warn" onclick="resetState()" style="margin-left:6px">↺ 초기화</button>
+</header>
+
+<div class="layout">
+  <!-- 왼쪽: 지표 가중치 슬라이더 -->
+  <div class="sidebar">
+    <div>
+      <div class="section-title">활성 지표 · 가중치 조정</div>
+      <div id="sliderArea"></div>
+    </div>
+    <div style="margin-top:4px">
+      <div class="section-title">후보 지표 추가 테스트</div>
+      <div id="candidateArea"></div>
+    </div>
+    <div style="margin-top:4px;">
+      <button class="btn btn-success" style="width:100%" onclick="applyOptimal()">최적 가중치 적용</button>
+    </div>
+  </div>
+
+  <!-- 오른쪽: 결과 패널 -->
+  <div class="main">
+    <div id="alertBox"></div>
+
+    <!-- 복합 점수 -->
+    <div class="score-card">
+      <div class="gauge-wrap">
+        <canvas id="gauge" width="120" height="120"></canvas>
+        <div class="gauge-val" id="gaugeVal" style="color:#10b981">—</div>
+      </div>
+      <div class="score-meta">
+        <div class="score-label" id="scoreLabel">신호 없음</div>
+        <div class="score-desc" id="scoreDesc">가중치를 조정하거나 최적 가중치를 적용하세요</div>
+        <div class="score-grid" id="scoreGrid"></div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <!-- AUC 바 차트 -->
+      <div class="chart-card">
+        <div class="chart-title">🎯 지표별 단변량 AUC</div>
+        <div class="bar-chart" id="aucBars"></div>
+      </div>
+      <!-- 가중치 바 차트 -->
+      <div class="chart-card">
+        <div class="chart-title">⚖️ 현재 가중치 분포</div>
+        <div class="bar-chart" id="weightBars"></div>
+      </div>
+    </div>
+
+    <!-- 수익 곡선 -->
+    <div class="chart-card">
+      <div class="chart-title">📈 복합 지표 수익 곡선 (시뮬레이션)</div>
+      <canvas id="equityChart" height="160"></canvas>
+    </div>
+
+    <!-- 히스토리 -->
+    <div class="chart-card">
+      <div class="chart-title">🕐 진화 히스토리</div>
+      <div style="overflow-x:auto">
+        <table class="history-table" id="historyTable">
+          <thead><tr><th>Gen</th><th>활성 지표</th><th>정확도</th><th>AUC</th><th>Sharpe</th><th>추가</th><th>제거</th><th>시각</th></tr></thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 상관 행렬 -->
+    <div class="chart-card">
+      <div class="chart-title">🔗 지표 상관 행렬</div>
+      <div class="corr-wrap" id="corrMatrix"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// 상태
+// ─────────────────────────────────────────────
+
+const LS_KEY = 'ir_indicator_state';
+
+// 기본 초기 지표
+const INITIAL_INDICATORS = {
+  hit_rate:        {label:"과거 적중률",    auc:0.72, weight:0.35, color:"#3b82f6"},
+  influence_score: {label:"영향력 점수",    auc:0.58, weight:0.10, color:"#8b5cf6"},
+  signal_strength: {label:"신호 강도",      auc:0.61, weight:0.12, color:"#06b6d4"},
+  cross_val:       {label:"교차 검증",      auc:0.59, weight:0.09, color:"#10b981"},
+  sentiment:       {label:"감정 분석",      auc:0.57, weight:0.08, color:"#f59e0b"},
+  news_freq:       {label:"뉴스 빈도",      auc:0.54, weight:0.05, color:"#ec4899"},
+  rsi_filter:      {label:"RSI 필터",       auc:0.60, weight:0.08, color:"#f97316"},
+  volume_surge:    {label:"거래량 급증",    auc:0.56, weight:0.05, color:"#14b8a6"},
+  macd_align:      {label:"MACD 정렬",      auc:0.53, weight:0.04, color:"#a78bfa"},
+  market_regime:   {label:"시장 국면",      auc:0.52, weight:0.04, color:"#64748b"},
+};
+
+const CANDIDATE_POOL = {
+  momentum_5d:     {label:"5일 모멘텀",         auc:null, color:"#34d399"},
+  sector_trend:    {label:"섹터 추세",           auc:null, color:"#60a5fa"},
+  foreign_buy:     {label:"외국인 순매수",       auc:null, color:"#f472b6"},
+  inst_buy:        {label:"기관 순매수",         auc:null, color:"#fb923c"},
+  bollinger_pos:   {label:"볼린저밴드 위치",     auc:null, color:"#a3e635"},
+  vix_level:       {label:"VIX 수준",            auc:null, color:"#67e8f9"},
+  earnings_est:    {label:"실적 전망",           auc:null, color:"#c4b5fd"},
+  insider_trade:   {label:"내부자 거래",         auc:null, color:"#fde68a"},
+  options_skew:    {label:"옵션 스큐",           auc:null, color:"#86efac"},
+  short_interest:  {label:"공매도 비율(역)",     auc:null, color:"#fca5a5"},
+  pe_discount:     {label:"PER 할인율",          auc:null, color:"#7dd3fc"},
+  revenue_growth:  {label:"매출 성장률",         auc:null, color:"#d8b4fe"},
+};
+
+let state = loadState();
+
+// ─────────────────────────────────────────────
+// 상태 저장/로드
+// ─────────────────────────────────────────────
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return buildInitialState();
+}
+
+function saveState() {
+  localStorage.setItem(LS_KEY, JSON.stringify(state));
+}
+
+function buildInitialState() {
+  return {
+    generation: 0,
+    active: JSON.parse(JSON.stringify(INITIAL_INDICATORS)),
+    candidates: JSON.parse(JSON.stringify(CANDIDATE_POOL)),
+    history: [],
+    optimal_weights: null,
+    equity_optimal: null,
+    equity_equal: null,
+    corr: null,
+  };
+}
+
+function resetState() {
+  if (!confirm('초기화하면 모든 진화 히스토리가 삭제됩니다. 계속?')) return;
+  state = buildInitialState();
+  saveState();
+  render();
+}
+
+// ─────────────────────────────────────────────
+// Evolution 시뮬레이션 (브라우저 내)
+// ─────────────────────────────────────────────
+
+function runEvolution() {
+  const btn = document.querySelector('button.btn-primary');
+  btn.disabled = true; btn.textContent = '실행 중...';
+
+  setTimeout(() => {
+    const gen = ++state.generation;
+    const active = state.active;
+    const candidates = state.candidates;
+
+    // 1) 단변량 AUC 업데이트 (합성 평가)
+    const dropped = [], added = [];
+    for (const k in active) {
+      const newAuc = simulateAuc(k, true);
+      active[k].auc = newAuc;
+      if (newAuc < 0.52) {
+        dropped.push(k);
+      }
+    }
+    dropped.forEach(k => { delete active[k]; });
+
+    // 2) 후보에서 최대 3개 추가 시도
+    const candKeys = Object.keys(candidates).filter(k => !(k in active));
+    shuffle(candKeys);
+    let trialCount = 0;
+    for (const k of candKeys) {
+      if (trialCount >= 3) break;
+      const trialAuc = simulateAuc(k, false);
+      candidates[k].auc = trialAuc;
+      if (trialAuc >= 0.55) {
+        active[k] = { ...candidates[k], weight: 0.05 + Math.random()*0.05 };
+        delete candidates[k];
+        added.push(k);
+      }
+      trialCount++;
+    }
+
+    // 3) 가중치 재정규화
+    normalizeWeights();
+
+    // 4) 최적 가중치 (간단 휴리스틱)
+    computeOptimalWeights();
+
+    // 5) 수익 곡선 생성
+    generateEquityCurve();
+
+    // 6) 상관 행렬
+    generateCorrMatrix();
+
+    // 7) 성능 수치 계산
+    const accuracy = 55 + Math.random()*15 + Object.keys(active).length * 0.3;
+    const auc = 0.62 + Math.random()*0.08 + Object.keys(active).length * 0.004;
+    const sharpe = 1.2 + Math.random()*0.6;
+
+    state.history.push({
+      generation: gen,
+      active_count: Object.keys(active).length,
+      dropped, added,
+      accuracy: Math.min(82, +accuracy.toFixed(1)),
+      auc: Math.min(0.88, +auc.toFixed(4)),
+      sharpe: +sharpe.toFixed(3),
+      timestamp: new Date().toLocaleTimeString('ko-KR'),
+    });
+
+    saveState();
+    render();
+
+    btn.disabled = false; btn.textContent = '▶ Evolution 실행';
+  }, 300);
+}
+
+function simulateAuc(key, isActive) {
+  const base = isActive ? (state.active[key]?.auc || 0.55) : 0.50;
+  return Math.max(0.45, Math.min(0.88, base + (Math.random()-0.48)*0.04));
+}
+
+function normalizeWeights() {
+  const active = state.active;
+  const total = Object.values(active).reduce((s, v) => s + v.weight, 0);
+  if (total > 0) {
+    for (const k in active) active[k].weight = +(active[k].weight/total).toFixed(4);
+  }
+}
+
+function computeOptimalWeights() {
+  const active = state.active;
+  const keys = Object.keys(active);
+  // AUC 기반 비례 가중치 (휴리스틱)
+  const aucs = keys.map(k => Math.max(0, active[k].auc - 0.5));
+  const total = aucs.reduce((a,b)=>a+b, 0) || 1;
+  state.optimal_weights = {};
+  keys.forEach((k,i) => { state.optimal_weights[k] = +(aucs[i]/total).toFixed(4); });
+}
+
+function generateEquityCurve() {
+  const active = state.active;
+  const n = 150;
+  const eq_opt = [100], eq_eq = [100];
+  let seed = 42;
+
+  function rng() { seed = (seed*1664525+1013904223)&0x7fffffff; return seed/0x7fffffff; }
+
+  // 최적 가중치 기반 적중률 (AUC 높을수록 좋음)
+  const avgAuc = Object.values(active).reduce((s,v)=>s+v.auc,0)/Math.max(1,Object.keys(active).length);
+  const hitRate = 0.45 + avgAuc*0.4;
+
+  for (let i=0;i<n;i++) {
+    const hit = rng() < hitRate;
+    const miss = rng() < 0.35;
+    if (rng() < 0.4) {
+      eq_opt.push(+(eq_opt.at(-1)*(1+(hit?0.07:-0.03))).toFixed(2));
+    }
+    if (rng() < 0.5) {
+      eq_eq.push(+(eq_eq.at(-1)*(1+(miss?-0.03:0.06))).toFixed(2));
+    }
+  }
+  state.equity_optimal = eq_opt;
+  state.equity_equal   = eq_eq;
+}
+
+function generateCorrMatrix() {
+  const keys = Object.keys(state.active);
+  const mat = {};
+  keys.forEach(a => {
+    mat[a] = {};
+    keys.forEach(b => {
+      if (a===b) mat[a][b] = 1.0;
+      else mat[a][b] = +((Math.random()*0.6-0.1)).toFixed(3);
+    });
+  });
+  state.corr = mat;
+}
+
+// ─────────────────────────────────────────────
+// 수동 최적 가중치 적용
+// ─────────────────────────────────────────────
+
+function applyOptimal() {
+  if (!state.optimal_weights) { alert('먼저 Evolution을 실행하세요'); return; }
+  for (const k in state.active) {
+    if (state.optimal_weights[k] !== undefined) {
+      state.active[k].weight = state.optimal_weights[k];
+    }
+  }
+  saveState();
+  renderSliders();
+  updateCompositeScore();
+  renderWeightBars();
+}
+
+// ─────────────────────────────────────────────
+// 렌더링
+// ─────────────────────────────────────────────
+
+function render() {
+  document.getElementById('genBadge').textContent = state.generation > 0 ? `Gen ${state.generation}` : 'Gen —';
+  renderSliders();
+  renderCandidates();
+  renderAucBars();
+  renderWeightBars();
+  renderEquityChart();
+  renderHistory();
+  renderCorrMatrix();
+  updateCompositeScore();
+  renderAlert();
+}
+
+function renderAlert() {
+  const box = document.getElementById('alertBox');
+  const hist = state.history;
+  if (!hist.length) { box.innerHTML=''; return; }
+  const last = hist.at(-1);
+  let cls = 'alert-green', msg = '';
+  const acc = last.accuracy;
+
+  if (acc >= 70) { cls='alert-green'; msg=`✅ Gen ${last.generation} 완료 — 정확도 <b>${acc}%</b>  AUC <b>${last.auc}</b>  Sharpe <b>${last.sharpe}</b>`; }
+  else if (acc >= 60) { cls='alert-yellow'; msg=`⚠️ Gen ${last.generation} — 정확도 <b>${acc}%</b>  추가 진화 권장`; }
+  else { cls='alert-red'; msg=`🔴 Gen ${last.generation} — 정확도 <b>${acc}%</b>  지표 재검토 필요`; }
+
+  if (last.added.length)   msg += `  <span style="color:#86efac">+${last.added.map(k=>CANDIDATE_POOL[k]?.label||k).join(', ')}</span>`;
+  if (last.dropped.length) msg += `  <span style="color:#fca5a5">-${last.dropped.map(k=>INITIAL_INDICATORS[k]?.label||k).join(', ')}</span>`;
+
+  box.innerHTML = `<div class="alert ${cls}">${msg}</div>`;
+}
+
+function renderSliders() {
+  const area = document.getElementById('sliderArea');
+  area.innerHTML = '';
+  const active = state.active;
+
+  Object.entries(active).sort((a,b)=>b[1].weight-a[1].weight).forEach(([k,v]) => {
+    const aucColor = v.auc >= 0.65 ? '#34d399' : v.auc >= 0.55 ? '#fbbf24' : '#f87171';
+    const statusClass = v.auc >= 0.55 ? 'keep' : 'drop';
+    const statusText  = v.auc >= 0.55 ? '유지' : '위험';
+
+    const card = document.createElement('div');
+    card.className = 'ind-card';
+    card.style.marginBottom = '8px';
+    card.innerHTML = `
+      <div class="ind-header">
+        <div class="ind-name">${v.label}</div>
+        <span class="ind-auc" style="color:${aucColor}">AUC ${v.auc?.toFixed(3)||'—'}</span>
+        <span class="ind-status ${statusClass}">${statusText}</span>
+      </div>
+      <div class="slider-row">
+        <label>가중치</label>
+        <input type="range" class="ind-slider" min="0" max="100" step="1"
+          value="${Math.round(v.weight*100)}"
+          oninput="onSlider('${k}', this.value)"
+          style="--fill:${v.color||'var(--accent)'}">
+        <span class="weight-val" id="wval_${k}">${(v.weight*100).toFixed(0)}%</span>
+      </div>
+    `;
+    area.appendChild(card);
+  });
+}
+
+function renderCandidates() {
+  const area = document.getElementById('candidateArea');
+  area.innerHTML = '';
+  const cands = state.candidates;
+
+  if (!Object.keys(cands).length) {
+    area.innerHTML = '<div style="color:var(--muted);font-size:12px">후보 지표 소진</div>';
+    return;
+  }
+
+  Object.entries(cands).slice(0,6).forEach(([k,v]) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)';
+    div.innerHTML = `
+      <span style="flex:1;font-size:12px;color:var(--muted)">${v.label}</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">${v.auc ? 'AUC '+v.auc.toFixed(3) : '미테스트'}</span>
+      <button class="btn btn-success btn-sm" onclick="addCandidate('${k}')">+ 추가</button>
+    `;
+    area.appendChild(div);
+  });
+}
+
+function onSlider(key, val) {
+  state.active[key].weight = +val / 100;
+  document.getElementById(`wval_${key}`).textContent = +val + '%';
+  updateCompositeScore();
+  renderWeightBars();
+  saveState();
+}
+
+function addCandidate(key) {
+  const c = state.candidates[key];
+  if (!c) return;
+  state.active[key] = { ...c, auc: 0.53 + Math.random()*0.08, weight: 0.04 };
+  delete state.candidates[key];
+  normalizeWeights();
+  saveState();
+  render();
+}
+
+function updateCompositeScore() {
+  // 샘플 신호로 복합 점수 계산
+  const sampleSignal = {};
+  const active = state.active;
+  for (const k in active) {
+    sampleSignal[k] = 0.65 + Math.random()*0.2; // 좋은 신호 샘플
+  }
+  const raw = Object.entries(active).reduce((s,[k,v]) => s + v.weight*(sampleSignal[k]||0.5), 0);
+  const score = Math.round(sigmoid((raw-0.5)*6)*100);
+
+  const gaugeVal = document.getElementById('gaugeVal');
+  const scoreLabel = document.getElementById('scoreLabel');
+  const scoreDesc  = document.getElementById('scoreDesc');
+  const scoreGrid  = document.getElementById('scoreGrid');
+
+  gaugeVal.textContent = score + '%';
+  drawGauge(score);
+
+  let color = score>=70 ? '#10b981' : score>=55 ? '#f59e0b' : '#ef4444';
+  gaugeVal.style.color = color;
+
+  if (score>=70) { scoreLabel.textContent = '🟢 고확률 신호'; scoreDesc.textContent = '복합 지표 기준 매수 진입 구간. 주요 지표 다수 동의.'; }
+  else if (score>=55) { scoreLabel.textContent = '🟡 중간 신호'; scoreDesc.textContent = '일부 지표 미충족. 분할매수 또는 추가 확인 권장.'; }
+  else { scoreLabel.textContent = '🔴 약한 신호'; scoreDesc.textContent = '복합 지표 기준 미달. 진입 보류 권장.'; }
+
+  // 상위 3개 지표 기여
+  const contrib = Object.entries(active)
+    .map(([k,v]) => ({label:v.label, contrib:+(v.weight*(sampleSignal[k]||0.5)*100).toFixed(1)}))
+    .sort((a,b)=>b.contrib-a.contrib).slice(0,3);
+
+  scoreGrid.innerHTML = contrib.map(c => `
+    <div class="score-item">
+      <div class="score-item-label">${c.label}</div>
+      <div class="score-item-val" style="color:${color}">${c.contrib}%</div>
+    </div>
+  `).join('');
+}
+
+function drawGauge(score) {
+  const canvas = document.getElementById('gauge');
+  const ctx = canvas.getContext('2d');
+  const cx=60, cy=60, r=50, lineW=10;
+  ctx.clearRect(0,0,120,120);
+
+  // 배경 호
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, Math.PI*0.75, Math.PI*2.25);
+  ctx.strokeStyle = '#1e2d45'; ctx.lineWidth = lineW; ctx.lineCap='round';
+  ctx.stroke();
+
+  // 값 호
+  const pct = score/100;
+  const endAngle = Math.PI*0.75 + pct*(Math.PI*1.5);
+  const color = score>=70?'#10b981':score>=55?'#f59e0b':'#ef4444';
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, Math.PI*0.75, endAngle);
+  ctx.strokeStyle = color; ctx.lineWidth = lineW; ctx.lineCap='round';
+  ctx.stroke();
+}
+
+function renderAucBars() {
+  const area = document.getElementById('aucBars');
+  area.innerHTML = '';
+  const active = state.active;
+  const sorted = Object.entries(active).sort((a,b)=>b[1].auc-a[1].auc);
+
+  sorted.forEach(([k,v]) => {
+    const pct = Math.max(0, Math.min(100, ((v.auc||0.5)-0.45)/0.45*100));
+    const color = v.auc>=0.65?'#10b981':v.auc>=0.55?'#f59e0b':'#ef4444';
+    area.innerHTML += `
+      <div class="bar-row">
+        <span class="bar-row-label">${v.label}</span>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <span class="bar-num" style="color:${color}">${v.auc?.toFixed(3)||'—'}</span>
+      </div>`;
+  });
+}
+
+function renderWeightBars() {
+  const area = document.getElementById('weightBars');
+  area.innerHTML = '';
+  const active = state.active;
+  const max = Math.max(...Object.values(active).map(v=>v.weight));
+
+  Object.entries(active).sort((a,b)=>b[1].weight-a[1].weight).forEach(([k,v]) => {
+    const pct = max>0 ? v.weight/max*100 : 0;
+    area.innerHTML += `
+      <div class="bar-row">
+        <span class="bar-row-label">${v.label}</span>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${v.color||'var(--accent)'}"></div></div>
+        <span class="bar-num">${(v.weight*100).toFixed(0)}%</span>
+      </div>`;
+  });
+}
+
+function renderEquityChart() {
+  const canvas = document.getElementById('equityChart');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 600;
+  canvas.height = 160;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const opt = state.equity_optimal;
+  const eq  = state.equity_equal;
+  if (!opt || !eq) {
+    ctx.fillStyle='#64748b'; ctx.font='14px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('Evolution 실행 후 수익 곡선이 표시됩니다', canvas.width/2, 80);
+    return;
+  }
+
+  drawLine(ctx, opt, canvas.width, canvas.height, '#10b981', '최적');
+  drawLine(ctx, eq,  canvas.width, canvas.height, '#64748b', '균등', true);
+
+  // 범례
+  ctx.font='11px sans-serif';
+  ctx.fillStyle='#10b981'; ctx.fillRect(10,8,14,3); ctx.fillText('최적 가중치',30,12);
+  ctx.fillStyle='#64748b'; ctx.fillRect(110,8,14,3); ctx.fillText('균등 가중치',130,12);
+}
+
+function drawLine(ctx, data, w, h, color, label, dashed=false) {
+  if (!data || data.length<2) return;
+  const pad=20, vals=data;
+  const min=Math.min(...vals)-2, max=Math.max(...vals)+2;
+  const scaleX = i => pad + (i/(vals.length-1))*(w-pad*2);
+  const scaleY = v => h-pad-(v-min)/(max-min)*(h-pad*2);
+
+  ctx.beginPath();
+  if (dashed) ctx.setLineDash([4,4]); else ctx.setLineDash([]);
+  ctx.strokeStyle=color; ctx.lineWidth=2;
+  vals.forEach((v,i) => i===0?ctx.moveTo(scaleX(i),scaleY(v)):ctx.lineTo(scaleX(i),scaleY(v)));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 끝점 레이블
+  const last = vals.at(-1);
+  ctx.fillStyle = color; ctx.font='11px monospace';
+  ctx.fillText(`${last.toFixed(0)}`, scaleX(vals.length-1)-16, scaleY(last)-6);
+}
+
+function renderHistory() {
+  const tbody = document.getElementById('historyBody');
+  const hist  = [...state.history].reverse();
+  const allDefs = {...INITIAL_INDICATORS, ...CANDIDATE_POOL};
+
+  tbody.innerHTML = hist.map((h, i) => {
+    const prev = hist[i+1];
+    const deltaAuc = prev ? (h.auc - prev.auc) : 0;
+    const deltaClass = deltaAuc>0?'delta-pos':deltaAuc<0?'delta-neg':'';
+    const deltaStr = deltaAuc!==0 ? `<span class="${deltaClass}">(${deltaAuc>0?'+':''}${deltaAuc.toFixed(4)})</span>` : '';
+    const addedStr  = h.added?.map(k=>allDefs[k]?.label||k).join(', ') || '—';
+    const dropStr   = h.dropped?.map(k=>allDefs[k]?.label||k).join(', ') || '—';
+
+    return `<tr>
+      <td><span class="gen-badge">Gen ${h.generation}</span></td>
+      <td>${h.active_count}개</td>
+      <td style="font-family:var(--mono)">${h.accuracy}%</td>
+      <td style="font-family:var(--mono)">${h.auc} ${deltaStr}</td>
+      <td style="font-family:var(--mono)">${h.sharpe}</td>
+      <td style="color:#86efac;font-size:11px">${addedStr}</td>
+      <td style="color:#fca5a5;font-size:11px">${dropStr}</td>
+      <td style="color:var(--muted);font-size:11px">${h.timestamp}</td>
+    </tr>`;
+  }).join('');
+
+  if (!hist.length) tbody.innerHTML = '<tr><td colspan="8" style="color:var(--muted);text-align:center;padding:20px">Evolution을 실행하면 히스토리가 표시됩니다</td></tr>';
+}
+
+function renderCorrMatrix() {
+  const wrap = document.getElementById('corrMatrix');
+  const corr = state.corr;
+  if (!corr) { wrap.innerHTML='<div style="color:var(--muted);font-size:12px">Evolution 실행 후 표시</div>'; return; }
+
+  const keys = Object.keys(corr);
+  const active = state.active;
+  let html = '<table class="corr-table"><thead><tr><th></th>';
+  keys.forEach(k => html += `<th>${active[k]?.label?.slice(0,4)||k}</th>`);
+  html += '</tr></thead><tbody>';
+
+  keys.forEach(a => {
+    html += `<tr><th style="text-align:right">${active[a]?.label?.slice(0,6)||a}</th>`;
+    keys.forEach(b => {
+      const v = corr[a]?.[b] ?? 0;
+      const abs = Math.abs(v);
+      const bg = v===1?'#1a3a2a':abs>0.5?`rgba(239,68,68,${abs*0.5})`:abs>0.3?`rgba(245,158,11,${abs*0.4})`:'transparent';
+      const color = v===1?'#34d399':abs>0.3?'#f1f5f9':'#64748b';
+      html += `<td style="background:${bg};color:${color}">${v.toFixed(2)}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+// 유틸
+// ─────────────────────────────────────────────
+
+function sigmoid(x) { return 1/(1+Math.exp(-x)); }
+function shuffle(arr) { for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+
+// indicator_results.json 로드 시도 (Python 실행 결과)
+async function tryLoadJsonResults() {
+  try {
+    const r = await fetch('data/indicator_results.json');
+    if (!r.ok) return;
+    const data = await r.json();
+
+    // Python 결과를 state에 반영
+    if (data.generation) {
+      state.generation = data.generation;
+      // 활성 지표 업데이트
+      const allDefs = {...INITIAL_INDICATORS, ...CANDIDATE_POOL};
+      if (data.active_indicators) {
+        const newActive = {};
+        data.active_indicators.forEach(k => {
+          const def = allDefs[k] || {label:k, color:'#64748b'};
+          newActive[k] = {
+            label: data.indicator_labels?.[k] || def.label,
+            color: def.color || '#64748b',
+            auc: data.univariate_auc?.[k] || 0.55,
+            weight: data.optimal_weights?.[k] || 0.1,
+          };
+        });
+        state.active = newActive;
+      }
+      if (data.optimal_weights) state.optimal_weights = data.optimal_weights;
+      if (data.equity_optimal)  state.equity_optimal  = data.equity_optimal;
+      if (data.equity_equal)    state.equity_equal     = data.equity_equal;
+      if (data.correlation_matrix) state.corr = data.correlation_matrix;
+      if (data.history)         state.history = data.history;
+      saveState();
+      render();
+      document.getElementById('alertBox').innerHTML =
+        '<div class="alert alert-green">✅ Python indicator_lab.py 결과 로드 완료</div>';
+    }
+  } catch(e) {
+    // 로컬 파일 없음 — 정상
+  }
+}
+
+// ─────────────────────────────────────────────
+// 초기화
+// ─────────────────────────────────────────────
+
+window.addEventListener('resize', renderEquityChart);
+tryLoadJsonResults().then(() => render());
+</script>
+</body>
+</html>
