@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>매수 신호 대시보드 — Influence Radar</title>
+<style>
+:root {
+  --bg:    #04040f;
+  --bg2:   #0a0a1e;
+  --bg3:   #0f0f2a;
+  --border:#1e1e4a;
+  --text:  #c8d8f0;
+  --dim:   #5566aa;
+  --green: #16a34a;
+  --yellow:#d97706;
+  --red:   #dc2626;
+  --mono:  'Courier New', monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 16px;
+  min-height: 100vh;
+}
+
+/* ── 헤더 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.header-title { font-size: 17px; font-weight: 700; color: #e0f0ff; }
+.coord-badge {
+  font-size: 10px;
+  background: #1e1e4a;
+  color: #93c5fd;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: var(--mono);
+}
+.refresh-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.refresh-btn:hover { border-color: #4466cc; }
+
+/* ── 요약 바 */
+.summary {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.stat-chip {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 14px;
+  text-align: center;
+  min-width: 80px;
+}
+.stat-chip .val { font-size: 22px; font-weight: 700; }
+.stat-chip .lbl { font-size: 10px; color: var(--dim); margin-top: 2px; }
+.buy-chip  { border-color: #16a34a44; }
+.buy-chip  .val { color: #4ade80; }
+.watch-chip { border-color: #d9770644; }
+.watch-chip .val { color: #fbbf24; }
+
+/* ── 필터 탭 */
+.filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.flt {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.flt.active { border-color: #3b82f6; color: #93c5fd; background: #1e3a6a; }
+
+/* ── 카드 그리드 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+}
+
+/* ── 시그널 카드 */
+.sig-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  transition: border-color .15s;
+  position: relative;
+  overflow: hidden;
+}
+.sig-card.BUY   { border-color: #16a34a66; }
+.sig-card.WATCH { border-color: #d9770666; }
+.sig-card.WAIT  { border-color: var(--border); }
+
+.sig-card.BUY::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #16a34a, #4ade80, #16a34a);
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0%,100% { opacity: .6 }
+  50%      { opacity: 1 }
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sym-name { }
+.sym  { font-size: 15px; font-weight: 700; color: #e0f0ff; }
+.name { font-size: 11px; color: var(--dim); margin-top: 1px; }
+
+.signal-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+.signal-badge.BUY   { background: #14532d; color: #4ade80; }
+.signal-badge.WATCH { background: #451a03; color: #fbbf24; }
+.signal-badge.WAIT  { background: #1e1e3a; color: #6677aa; }
+
+/* ── 점수 게이지 */
+.gauge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.gauge-bar {
+  flex: 1;
+  height: 6px;
+  background: #1e1e4a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .5s;
+}
+.gauge-score { font-size: 18px; font-weight: 700; min-width: 52px; text-align: right; }
+.score-BUY   { color: #4ade80; }
+.score-WATCH { color: #fbbf24; }
+.score-WAIT  { color: #6677aa; }
+
+/* ── 가격 */
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.price-val { font-size: 15px; font-weight: 600; color: #e0f0ff; }
+.change-pos { color: #4ade80; }
+.change-neg { color: #f87171; }
+
+/* ── 인플루언서 & 섹터 */
+.meta-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.tag {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: #1e1e4a;
+  color: #7788bb;
+}
+.tag.influencer { background: #1e3260; color: #93c5fd; }
+
+/* ── 지표 미니 바 */
+.ind-section { margin-top: 8px; }
+.ind-title { font-size: 10px; color: var(--dim); margin-bottom: 5px; }
+.ind-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.ind-key { font-size: 10px; color: #8899cc; width: 110px; flex-shrink: 0; }
+.ind-bar {
+  flex: 1;
+  height: 4px;
+  background: #1e1e4a;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ind-fill { height: 100%; border-radius: 2px; background: #3b82f6; }
+.ind-val { font-size: 10px; color: var(--dim); width: 34px; text-align: right; }
+
+/* ── 로딩 */
+.loading {
+  text-align: center;
+  padding: 60px;
+  color: var(--dim);
+  font-size: 14px;
+}
+
+/* ── 에러 */
+.error-box {
+  background: #2a0a0a;
+  border: 1px solid #dc2626;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  color: #f87171;
+  margin: 20px 0;
+}
+
+/* ── 업데이트 시각 */
+.update-time {
+  text-align: right;
+  font-size: 10px;
+  color: var(--dim);
+  margin-bottom: 12px;
+}
+
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
+  .summary { gap: 6px; }
+  .stat-chip { min-width: 70px; padding: 7px 10px; }
+  .stat-chip .val { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">📡 매수 신호 대시보드</div>
+    <div id="coord-sig" class="coord-badge" style="margin-top:4px">로딩 중...</div>
+  </div>
+  <button class="refresh-btn" onclick="loadSignals()">⟳ 새로고침</button>
+</div>
+
+<div id="update-time" class="update-time"></div>
+
+<div id="summary" class="summary">
+  <div class="stat-chip buy-chip">
+    <div class="val" id="buy-count">–</div>
+    <div class="lbl">🟢 BUY</div>
+  </div>
+  <div class="stat-chip watch-chip">
+    <div class="val" id="watch-count">–</div>
+    <div class="lbl">🟡 WATCH</div>
+  </div>
+  <div class="stat-chip">
+    <div class="val" id="total-count">–</div>
+    <div class="lbl">전체</div>
+  </div>
+</div>
+
+<div class="filters" id="filters">
+  <button class="flt active" onclick="setFilter('ALL',this)">전체</button>
+  <button class="flt" onclick="setFilter('BUY',this)">🟢 BUY</button>
+  <button class="flt" onclick="setFilter('WATCH',this)">🟡 WATCH</button>
+  <button class="flt" onclick="setFilter('KR',this)">🇰🇷 한국</button>
+  <button class="flt" onclick="setFilter('US',this)">🇺🇸 미국</button>
+</div>
+
+<div id="grid" class="grid">
+  <div class="loading">⏳ 신호 데이터 로딩 중...</div>
+</div>
+
+<script>
+const IND_LABELS = {
+  rsi_filter:    'RSI 필터',
+  macd_align:    'MACD 정렬',
+  volume_surge:  '거래량 급증',
+  volume_ratio:  '거래량 배율',
+  bollinger_pos: '볼린저밴드',
+  momentum_5d:   '5일 모멘텀',
+  gap_up:        '갭상승',
+  price_vs_52w:  '52주 위치',
+  atr_stability: 'ATR 안정도',
+  trend_dir_20:  '20일 추세',
+  pre_run_inv:   '사전모멘텀(역)',
+  hit_rate:      '인물 적중률',
+  sentiment:     '감정 분석',
+  signal_strength:'신호 강도',
+};
+
+const GAUGE_COLOR = {
+  BUY:   'linear-gradient(90deg,#16a34a,#4ade80)',
+  WATCH: 'linear-gradient(90deg,#b45309,#fbbf24)',
+  WAIT:  'linear-gradient(90deg,#334,#556)',
+};
+
+let allSignals = [];
+let currentFilter = 'ALL';
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.flt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+
+function renderCards() {
+  const grid = document.getElementById('grid');
+  let data = allSignals.filter(s => {
+    if (currentFilter === 'BUY')   return s.signal === 'BUY';
+    if (currentFilter === 'WATCH') return s.signal === 'WATCH';
+    if (currentFilter === 'KR')    return s.market === 'KR';
+    if (currentFilter === 'US')    return s.market === 'US';
+    return true;
+  });
+
+  if (!data.length) {
+    grid.innerHTML = '<div class="loading" style="color:#556">해당 신호 없음</div>';
+    return;
+  }
+
+  grid.innerHTML = data.map(s => {
+    const chgClass = s.change_pct >= 0 ? 'change-pos' : 'change-neg';
+    const chgSign  = s.change_pct >= 0 ? '+' : '';
+
+    // 지표 표시 (상위 6개)
+    const indKeys = s.top_indicators && s.top_indicators.length
+      ? s.top_indicators
+      : Object.keys(s.indicators || {}).filter(k => k !== 'rsi_raw').slice(0, 6);
+
+    const indRows = indKeys.slice(0, 6).map(k => {
+      const v = (s.indicators && s.indicators[k] !== undefined)
+        ? s.indicators[k] : 0.5;
+      const pct = Math.round(v * 100);
+      return `
+        <div class="ind-row">
+          <div class="ind-key">${IND_LABELS[k] || k}</div>
+          <div class="ind-bar"><div class="ind-fill" style="width:${pct}%"></div></div>
+          <div class="ind-val">${pct}%</div>
+        </div>`;
+    }).join('');
+
+    const marketFlag = s.market === 'KR' ? '🇰🇷' : '🇺🇸';
+
+    return `
+    <div class="sig-card ${s.signal}">
+      <div class="card-top">
+        <div class="sym-name">
+          <div class="sym">${marketFlag} ${s.symbol}</div>
+          <div class="name">${s.name}</div>
+        </div>
+        <span class="signal-badge ${s.signal}">${s.signal}</span>
+      </div>
+
+      <div class="gauge-row">
+        <div class="gauge-bar">
+          <div class="gauge-fill" style="width:${s.score}%;background:${GAUGE_COLOR[s.signal]}"></div>
+        </div>
+        <div class="gauge-score score-${s.signal}">${s.score.toFixed(1)}%</div>
+      </div>
+
+      <div class="price-row">
+        <span class="price-val">${s.price.toLocaleString()}</span>
+        <span class="${chgClass}">${chgSign}${s.change_pct}%</span>
+      </div>
+
+      <div class="meta-row">
+        <span class="tag influencer">👤 ${s.influencer}</span>
+        <span class="tag">${s.sector}</span>
+      </div>
+
+      <div class="ind-section">
+        <div class="ind-title">주요 지표 기여</div>
+        ${indRows}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadSignals() {
+  document.getElementById('grid').innerHTML = '<div class="loading">⏳ 로딩 중...</div>';
+  try {
+    const r = await fetch('data/signals.json?t=' + Date.now());
+    if (!r.ok) throw new Error('signals.json 없음');
+    const data = await r.json();
+
+    allSignals = data.signals || [];
+
+    // 헤더 업데이트
+    document.getElementById('coord-sig').textContent = data.coordinate_sig || '좌표 미설정';
+    document.getElementById('buy-count').textContent   = data.buy_count   || 0;
+    document.getElementById('watch-count').textContent = data.watch_count || 0;
+    document.getElementById('total-count').textContent = data.total_scored || allSignals.length;
+
+    const dt = new Date(data.generated_at);
+    document.getElementById('update-time').textContent =
+      '마지막 업데이트: ' + dt.toLocaleString('ko-KR');
+
+    renderCards();
+  } catch(e) {
+    document.getElementById('grid').innerHTML = `
+      <div class="error-box">
+        <div style="font-size:28px;margin-bottom:10px">📭</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">신호 데이터가 없습니다</div>
+        <div style="font-size:11px;color:#aaa">
+          GitHub Actions → Signal Engine 워크플로우를 실행하거나<br>
+          로컬에서 <code>python scripts/signal_engine.py</code> 실행
+        </div>
+      </div>`;
+  }
+}
+
+// 자동 로드
+loadSignals();
+// 5분마다 자동 새로고침
+setInterval(loadSignals, 5 * 60 * 1000);
+</script>
+</body>
+</html>

@@ -328,6 +328,10 @@ console.log('✅ Firebase 연결 완료');
     <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
     Indicator Lab
   </button>
+  <button class="nav-btn" onclick="switchTab('signal',this)" style="color:#16a34a">
+    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    매수신호
+  </button>
 </nav>
 
 <!-- CONTENT -->
@@ -342,6 +346,9 @@ console.log('✅ Firebase 연결 완료');
   <div class="tab" id="tab-history"></div>
   <div class="tab" id="tab-indlab" style="padding:0;height:calc(100vh - 140px)">
     <iframe src="indicator-simulator.html" style="width:100%;height:100%;border:none;display:block" loading="lazy"></iframe>
+  </div>
+  <div class="tab" id="tab-signal" style="padding:0;height:calc(100vh - 140px)">
+    <iframe src="signal-dashboard.html" style="width:100%;height:100%;border:none;display:block" loading="lazy"></iframe>
   </div>
 </div>
 

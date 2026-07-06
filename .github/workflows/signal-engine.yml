@@ -1,0 +1,64 @@
+name: Signal Engine — 매수 신호 자동 생성
+
+on:
+  workflow_dispatch:          # 수동 실행
+  schedule:
+    # 한국장 시작 전: KST 08:30 = UTC 23:30 (전날)
+    - cron: '30 23 * * 0-4'
+    # 미국장 시작 전: ET 09:00 = UTC 14:00
+    - cron: '0 14 * * 1-5'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-signals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance pandas numpy scipy
+
+      - name: Run Signal Engine
+        run: |
+          mkdir -p data
+          python scripts/signal_engine.py
+
+      - name: 신호 요약 출력
+        run: |
+          python -c "
+          import json
+          with open('data/signals.json') as f:
+              d = json.load(f)
+          print(f'좌표: {d[\"coordinate_sig\"]}')
+          print(f'스코어링: {d[\"total_scored\"]}종목  BUY: {d[\"buy_count\"]}  WATCH: {d[\"watch_count\"]}')
+          print()
+          print('─── BUY 신호 ────────────────────────────────')
+          for s in d['signals']:
+              if s['signal'] == 'BUY':
+                  print(f'  🟢 {s[\"symbol\"]:12s} {s[\"name\"]:18s} {s[\"score\"]:5.1f}%  {s[\"price\"]:>10.2f} ({s[\"change_pct\"]:+.2f}%)')
+          print()
+          print('─── WATCH 신호 ──────────────────────────────')
+          for s in d['signals']:
+              if s['signal'] == 'WATCH':
+                  print(f'  🟡 {s[\"symbol\"]:12s} {s[\"name\"]:18s} {s[\"score\"]:5.1f}%  {s[\"price\"]:>10.2f} ({s[\"change_pct\"]:+.2f}%)')
+          "
+
+      - name: 결과 커밋 & 푸시
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/signals.json
+          git diff --cached --quiet || git commit -m "📡 Signal Engine 자동 업데이트 $(date +'%Y-%m-%d %H:%M')"
+          git push

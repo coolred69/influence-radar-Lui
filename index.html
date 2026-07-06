@@ -48,8 +48,10 @@ body {
 .nav-card:hover { border-color: var(--border2); background: var(--bg3); }
 .nav-card.us:hover { border-color: #3b82f6; }
 .nav-card.kr:hover { border-color: #16a34a; }
-.nav-card.lab:hover { border-color: #f59e0b; }
-.badge-lab { background: #451a03; color: #fcd34d; }
+.nav-card.lab:hover    { border-color: #f59e0b; }
+.nav-card.signal:hover { border-color: #16a34a; }
+.badge-lab    { background: #451a03; color: #fcd34d; }
+.badge-signal { background: #14532d; color: #4ade80; }
 .nav-icon { font-size: 36px; flex-shrink: 0; }
 .nav-info { flex: 1; }
 .nav-title { font-size: 17px; font-weight: 700; color: #e0f0ff; margin-bottom: 4px; }
@@ -94,8 +96,18 @@ body {
     <div class="nav-icon">🧬</div>
     <div class="nav-info">
       <div class="nav-title">Indicator Lab</div>
-      <div class="nav-desc">50개 실제 영향력자 이벤트 백테스트 → 지표 자동 진화 · 최적 복합 시그널 생성</div>
+      <div class="nav-desc">200개 실이벤트 백테스트 → 지표 자동 진화 · IR-COORD 고유 좌표 생성</div>
       <span class="nav-badge badge-lab">AI Evolution</span>
+    </div>
+    <div class="nav-arrow">›</div>
+  </a>
+
+  <a href="signal-dashboard.html" class="nav-card signal">
+    <div class="nav-icon">📡</div>
+    <div class="nav-info">
+      <div class="nav-title">매수 신호</div>
+      <div class="nav-desc">IR-COORD 좌표로 20개 종목 실시간 스코어링 → BUY / WATCH / WAIT 신호</div>
+      <span class="nav-badge badge-signal">Live Signals</span>
     </div>
     <div class="nav-arrow">›</div>
   </a>
