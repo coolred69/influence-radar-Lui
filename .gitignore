@@ -1,0 +1,17 @@
+# 보안 파일
+.env
+*.env
+kis_mcp/.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 로컬 DB
+kis_mcp/*.db
+kis_mcp/*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db

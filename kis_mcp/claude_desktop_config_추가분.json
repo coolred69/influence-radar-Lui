@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "kis-trading": {
+      "command": "python",
+      "args": ["C:\\Githubdesktop\\influence-radar-lui\\kis_mcp\\kis_mcp_server.py"]
+    }
+  }
+}

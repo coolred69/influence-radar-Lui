@@ -431,6 +431,99 @@ const HEALTHCARE_TICKERS = new Set(['JNJ','UNH','LLY','PFE','MRNA','ABBV','TMO',
 const RETAIL_TICKERS     = new Set(['AMZN','WMT','TGT','COST','HD','MCD','SBUX','NKE','LOW']);
 const REALESTATE_TICKERS = new Set(['AMT','PLD','EQIX','SPG','O','VNQ','IYR','WELL','DLR']);
 
+// ── 한국주식 유틸 ─────────────────────────────────────────────
+const KOSDAQ_SET = new Set(['247540','086520','323410','259960','041510','352820']);
+function isKRStock(ticker) { return /^\d{6}$/.test(String(ticker||'')); }
+function toYahooKR(code) {
+  return KOSDAQ_SET.has(code) ? `${code}.KQ` : `${code}.KS`;
+}
+
+// 한국주식 fallback 가격 (원, 장 마감 후 또는 API 실패 시)
+const KR_PRICES = {
+  '005930':75000,'000660':195000,'005380':220000,'000270':95000,
+  '051910':300000,'006400':280000,'373220':390000,'068270':180000,
+  '207940':1050000,'105560':88000,'055550':52000,'086790':68000,
+  '012330':270000,'028260':185000,'096770':120000,'042700':85000,
+  '035420':180000,'035720':45000,'247540':95000,'086520':55000,
+  '259960':280000,'352820':190000,'323410':30000,
+};
+
+// 한국주식 실시간가 캐시 (Firebase 또는 Yahoo 우선)
+let krLivePrices = JSON.parse(localStorage.getItem('ir_kr_live_prices') || '{}');
+let krPriceUpdatedAt = parseInt(localStorage.getItem('ir_kr_price_updated') || '0');
+
+// ── Firebase에서 KR 가격 로드 (GitHub Actions가 저장한 데이터)
+async function loadKRPricesFromFirebase() {
+  if (!window.db) return;
+  try {
+    const { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js');
+    const snap = await getDoc(doc(window.db, 'radar', 'kr_prices'));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.prices) {
+        krLivePrices = data.prices;
+        krPriceUpdatedAt = Date.now();
+        localStorage.setItem('ir_kr_live_prices', JSON.stringify(krLivePrices));
+        localStorage.setItem('ir_kr_price_updated', String(krPriceUpdatedAt));
+        console.log(`✅ KR 가격 Firebase 로드: ${Object.keys(krLivePrices).length}개 종목`);
+      }
+    }
+  } catch(e) { console.warn('KR Firebase 가격 로드 실패:', e); }
+}
+
+// ── Yahoo Finance에서 KR 단일 종목 즉시 조회 (fallback)
+async function fetchKRPriceYahoo(code) {
+  const sym = toYahooKR(code);
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`;
+  const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+  try {
+    const res = await fetch(proxy, {signal: AbortSignal.timeout(8000)});
+    if(!res.ok) return null;
+    const json = await res.json();
+    const meta = json?.chart?.result?.[0]?.meta;
+    if(!meta?.regularMarketPrice) return null;
+    const price = meta.regularMarketPrice;
+    const prev  = meta.chartPreviousClose || price;
+    const chg   = price - prev;
+    const chgPct = prev > 0 ? chg / prev * 100 : 0;
+    return {
+      price: Math.round(price),
+      change: Math.round(chg),
+      changePct: Math.round(chgPct * 100) / 100,
+    };
+  } catch(e) { return null; }
+}
+
+// ── KR 현재가 조회 (Firebase 캐시 → Yahoo → fallback)
+async function getKRLivePrice(code) {
+  const CACHE_TTL = 15 * 60 * 1000; // 15분
+  const cached = krLivePrices[code];
+  if (cached && (Date.now() - krPriceUpdatedAt < CACHE_TTL)) {
+    return { price: cached.price, changePct: cached.changePct || 0, isLive: true };
+  }
+  // Yahoo Finance 직접 조회
+  const data = await fetchKRPriceYahoo(code);
+  if (data) {
+    krLivePrices[code] = {...data, updatedAt: new Date().toISOString()};
+    localStorage.setItem('ir_kr_live_prices', JSON.stringify(krLivePrices));
+    return { price: data.price, changePct: data.changePct, isLive: true };
+  }
+  return { price: KR_PRICES[code] || 0, changePct: 0, isLive: false };
+}
+
+// ── KR 가격 포맷 (원화)
+function fmtKRPrice(code) {
+  const cached = krLivePrices[code];
+  const price = cached?.price || KR_PRICES[code] || 0;
+  const chgPct = cached?.changePct || 0;
+  const arrow = chgPct > 0 ? '▲' : chgPct < 0 ? '▼' : '';
+  const color = chgPct > 0 ? '#16a34a' : chgPct < 0 ? '#dc2626' : '#556677';
+  return { price, changePct: chgPct, arrow, color,
+           display: price >= 10000 ? `${(price/10000).toFixed(1)}만` : `${price.toLocaleString()}`,
+           isLive: !!cached };
+}
+// ─────────────────────────────────────────────────────────────
+
 // 실시간 현재가 캐시
 let livePrices = JSON.parse(localStorage.getItem('ir_live_prices') || '{}');
 let priceUpdatedAt = localStorage.getItem('ir_price_updated') || null;
@@ -491,8 +584,11 @@ async function updateAllPrices() {
   }
 }
 
-// ── 단일 종목 현재가 즉시 조회
+// ── 단일 종목 현재가 즉시 조회 (US + KR 통합)
 async function getLivePrice(ticker) {
+  // 한국주식은 별도 함수로 라우팅
+  if (isKRStock(ticker)) return getKRLivePrice(ticker);
+
   const cached = livePrices[ticker];
   const lastUpdate = priceUpdatedAt ? parseInt(priceUpdatedAt) : 0;
   if(cached && Date.now() - lastUpdate < 15*60*1000) return cached;
@@ -5896,6 +5992,10 @@ window.onload = function(){
       if(state.currentTab==='stocks') renderStocks();
     });
   }, 15*60*1000);
+
+  // ── 한국주식 가격 Firebase 로드 (GitHub Actions가 저장한 데이터)
+  setTimeout(() => loadKRPricesFromFirebase(), 2000);
+  setInterval(() => loadKRPricesFromFirebase(), 10*60*1000); // 10분마다 갱신
 
   // ── 기존 signalLog에 prediction 소급 동기화 (1회)
   setTimeout(() => {

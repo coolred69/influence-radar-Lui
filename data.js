@@ -57,6 +57,28 @@ const FIGS = [
    inf:72,base:72,susp:55,chType:"정책발표형",
    ch:["OPEC+ 발표","사우디 국영미디어 SPA"],
    sec:["ENERGY","DEFENSE"],rel:[]},
+
+  // ── 한국 인플루언서
+  {id:10,name:"이재용",avatar:"JY",country:"🇰🇷",title:"삼성전자 회장",color:"#1428a0",
+   twitter:null, googleAlert:"이재용 삼성전자",
+   inf:82,base:82,susp:42,hitRate:38,evPct:3.2,chType:"이벤트발표형",
+   ch:["삼성전자 공시·IR","해외 사업장 시찰","반도체 투자발표"],
+   sec:["KR_SEMICON","KR_IT"],rel:[]},
+  {id:11,name:"정의선",avatar:"EC",country:"🇰🇷",title:"현대차그룹 회장",color:"#002c5f",
+   twitter:null, googleAlert:"정의선 현대차",
+   inf:76,base:76,susp:35,hitRate:34,evPct:2.6,chType:"이벤트발표형",
+   ch:["현대차 실적발표","국제모터쇼 기조연설","공장 착공식·MOU"],
+   sec:["KR_AUTO","KR_BATTERY"],rel:[]},
+  {id:12,name:"최태원",avatar:"TW",country:"🇰🇷",title:"SK그룹 회장",color:"#ea0029",
+   twitter:null, googleAlert:"최태원 SK그룹",
+   inf:73,base:73,susp:38,hitRate:32,evPct:2.1,chType:"이벤트발표형",
+   ch:["SK CEO Summit","실적발표","다보스·CES 발언"],
+   sec:["KR_SEMICON","KR_BATTERY","KR_ENERGY"],rel:[]},
+  {id:13,name:"이재명",avatar:"JM",country:"🇰🇷",title:"대통령",color:"#004ea2",
+   twitter:null, googleAlert:"이재명 정책 주식",
+   inf:88,base:88,susp:52,hitRate:41,evPct:3.8,chType:"정책발표형",
+   ch:["국무회의 발표","국정연설·신년사","경제부처 업무보고"],
+   sec:["KR_SEMICON","KR_AUTO","KR_BATTERY","KR_ENERGY","KR_FINANCE"],rel:[]},
 ];
 
 const SM = {
@@ -96,6 +118,26 @@ const SM = {
   REALESTATE:{label:"부동산·리츠",color:"#14b8a6",temp:44,
     d:[{t:"PLD",n:"Prologis",f:82,mc:"100B",note:"물류창고REIT"},{t:"AMT",n:"American Tower",f:78,mc:"90B",note:"통신타워REIT"},{t:"EQIX",n:"Equinix",f:84,mc:"80B",note:"데이터센터REIT"}],
     i:[{t:"SPG",n:"Simon Property",f:70,mc:"55B",note:"쇼핑몰REIT"},{t:"O",n:"Realty Income",f:74,mc:"50B",note:"월배당REIT"},{t:"WELL",n:"Welltower",f:75,mc:"70B",note:"헬스케어REIT"}]},
+
+  // ── 한국 섹터 (KR prefix, 6자리 종목코드)
+  KR_SEMICON:{label:"🇰🇷 한국반도체",color:"#1428a0",temp:78,
+    d:[{t:"005930",n:"삼성전자",f:92,mc:"400조",note:"DRAM·낸드·파운드리"},{t:"000660",n:"SK하이닉스",f:88,mc:"90조",note:"HBM AI메모리 1위"}],
+    i:[{t:"042700",n:"한미반도체",f:76,mc:"20조",note:"TC본더"},{t:"000990",n:"DB하이텍",f:62,mc:"3조",note:"파운드리"}]},
+  KR_AUTO:{label:"🇰🇷 한국자동차",color:"#002c5f",temp:58,
+    d:[{t:"005380",n:"현대차",f:82,mc:"55조",note:"글로벌 4위 완성차"},{t:"000270",n:"기아",f:80,mc:"40조",note:"SUV·EV"}],
+    i:[{t:"012330",n:"현대모비스",f:74,mc:"20조",note:"부품·자율주행"},{t:"064350",n:"현대로템",f:66,mc:"5조",note:"방산·철도"}]},
+  KR_BATTERY:{label:"🇰🇷 한국배터리",color:"#00a550",temp:65,
+    d:[{t:"373220",n:"LG에너지솔루션",f:84,mc:"60조",note:"EV배터리 글로벌2위"},{t:"006400",n:"삼성SDI",f:80,mc:"30조",note:"전고체·각형"}],
+    i:[{t:"051910",n:"LG화학",f:76,mc:"25조",note:"배터리소재·화학"},{t:"247540",n:"에코프로비엠",f:70,mc:"10조",note:"양극재"}]},
+  KR_BIO:{label:"🇰🇷 한국바이오",color:"#ec4899",temp:55,
+    d:[{t:"207940",n:"삼성바이오로직스",f:86,mc:"60조",note:"CMO 글로벌3위"},{t:"068270",n:"셀트리온",f:78,mc:"25조",note:"바이오시밀러"}],
+    i:[{t:"326030",n:"SK바이오팜",f:62,mc:"4조",note:"신약"},{t:"196170",n:"알테오젠",f:68,mc:"8조",note:"피하주사플랫폼"}]},
+  KR_IT:{label:"🇰🇷 한국IT",color:"#06b6d4",temp:52,
+    d:[{t:"035420",n:"NAVER",f:80,mc:"35조",note:"포털·AI·웹툰"},{t:"035720",n:"카카오",f:68,mc:"15조",note:"메신저·플랫폼"}],
+    i:[{t:"259960",n:"크래프톤",f:72,mc:"12조",note:"배틀그라운드"},{t:"352820",n:"하이브",f:66,mc:"7조",note:"K-팝"}]},
+  KR_FINANCE:{label:"🇰🇷 한국금융",color:"#0ea5e9",temp:48,
+    d:[{t:"105560",n:"KB금융",f:80,mc:"30조",note:"국내최대금융그룹"},{t:"055550",n:"신한지주",f:78,mc:"25조",note:"글로벌확장"}],
+    i:[{t:"086790",n:"하나금융지주",f:74,mc:"18조",note:"외환·글로벌"},{t:"323410",n:"카카오뱅크",f:62,mc:"8조",note:"인터넷은행"}]},
 };
 
 // ── 인물별 과거 패턴 데이터베이스
@@ -330,6 +372,71 @@ const PATTERNS = {
     overallPattern:"조작 의심 없음. 실적·이벤트 기반 예측 가능한 상승 패턴. 캘린더 등록만으로 선제 대응 가능",
     patternBonus: +3,
   },
+
+  10: { // 이재용
+    name:"이재용",color:"#1428a0",patternScore:72,
+    signaturePatterns:[
+      {id:"JY1",name:"투자·MOU 발표 랠리",type:"정상패턴",frequency:"연2~3회",
+       description:"해외 공장 착공·대규모 투자 발표 시 삼성전자·SK하이닉스 동반 상승",
+       avgDropPct:-3,avgRecoveryDays:0,avgPureEffect:-2.5,suspicion:15,
+       examples:[{date:"2025-05-10",event:"미국 텍사스 파운드리 투자 24조 발표",drop:-3,recovery:0}],
+       signal:"대규모 투자 발표 → 삼성전자 단기 상승. 반도체 섹터 동반",
+       actionOnDetect:"005930 발표 당일 진입 · 2~3일 후 청산"},
+      {id:"JY2",name:"재판 리스크",type:"리스크패턴",frequency:"판결 기간",
+       description:"재판 판결 전후 불확실성으로 삼성전자 단기 약세",
+       avgDropPct:2,avgRecoveryDays:5,avgPureEffect:1.5,suspicion:20,
+       examples:[{date:"2025-02-01",event:"파기환송심 결심 공판",drop:2,recovery:5}],
+       signal:"판결 전 약세 → 판결 확정 후 불확실성 해소로 반등",
+       actionOnDetect:"판결 확정 이후 진입이 안전"},
+    ],
+    overallPattern:"대규모 투자·MOU 발표가 주가 촉매. 재판 일정이 단기 리스크. 삼성전자 직접 연동 강함",
+    patternBonus:+2,
+  },
+  11: { // 정의선
+    name:"정의선",color:"#002c5f",patternScore:68,
+    signaturePatterns:[
+      {id:"EC1",name:"글로벌 MOU·공장 발표",type:"정상패턴",frequency:"연3~4회",
+       description:"북미·유럽 신규 투자·협력 발표 시 현대차·기아 동반 상승",
+       avgDropPct:-2.5,avgRecoveryDays:0,avgPureEffect:-2,suspicion:12,
+       examples:[{date:"2025-09-15",event:"미국 조지아 EV전용공장 추가투자 발표",drop:-2.5,recovery:0}],
+       signal:"MOU·착공 발표 → 현대차 당일 +2~4%",
+       actionOnDetect:"005380·000270 발표 당일 매수, 1~2일 청산"},
+    ],
+    overallPattern:"EV 전환 가속·해외 투자 발표가 주가 촉매. 글로벌 자동차 판매 수치와 연동",
+    patternBonus:+1,
+  },
+  12: { // 최태원
+    name:"최태원",color:"#ea0029",patternScore:65,
+    signaturePatterns:[
+      {id:"TW1",name:"SK하이닉스 HBM 투자 발표",type:"정상패턴",frequency:"연2~3회",
+       description:"AI향 HBM 대규모 투자·NVIDIA 공급 계약 발표 시 000660 강세",
+       avgDropPct:-4,avgRecoveryDays:0,avgPureEffect:-3.5,suspicion:10,
+       examples:[{date:"2025-04-20",event:"HBM4 공급 계약 확대 발표",drop:-5,recovery:0}],
+       signal:"AI·HBM 투자 발표 → SK하이닉스 즉각 반응",
+       actionOnDetect:"000660 당일 진입, 발표 후 갭업 시 청산"},
+    ],
+    overallPattern:"SK하이닉스 HBM 투자 발표가 핵심 촉매. AI 반도체 수요와 직결",
+    patternBonus:+2,
+  },
+  13: { // 이재명
+    name:"이재명",color:"#004ea2",patternScore:75,
+    signaturePatterns:[
+      {id:"JM1",name:"산업 지원 정책 발표",type:"정상패턴",frequency:"분기 1~2회",
+       description:"반도체·배터리·자동차 등 국가 전략산업 지원 발표 시 해당 섹터 상승",
+       avgDropPct:-3,avgRecoveryDays:0,avgPureEffect:-2.5,suspicion:20,
+       examples:[{date:"2026-01-10",event:"반도체 클러스터 국비 지원 확대 발표",drop:-3,recovery:0}],
+       signal:"특정 산업 언급 → 해당 섹터 대형주 당일 상승",
+       actionOnDetect:"해당 섹터 대형주 발표 당일 매수, 다음날 청산"},
+      {id:"JM2",name:"부동산·금리 정책 충격",type:"리스크패턴",frequency:"정기적",
+       description:"금리·부동산 규제 강화 발표 시 금융·건설주 약세",
+       avgDropPct:3,avgRecoveryDays:7,avgPureEffect:2,suspicion:25,
+       examples:[{date:"2026-02-15",event:"가계부채 추가 규제 발표",drop:2.5,recovery:7}],
+       signal:"규제 강화 → 금융주 단기 약세",
+       actionOnDetect:"규제 발표 전 금융주 포지션 정리"},
+    ],
+    overallPattern:"정책 발표가 섹터별로 즉각 반응. 지지 정책→상승, 규제→하락. 예측 가능성 높음",
+    patternBonus:+3,
+  },
 };
 
 const INIT_LOGS = [
@@ -363,4 +470,14 @@ const INIT_LOGS = [
   {id:10,figId:3,date:"2024-12-18",type:"부정",stmt:"25bp 인하 + 2025년 인하 횟수 축소 시그널",
    tickers:"SPY,TLT",drop:3,spDrop:3,sectorDrop:4,recovery:7,verified:true,
    note:"인하 단행했으나 매파적 메시지 — S&P -2.9%, 나스닥 -3.6%"},
+  // ── 한국 인플루언서 샘플 로그
+  {id:11,figId:10,date:"2025-05-10",type:"긍정",stmt:"미국 텍사스 파운드리 24조 투자 발표",
+   tickers:"005930,000660",drop:-3,spDrop:0,sectorDrop:-2,recovery:0,verified:true,
+   note:"이재용 회장 현지 착공식 — 삼성전자 당일 +3.1%"},
+  {id:12,figId:12,date:"2025-04-20",type:"긍정",stmt:"NVIDIA 향 HBM4 공급 계약 확대 발표",
+   tickers:"000660,005930",drop:-5,spDrop:-1,sectorDrop:-4,recovery:0,verified:true,
+   note:"최태원 직접 발표 — SK하이닉스 당일 +5.2%"},
+  {id:13,figId:13,date:"2026-01-10",type:"긍정",stmt:"반도체 클러스터 국비 지원 2조 확대 발표",
+   tickers:"005930,000660,042700",drop:-3,spDrop:0,sectorDrop:-2.5,recovery:0,verified:true,
+   note:"국무회의 후 발표 — 반도체 섹터 전반 상승"},
 ];
