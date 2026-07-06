@@ -324,10 +324,10 @@ console.log('✅ Firebase 연결 완료');
     <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
     종목 히스토리
   </button>
-  <a href="indicator-simulator.html" target="_blank" class="nav-btn" style="text-decoration:none">
+  <button class="nav-btn" onclick="switchTab('indlab',this)">
     <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
     Indicator Lab
-  </a>
+  </button>
 </nav>
 
 <!-- CONTENT -->
@@ -340,6 +340,9 @@ console.log('✅ Firebase 연결 완료');
   <div class="tab" id="tab-sim"></div>
   <div class="tab" id="tab-trade"></div>
   <div class="tab" id="tab-history"></div>
+  <div class="tab" id="tab-indlab" style="padding:0;height:calc(100vh - 140px)">
+    <iframe src="indicator-simulator.html" style="width:100%;height:100%;border:none;display:block" loading="lazy"></iframe>
+  </div>
 </div>
 
 <!-- DESKTOP TAB NAV (hidden) -->
