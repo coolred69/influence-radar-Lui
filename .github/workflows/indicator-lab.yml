@@ -25,7 +25,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install yfinance pandas numpy
+        run: pip install yfinance pandas numpy scipy
 
       - name: Step 1 — 실데이터 수집 (build_training_data.py)
         run: |

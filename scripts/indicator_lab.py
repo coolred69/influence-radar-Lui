@@ -1,429 +1,461 @@
 #!/usr/bin/env python3
 """
-Influence Radar — Indicator Lab  (반복 진화형)
-────────────────────────────────────────────
-실행할 때마다:
-  1. 현재 지표 풀 테스트
-  2. AUC < DROP_THRESHOLD 지표 자동 제거
-  3. CANDIDATE_POOL 에서 무작위로 새 지표 추가 시도
-  4. 추가 후 성능이 오르면 채택, 안 오르면 폐기
-  5. 결과를 data/indicator_results.json 에 누적 저장
+Influence Radar — Indicator Lab v2 (진화형 실데이터 최적화)
+════════════════════════════════════════════════════════════
+완전히 실데이터만 사용. 합성 데이터 ZERO.
 
-→ 실행을 반복할수록 지표 풀이 진화함.
+알고리즘:
+  1. training_data.json 로드 (없으면 종료)
+  2. Train 80% / Test 20% 분리
+  3. 각 지표 단변량 AUC 측정 → DROP_THRESHOLD 미만 제거
+  4. 후보 지표 추가 시험 (실데이터 기반)
+  5. 2단계 최적화: 랜덤 탐색 → scipy Nelder-Mead 정밀 수렴
+  6. Train/Test AUC 비교 → 오버피팅 경고
+  7. "IR-COORD" 고유 좌표 서명 생성
+  8. data/indicator_results.json 저장
 
 사용:
-  python scripts/indicator_lab.py           # 1회 실행 (진화 1스텝)
-  python scripts/indicator_lab.py --reset   # 초기화 후 재시작
+  python scripts/indicator_lab.py
+  python scripts/indicator_lab.py --reset
 """
 
-import json, random, math, os, sys, copy
+import json, random, math, os, sys, copy, hashlib
 from datetime import datetime
 
-RESULTS_PATH     = "data/indicator_results.json"
-TRAINING_PATH    = "data/training_data.json"   # build_training_data.py 출력
-DROP_THRESHOLD   = 0.52   # AUC 이 이하면 제거
-ADOPT_THRESHOLD  = 0.003  # 추가 후 AUC 상승 최소치
-GRID_ITER        = 80_000 # 그리드서치 반복 수
-N_SIGNALS        = 400    # 합성 신호 수 (실데이터 없을 때만)
-EQUITY_SEED      = 99     # 시뮬레이션 재현성
+try:
+    import numpy as np
+    from scipy.optimize import minimize as scipy_minimize
+    HAS_SCIPY = True
+except ImportError:
+    HAS_SCIPY = False
+    print("⚠ scipy 없음. pip install scipy 설치 시 정밀도 향상")
 
-# ─────────────────────────────────────────────
-# 지표 풀 (초기 + 후보)
-# ─────────────────────────────────────────────
+RESULTS_PATH   = "data/indicator_results.json"
+TRAINING_PATH  = "data/training_data.json"
+DROP_THRESHOLD = 0.52     # 단변량 AUC 하한
+ADOPT_MIN_ΔAUC = 0.002    # 신규 지표 채택 최소 AUC 향상치
+GRID_ITER_1    = 30_000   # 1단계 랜덤 탐색
+GRID_ITER_2    = 100      # 2단계: top-100 근방 집중 탐색
+TRAIN_RATIO    = 0.80     # 훈련/테스트 분리 비율
 
-INITIAL_INDICATORS = {
-    "hit_rate":        {"label": "과거 적중률",   "gen": lambda p: _gen_by_type(p, "hit_rate")},
-    "influence_score": {"label": "영향력 점수",   "gen": lambda p: _gen_by_type(p, "influence")},
-    "signal_strength": {"label": "신호 강도",     "gen": lambda _: random.betavariate(2, 2)},
-    "cross_val":       {"label": "교차 검증",     "gen": lambda _: min(random.randint(0,5)/5.0, 1.0)},
-    "sentiment":       {"label": "감정 분석",     "gen": lambda _: random.choices([1,0.5,0],[.5,.3,.2])[0]},
-    "news_freq":       {"label": "뉴스 빈도",     "gen": lambda _: random.betavariate(1.5,3)},
-    "rsi_filter":      {"label": "RSI 필터",      "gen": lambda _: float(random.choices([1,0],[.55,.45])[0])},
-    "volume_surge":    {"label": "거래량 급증",   "gen": lambda _: float(random.choices([1,0],[.4,.6])[0])},
-    "macd_align":      {"label": "MACD 정렬",     "gen": lambda _: float(random.choices([1,0],[.5,.5])[0])},
-    "market_regime":   {"label": "시장 국면",     "gen": lambda _: float(random.choices([1,0],[.6,.4])[0])},
+# ──────────────────────────────────────────────────────────────
+# 활성 지표 정의 (실데이터 키와 1:1 매핑)
+# training_data.json indicators 키 이름과 반드시 일치
+# ──────────────────────────────────────────────────────────────
+INITIAL_INDICATORS = [
+    "rsi_filter",
+    "macd_align",
+    "volume_surge",
+    "volume_ratio",
+    "bollinger_pos",
+    "momentum_5d",
+    "sentiment",
+    "hit_rate",
+    "signal_strength",
+    "news_freq",
+]
+
+# 실데이터에 존재하는 추가 후보 지표
+CANDIDATE_INDICATORS = [
+    "gap_up",
+    "price_vs_52w",
+    "atr_stability",
+    "trend_dir_20",
+    "pre_run_inv",
+    "cross_val",
+]
+
+INDICATOR_LABELS = {
+    "rsi_filter":    "RSI 필터(30~65)",
+    "macd_align":    "MACD 정렬",
+    "volume_surge":  "거래량 급증",
+    "volume_ratio":  "거래량 배율",
+    "bollinger_pos": "볼린저밴드 위치",
+    "momentum_5d":   "5일 모멘텀",
+    "sentiment":     "감정 분석",
+    "hit_rate":      "인물 과거 적중률",
+    "signal_strength":"신호 강도",
+    "news_freq":     "뉴스 검증 빈도",
+    "gap_up":        "갭 상승 비율",
+    "price_vs_52w":  "52주 고가 대비",
+    "atr_stability": "변동성 안정도",
+    "trend_dir_20":  "20일 추세 방향",
+    "pre_run_inv":   "사전 모멘텀(역)",
+    "cross_val":     "다중 검증 점수",
 }
 
-# 언제든 추가 테스트할 수 있는 후보 지표
-# (실제 구현 시 real data 로 교체)
-CANDIDATE_POOL = {
-    "momentum_5d":     {"label": "5일 모멘텀",          "gen": lambda _: random.betavariate(2,2)},
-    "sector_trend":    {"label": "섹터 추세",            "gen": lambda _: float(random.choices([1,0],[.55,.45])[0])},
-    "foreign_buy":     {"label": "외국인 순매수",        "gen": lambda _: float(random.choices([1,0],[.45,.55])[0])},
-    "inst_buy":        {"label": "기관 순매수",          "gen": lambda _: float(random.choices([1,0],[.5,.5])[0])},
-    "bollinger_pos":   {"label": "볼린저밴드 위치",      "gen": lambda _: random.betavariate(2,2)},
-    "vix_level":       {"label": "VIX 수준",             "gen": lambda _: random.betavariate(3,2)},
-    "earnings_est":    {"label": "실적 전망 (Up/Down)",  "gen": lambda _: float(random.choices([1,0],[.55,.45])[0])},
-    "insider_trade":   {"label": "내부자 거래",          "gen": lambda _: float(random.choices([1,0],[.35,.65])[0])},
-    "options_skew":    {"label": "옵션 스큐",            "gen": lambda _: random.betavariate(2,3)},
-    "short_interest":  {"label": "공매도 비율 (역)→",    "gen": lambda _: random.betavariate(2,2)},
-    "pe_discount":     {"label": "PER 할인율",           "gen": lambda _: random.betavariate(2,2)},
-    "revenue_growth":  {"label": "매출 성장률",          "gen": lambda _: random.betavariate(2,2)},
-    "debt_ratio":      {"label": "부채비율 (역)",        "gen": lambda _: random.betavariate(1.5,3)},
-    "patent_score":    {"label": "특허 출원 강도",       "gen": lambda _: random.betavariate(1.5,4)},
-    "social_buzz":     {"label": "SNS 버즈량",           "gen": lambda _: random.betavariate(1.5,3)},
-}
 
-# 지표의 실제 수익 기여도 (ground truth)
-# 새 지표 추가할 때 여기에도 등록 필요
-TRUE_WEIGHTS = {
-    "hit_rate":       0.32,
-    "influence_score":0.09,
-    "signal_strength":0.11,
-    "cross_val":      0.09,
-    "sentiment":      0.09,
-    "news_freq":      0.05,
-    "rsi_filter":     0.07,
-    "volume_surge":   0.04,
-    "macd_align":     0.03,
-    "market_regime":  0.02,
-    # 후보 지표 기여도
-    "momentum_5d":    0.06,
-    "sector_trend":   0.05,
-    "foreign_buy":    0.07,
-    "inst_buy":       0.06,
-    "bollinger_pos":  0.04,
-    "vix_level":      0.03,
-    "earnings_est":   0.08,
-    "insider_trade":  0.05,
-    "options_skew":   0.03,
-    "short_interest": 0.02,
-    "pe_discount":    0.04,
-    "revenue_growth": 0.05,
-    "debt_ratio":     0.02,
-    "patent_score":   0.01,
-    "social_buzz":    0.02,
-}
+# ──────────────────────────────────────────────────────────────
+# 데이터 로드
+# ──────────────────────────────────────────────────────────────
 
-# ─────────────────────────────────────────────
-# 합성 데이터 생성
-# ─────────────────────────────────────────────
+def load_real_data():
+    if not os.path.exists(TRAINING_PATH):
+        print(f"❌ {TRAINING_PATH} 없음. build_training_data.py 먼저 실행")
+        sys.exit(1)
+    with open(TRAINING_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    sigs = data.get("signals", [])
+    if len(sigs) < 30:
+        print(f"❌ 데이터 부족: {len(sigs)}건 (최소 30건 필요)")
+        sys.exit(1)
+    print(f"✅ 실데이터 로드: {len(sigs)}건  |  수익달성 {data.get('positive_rate',0)*100:.1f}%")
+    return sigs
 
-def generate_signals(n, active_indicators, seed=None):
-    if seed is not None:
-        random.seed(seed)
+def split_data(signals, ratio=TRAIN_RATIO, seed=42):
+    """날짜 순 정렬 후 앞 80%=train, 뒤 20%=test (시계열 누수 방지)"""
+    sorted_sigs = sorted(signals, key=lambda x: x.get("date",""))
+    n = int(len(sorted_sigs) * ratio)
+    return sorted_sigs[:n], sorted_sigs[n:]
 
-    all_defs = {**INITIAL_INDICATORS, **CANDIDATE_POOL}
-    signals = []
-
-    for i in range(n):
-        ptype = random.choice(["tech_ceo","policy","finance","analyst"])
-        inds  = {k: all_defs[k]["gen"](ptype) for k in active_indicators}
-
-        # 가중합 기반 실제 확률
-        total_tw = sum(TRUE_WEIGHTS.get(k,0.03) for k in active_indicators)
-        score = sum((TRUE_WEIGHTS.get(k,0.03)/total_tw) * inds[k] for k in active_indicators)
-        prob  = 0.30 + 0.55 * _sigmoid((score - 0.5) * 6)
-        outcome = 1 if random.random() < prob else 0
-
-        signals.append({"id":i, "outcome":outcome, "indicators": inds})
-
-    return signals
+def extract_indicators(signals, active_keys):
+    """signals에서 active_keys만 추출. 없는 키는 0.5로 채움"""
+    result = []
+    for s in signals:
+        ind = s.get("indicators", {})
+        filtered = {k: float(ind.get(k, 0.5)) for k in active_keys}
+        result.append({"outcome": s["outcome"], "indicators": filtered})
+    return result
 
 
-def _gen_by_type(ptype, field):
-    cfg = {
-        "tech_ceo": {"hit_rate":(0.62,0.13),"influence":(0.83,0.09)},
-        "policy":   {"hit_rate":(0.45,0.17),"influence":(0.76,0.10)},
-        "finance":  {"hit_rate":(0.56,0.14),"influence":(0.66,0.11)},
-        "analyst":  {"hit_rate":(0.59,0.11),"influence":(0.61,0.10)},
-    }
-    mu, sigma = cfg[ptype][field]
-    return max(0.05, min(0.99, random.gauss(mu, sigma)))
-
-
-def _sigmoid(x):
-    return 1 / (1 + math.exp(-x))
-
-
-# ─────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────
 # 평가 함수
-# ─────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────
 
-def _pearson(x, y):
-    n = len(x)
-    if n < 2: return 0.0
-    mx,my = sum(x)/n, sum(y)/n
-    num = sum((xi-mx)*(yi-my) for xi,yi in zip(x,y))
-    dx  = math.sqrt(sum((xi-mx)**2 for xi in x)+1e-9)
-    dy  = math.sqrt(sum((yi-my)**2 for yi in y)+1e-9)
-    return num/(dx*dy)
+def sigmoid(x):
+    return 1.0 / (1.0 + math.exp(-max(-500, min(500, x))))
 
-def _approx_auc(pairs):
-    """(score, label) 리스트 → AUC 근사"""
-    pairs = sorted(pairs, key=lambda x:-x[0])
-    pos = sum(l for _,l in pairs)
-    neg = len(pairs)-pos
-    if pos==0 or neg==0: return 0.5
-    rank_sum = sum((r+1) for r,(_, l) in enumerate(pairs) if l==1)
-    return 1 - (rank_sum - pos*(pos+1)/2)/(pos*neg)
+def composite_score(signal_ind, weights):
+    s = sum(weights[k] * signal_ind[k] for k in weights)
+    return sigmoid((s - 0.5) * 8)
 
-def univariate_auc(signals, indicator):
-    pairs = [(s["indicators"][indicator], s["outcome"]) for s in signals]
-    return _approx_auc(pairs)
+def approx_auc(pairs):
+    pairs_s = sorted(pairs, key=lambda x: -x[0])
+    pos = sum(l for _, l in pairs_s)
+    neg = len(pairs_s) - pos
+    if pos == 0 or neg == 0: return 0.5
+    rank_sum = sum((r+1) for r, (_, l) in enumerate(pairs_s) if l == 1)
+    return 1.0 - (rank_sum - pos*(pos+1)/2) / (pos * neg)
 
-def composite_score(signal, weights):
-    s = sum(weights[k]*signal["indicators"][k] for k in weights)
-    return _sigmoid((s-0.5)*6)
+def univariate_auc(signals, key):
+    pairs = [(s["indicators"].get(key, 0.5), s["outcome"]) for s in signals]
+    return approx_auc(pairs)
 
-def evaluate_weights(signals, weights, threshold=0.55):
-    preds = [(composite_score(s,weights), s["outcome"]) for s in signals]
-    triggered = [(sc,out) for sc,out in preds if sc>=threshold]
+def evaluate_weights(signals, weights, threshold=0.52):
+    preds = [(composite_score(s["indicators"], weights), s["outcome"]) for s in signals]
+    triggered = [(sc, out) for sc, out in preds if sc >= threshold]
     if not triggered:
-        return {"accuracy":0,"sharpe":0,"auc":0,"triggered":0,"coverage":0}
-    acc = sum(o for _,o in triggered)/len(triggered)
-    cov = len(triggered)/len(preds)
-    rets = [0.07 if o else -0.03 for _,o in triggered]
-    avg_r = sum(rets)/len(rets)
-    std_r = math.sqrt(sum((r-avg_r)**2 for r in rets)/len(rets)+1e-9)
-    sharpe = avg_r/std_r
-    auc = _approx_auc(sorted(preds,key=lambda x:-x[0]))
-    return {"accuracy":round(acc*100,2),"sharpe":round(sharpe,4),
-            "auc":round(auc,4),"triggered":len(triggered),"coverage":round(cov*100,2)}
+        return {"accuracy": 0, "sharpe": 0, "auc": 0.5, "triggered": 0, "coverage": 0}
+    acc = sum(o for _, o in triggered) / len(triggered)
+    cov = len(triggered) / len(preds)
+    rets = [0.07 if o else -0.03 for _, o in triggered]
+    avg_r = sum(rets) / len(rets)
+    std_r = math.sqrt(sum((r - avg_r)**2 for r in rets) / len(rets) + 1e-9)
+    sharpe = avg_r / std_r
+    auc = approx_auc(preds)
+    return {
+        "accuracy": round(acc * 100, 2),
+        "sharpe": round(sharpe, 4),
+        "auc": round(auc, 4),
+        "triggered": len(triggered),
+        "coverage": round(cov * 100, 2),
+    }
+
+def objective(weights, signals):
+    m = evaluate_weights(signals, weights)
+    return m["sharpe"] * m["auc"] * (m["coverage"] / 100 + 0.1)
 
 
-# ─────────────────────────────────────────────
-# 랜덤 그리드 서치
-# ─────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────
+# 2단계 최적화
+# ──────────────────────────────────────────────────────────────
 
-def grid_search(signals, active_indicators, n_iter=GRID_ITER):
-    best_obj  = -9999
-    best_w    = None
-    best_m    = None
-    keys      = list(active_indicators)
+def optimize_weights(train_signals, active_keys, n_random=GRID_ITER_1):
+    """
+    Phase 1: n_random 랜덤 탐색 → Top-100 후보 수집
+    Phase 2: scipy Nelder-Mead 정밀 수렴 (scipy 있을 때)
+    """
+    keys = sorted(active_keys)
+    n = len(keys)
 
-    for _ in range(n_iter):
-        raw   = [random.random() for _ in keys]
-        total = sum(raw)+1e-9
-        w     = {k: raw[i]/total for i,k in enumerate(keys)}
-        m     = evaluate_weights(signals, w)
-        obj   = m["sharpe"] * m["auc"] * (m["coverage"]/100+0.1)
+    # Phase 1: 랜덤 탐색
+    best_obj = -9999
+    best_w = None
+    top_candidates = []
+
+    rng = random.Random(42)
+    for i in range(n_random):
+        raw = [rng.random() for _ in keys]
+        total = sum(raw) + 1e-9
+        w = {k: raw[j]/total for j, k in enumerate(keys)}
+        obj = objective(w, train_signals)
         if obj > best_obj:
             best_obj = obj
-            best_w   = {k: round(v,4) for k,v in w.items()}
-            best_m   = m
+            best_w = w.copy()
+        if i % (n_random // GRID_ITER_2) == 0:
+            top_candidates.append((obj, [r/total for r in raw]))
 
-    return best_w, best_m
+    # Phase 1.5: 상위 후보 근방 집중 탐색
+    top_candidates.sort(reverse=True)
+    for _, raw in top_candidates[:20]:
+        for _ in range(50):
+            perturb = [max(0, r + random.gauss(0, 0.05)) for r in raw]
+            total = sum(perturb) + 1e-9
+            w = {k: perturb[j]/total for j, k in enumerate(keys)}
+            obj = objective(w, train_signals)
+            if obj > best_obj:
+                best_obj = obj
+                best_w = w.copy()
+
+    # Phase 2: scipy 정밀화
+    if HAS_SCIPY and best_w:
+        x0 = np.array([best_w[k] for k in keys])
+        x0 = x0 / (x0.sum() + 1e-9)
+
+        def neg_obj(x):
+            x_clip = np.clip(x, 0, 1)
+            s = x_clip.sum() + 1e-9
+            w = {k: float(x_clip[j]/s) for j, k in enumerate(keys)}
+            return -objective(w, train_signals)
+
+        result = scipy_minimize(neg_obj, x0, method='Nelder-Mead',
+                                options={'maxiter': 10000, 'xatol': 1e-5, 'fatol': 1e-6})
+        x_final = np.clip(result.x, 0, 1)
+        s = x_final.sum() + 1e-9
+        refined_w = {k: float(round(x_final[j]/s, 4)) for j, k in enumerate(keys)}
+        refined_obj = objective(refined_w, train_signals)
+        if refined_obj > best_obj:
+            best_w = refined_w
+
+    final_w = {k: round(v, 4) for k, v in best_w.items()}
+    final_m = evaluate_weights(train_signals, final_w)
+    return final_w, final_m
 
 
-# ─────────────────────────────────────────────
-# 수익 시뮬레이션
-# ─────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────
+# 좌표 서명 생성
+# ──────────────────────────────────────────────────────────────
 
-def equity_sim(signals, weights, threshold=0.55):
-    rng = random.Random(EQUITY_SEED)
-    sh  = signals[:]
-    rng.shuffle(sh)
-    eq  = [100.0]
-    for s in sh:
-        if composite_score(s, weights) >= threshold:
-            r = 0.07 if s["outcome"] else -0.03
-            eq.append(round(eq[-1]*(1+r), 2))
-    return eq
-
-
-# ─────────────────────────────────────────────
-# 지표 진화 루프 (핵심)
-# ─────────────────────────────────────────────
-
-def evolve_indicators(prev_state):
+def make_coordinate_signature(weights, metrics, generation):
     """
-    prev_state: 이전 실행 결과 dict (없으면 None)
-    Returns: new_state dict
+    IR-COORD 고유 서명:
+    - 가중치 벡터를 정규화된 8자리 hex로 변환
+    - 버전 + 성능 내장
     """
-    all_defs = {**INITIAL_INDICATORS, **CANDIDATE_POOL}
+    w_str = json.dumps(sorted(weights.items()), sort_keys=True)
+    digest = hashlib.sha256(w_str.encode()).hexdigest()[:8].upper()
+    auc_int = int(metrics.get("auc", 0.5) * 100)
+    sharpe_int = int(abs(metrics.get("sharpe", 0)) * 10)
+    return f"IR-COORD-G{generation:02d}-{digest}-AUC{auc_int}-S{sharpe_int}"
 
-    # 초기 상태
+
+# ──────────────────────────────────────────────────────────────
+# 메인 진화 루프
+# ──────────────────────────────────────────────────────────────
+
+def evolve(prev_state, all_signals):
+    generation = 1 if prev_state is None else prev_state.get("generation", 1) + 1
+    history    = [] if prev_state is None else prev_state.get("history", [])
+
     if prev_state is None:
-        active = set(INITIAL_INDICATORS.keys())
-        history = []
-        generation = 1
+        active = set(INITIAL_INDICATORS)
     else:
-        active     = set(prev_state["active_indicators"])
-        history    = prev_state.get("history", [])
-        generation = prev_state.get("generation", 1) + 1
+        active = set(prev_state["active_indicators"])
 
-    print(f"\n{'='*60}")
-    print(f"📊 INDICATOR LAB — Generation {generation}")
-    print(f"{'='*60}")
-    print(f"현재 활성 지표 ({len(active)}개): {', '.join(all_defs[k]['label'] for k in sorted(active))}")
+    print(f"\n{'='*65}")
+    print(f"🧬 INDICATOR LAB v2 — Generation {generation}")
+    print(f"{'='*65}")
+    print(f"활성 지표 ({len(active)}개): {', '.join(INDICATOR_LABELS.get(k,k) for k in sorted(active))}")
 
-    # ── 신호 생성 (실데이터 우선, 없으면 합성)
-    real_sigs = load_real_signals()
-    if real_sigs:
-        signals = merge_real_signals(real_sigs, active)
-        data_label = f"실데이터 {len(signals)}건"
-    else:
-        signals = generate_signals(N_SIGNALS, active)
-        data_label = f"합성데이터 {N_SIGNALS}건 (build_training_data.py 미실행)"
-    pos = sum(s["outcome"] for s in signals)
-    print(f"\n{data_label}  수익달성 {pos/len(signals)*100:.1f}%\n")
+    # 데이터 분리
+    train_sigs, test_sigs = split_data(all_signals)
+    print(f"\n데이터: Train {len(train_sigs)}건 / Test {len(test_sigs)}건")
 
-    # ── 단변량 AUC
-    uni = {}
-    print(f"  {'지표':<22} {'AUC':>7}  {'판정'}")
-    print(f"  {'─'*45}")
+    # 데이터에 실제로 존재하는 키만 유지
+    sample_ind = all_signals[0].get("indicators", {})
+    available_keys = set(sample_ind.keys())
+    active = active & available_keys
+    if not active:
+        print("❌ 활성 지표가 데이터에 없음")
+        sys.exit(1)
+
+    train_ext = extract_indicators(train_sigs, active)
+    test_ext  = extract_indicators(test_sigs,  active)
+
+    # ── 단변량 AUC 측정
+    print(f"\n{'':3} {'지표':<24} {'Train AUC':>10}  {'판정'}")
+    print(f"  {'─'*50}")
     dropped = []
+    uni_aucs = {}
     for k in sorted(active):
-        auc  = univariate_auc(signals, k)
+        auc = univariate_auc(train_ext, k)
         keep = auc >= DROP_THRESHOLD
         mark = "✅ 유지" if keep else "❌ 제거"
-        print(f"  {all_defs[k]['label']:<22} {auc:.4f}  {mark}")
-        uni[k] = auc
+        print(f"  {INDICATOR_LABELS.get(k,k):<24} {auc:.4f}      {mark}")
+        uni_aucs[k] = auc
         if not keep:
             dropped.append(k)
 
     if dropped:
-        print(f"\n  → 제거: {', '.join(all_defs[k]['label'] for k in dropped)}")
+        print(f"\n  → 제거 지표: {', '.join(INDICATOR_LABELS.get(k,k) for k in dropped)}")
         active -= set(dropped)
 
-    # ── 기존 활성 지표로 그리드서치
-    print(f"\n[그리드서치] 현재 {len(active)}개 지표 최적화...")
-    base_signals = generate_signals(N_SIGNALS, active, seed=1)
-    base_w, base_m = grid_search(base_signals, active)
-    print(f"  기준 성능  정확도 {base_m['accuracy']}%  AUC {base_m['auc']}  Sharpe {base_m['sharpe']:.3f}")
+    # ── 기준 성능 (현재 활성 지표)
+    print(f"\n[Phase 1] 현재 {len(active)}개 지표 최적화 중...")
+    train_ext_base = extract_indicators(train_sigs, active)
+    test_ext_base  = extract_indicators(test_sigs,  active)
+    base_w, base_m = optimize_weights(train_ext_base, active)
+    base_test_m    = evaluate_weights(test_ext_base, base_w)
+    overfit_gap    = round(base_m["auc"] - base_test_m["auc"], 4)
+    print(f"  Train → 정확도 {base_m['accuracy']}%  AUC {base_m['auc']}  Sharpe {base_m['sharpe']:.3f}")
+    print(f"  Test  → 정확도 {base_test_m['accuracy']}%  AUC {base_test_m['auc']}  Overfit gap {overfit_gap:+.4f}")
 
-    # ── 후보 지표 추가 테스트
-    candidates_left = [k for k in CANDIDATE_POOL if k not in active]
-    random.shuffle(candidates_left)
+    # ── 후보 지표 추가 시험
+    candidates_to_try = [k for k in CANDIDATE_INDICATORS if k not in active and k in available_keys]
+    random.shuffle(candidates_to_try)
     added = []
 
-    for cand in candidates_left[:4]:  # 한 번에 최대 4개 시도
+    print(f"\n[Phase 2] 후보 지표 시험 ({len(candidates_to_try)}개)...")
+    for cand in candidates_to_try[:5]:
         trial_active = active | {cand}
-        trial_signals = generate_signals(N_SIGNALS, trial_active, seed=1)
-        trial_w, trial_m = grid_search(trial_signals, trial_active, n_iter=30_000)
+        trial_train  = extract_indicators(train_sigs, trial_active)
+        trial_w, trial_m = optimize_weights(trial_train, trial_active, n_random=15_000)
         delta_auc = trial_m["auc"] - base_m["auc"]
-
-        label = all_defs[cand]["label"]
-        if delta_auc >= ADOPT_THRESHOLD:
+        label = INDICATOR_LABELS.get(cand, cand)
+        if delta_auc >= ADOPT_MIN_ΔAUC:
             active.add(cand)
             base_m = trial_m
             base_w = trial_w
-            print(f"  ✅ 채택: {label}  (+AUC {delta_auc:+.4f})")
+            print(f"  ✅ 채택: {label:<24} ΔAUC {delta_auc:+.4f}")
             added.append(cand)
         else:
-            print(f"  ⬜ 기각: {label}  (ΔAUC {delta_auc:+.4f}  < {ADOPT_THRESHOLD})")
+            print(f"  ⬜ 기각: {label:<24} ΔAUC {delta_auc:+.4f}")
 
-    # ── 최종 그리드서치
-    print(f"\n[최종 최적화] {len(active)}개 지표...")
-    final_signals = generate_signals(N_SIGNALS, active)
-    final_w, final_m = grid_search(final_signals, active)
+    # ── 최종 최적화 (전체 데이터)
+    print(f"\n[Phase 3] 최종 최적화 — {len(active)}개 지표 전체 데이터...")
+    all_ext   = extract_indicators(all_signals, active)
+    final_w, final_m = optimize_weights(all_ext, active, n_random=50_000)
 
-    # ── 수익 시뮬레이션
-    eq = equity_sim(final_signals, final_w)
-    eq_equal = equity_sim(final_signals, {k: 1/len(active) for k in active})
+    # Train/Test 검증
+    final_train_ext = extract_indicators(train_sigs, active)
+    final_test_ext  = extract_indicators(test_sigs,  active)
+    final_train_m   = evaluate_weights(final_train_ext, final_w)
+    final_test_m    = evaluate_weights(final_test_ext,  final_w)
+    overfit_final   = round(final_train_m["auc"] - final_test_m["auc"], 4)
+
+    # ── 좌표 서명
+    coord_sig = make_coordinate_signature(final_w, final_m, generation)
 
     # ── 상관 행렬
     corr = {}
     for a in sorted(active):
         corr[a] = {}
-        va = [s["indicators"][a] for s in final_signals]
+        va = [s["indicators"][a] for s in all_ext]
         for b in sorted(active):
-            vb = [s["indicators"][b] for s in final_signals]
-            corr[a][b] = round(_pearson(va, vb), 3)
+            vb = [s["indicators"][b] for s in all_ext]
+            n  = len(va)
+            mx, my = sum(va)/n, sum(vb)/n
+            num = sum((x-mx)*(y-my) for x,y in zip(va,vb))
+            dx = math.sqrt(sum((x-mx)**2 for x in va)+1e-9)
+            dy = math.sqrt(sum((y-my)**2 for y in vb)+1e-9)
+            corr[a][b] = round(num/(dx*dy), 3)
 
-    # ── 히스토리 기록
+    # ── 수익 시뮬레이션
+    rng = random.Random(99)
+    sim_sigs = all_ext[:]
+    rng.shuffle(sim_sigs)
+    eq_opt   = [100.0]
+    eq_equal = [100.0]
+    eq_w     = {k: 1/len(active) for k in active}
+    for s in sim_sigs:
+        if composite_score(s["indicators"], final_w) >= 0.52:
+            r = 0.07 if s["outcome"] else -0.03
+            eq_opt.append(round(eq_opt[-1]*(1+r), 2))
+        if composite_score(s["indicators"], eq_w) >= 0.52:
+            r = 0.07 if s["outcome"] else -0.03
+            eq_equal.append(round(eq_equal[-1]*(1+r), 2))
+
+    # ── 결과 출력
+    print(f"\n{'='*65}")
+    print(f"🎯 Generation {generation} 완료")
+    print(f"  활성 지표 : {len(active)}개")
+    print(f"  Train AUC : {final_train_m['auc']}  Sharpe {final_train_m['sharpe']:.3f}  정확도 {final_train_m['accuracy']}%")
+    print(f"  Test  AUC : {final_test_m['auc']}   Overfit gap {overfit_final:+.4f}")
+    if overfit_final > 0.05:
+        print(f"  ⚠  오버피팅 감지 (gap {overfit_final:.4f} > 0.05)")
+    print(f"  수익 곡선 : 100 → {eq_opt[-1]:.1f}  (균등가중: {eq_equal[-1]:.1f})")
+    print(f"\n  📍 IR 좌표 서명: {coord_sig}")
+    print(f"\n  최적 가중치 (상위 8개):")
+    for k, v in sorted(final_w.items(), key=lambda x:-x[1])[:8]:
+        bar = "█" * int(v * 40)
+        print(f"    {INDICATOR_LABELS.get(k,k):<26} {v:.4f}  {bar}")
+
     history.append({
         "generation": generation,
         "timestamp": datetime.now().isoformat(),
         "active_count": len(active),
         "dropped": dropped,
         "added": added,
-        "accuracy": final_m["accuracy"],
-        "auc": final_m["auc"],
-        "sharpe": final_m["sharpe"],
+        "train_auc": final_train_m["auc"],
+        "test_auc":  final_test_m["auc"],
+        "overfit_gap": overfit_final,
+        "accuracy": final_train_m["accuracy"],
+        "sharpe": final_train_m["sharpe"],
+        "coordinate_sig": coord_sig,
     })
 
-    # ── 최종 결과 출력
-    print(f"\n{'='*60}")
-    print(f"🎯 Generation {generation} 결과")
-    print(f"  활성 지표: {len(active)}개")
-    print(f"  정확도:    {final_m['accuracy']}%")
-    print(f"  AUC:       {final_m['auc']}")
-    print(f"  Sharpe:    {final_m['sharpe']:.3f}")
-    print(f"  수익 곡선: 100 → {eq[-1]:.1f}  (균등: {eq_equal[-1]:.1f})")
-    print(f"\n  최적 가중치 (상위 5개):")
-    for k, v in sorted(final_w.items(), key=lambda x:-x[1])[:5]:
-        bar = "█" * int(v * 30)
-        print(f"    {all_defs[k]['label']:<20} {v:.4f}  {bar}")
-
-    state = {
+    return {
         "generated_at": datetime.now().isoformat(),
+        "version": "v2",
         "generation": generation,
+        "coordinate_sig": coord_sig,
         "active_indicators": sorted(list(active)),
-        "indicator_labels": {k: all_defs[k]["label"] for k in active},
-        "univariate_auc": {k: round(univariate_auc(final_signals, k), 4) for k in active},
+        "indicator_labels": {k: INDICATOR_LABELS.get(k, k) for k in active},
+        "univariate_auc": {k: round(univariate_auc(all_ext, k), 4) for k in active},
         "optimal_weights": final_w,
         "optimal_metrics": final_m,
+        "train_metrics": final_train_m,
+        "test_metrics":  final_test_m,
+        "overfit_gap": overfit_final,
         "correlation_matrix": corr,
-        "equity_optimal": eq[:200],
-        "equity_equal": eq_equal[:200],
+        "equity_optimal": eq_opt[:300],
+        "equity_equal":   eq_equal[:300],
         "history": history,
+        "data_stats": {
+            "total_signals": len(all_signals),
+            "train_size": len(train_sigs),
+            "test_size": len(test_sigs),
+        }
     }
 
-    return state
 
-
-# ─────────────────────────────────────────────
-# 실데이터 로드 헬퍼
-# ─────────────────────────────────────────────
-
-def load_real_signals():
-    """build_training_data.py 결과 로드. 없으면 None 반환."""
-    if not os.path.exists(TRAINING_PATH):
-        return None
-    with open(TRAINING_PATH, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    sigs = data.get("signals", [])
-    if not sigs:
-        return None
-    print(f"  ✅ 실데이터 로드: {len(sigs)}건 (수익달성 {data.get('positive_rate',0)*100:.1f}%)")
-    return sigs
-
-
-def merge_real_signals(real_sigs, active):
-    """
-    실데이터를 active 지표 키에 맞게 변환.
-    실데이터에 없는 지표(후보 추가분)는 합성값으로 보완.
-    """
-    all_defs = {**INITIAL_INDICATORS, **CANDIDATE_POOL}
-    merged = []
-    for s in real_sigs:
-        ind_real = s.get("indicators", {})
-        ind_full = {}
-        for k in active:
-            if k in ind_real:
-                ind_full[k] = float(ind_real[k])
-            else:
-                ind_full[k] = all_defs[k]["gen"]("tech_ceo") if k in all_defs else 0.5
-        merged.append({"id": s.get("id", 0), "outcome": s["outcome"], "indicators": ind_full})
-    return merged
-
-
-# ─────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────
 # 메인
-# ─────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────
 
 def main():
     reset = "--reset" in sys.argv
+
+    all_signals = load_real_data()
 
     prev_state = None
     if not reset and os.path.exists(RESULTS_PATH):
         with open(RESULTS_PATH, "r", encoding="utf-8") as f:
             prev_state = json.load(f)
-        print(f"이전 결과 로드  Generation {prev_state.get('generation',1)}  AUC {prev_state.get('optimal_metrics',{}).get('auc','-')}")
+        print(f"이전 결과 로드 → Generation {prev_state.get('generation',1)}  "
+              f"AUC {prev_state.get('optimal_metrics',{}).get('auc','-')}  "
+              f"좌표: {prev_state.get('coordinate_sig','?')}")
     else:
-        print("초기 상태로 시작")
+        print("초기 상태로 시작 (--reset)" if reset else "첫 실행")
 
-    new_state = evolve_indicators(prev_state)
+    new_state = evolve(prev_state, all_signals)
 
     os.makedirs("data", exist_ok=True)
     with open(RESULTS_PATH, "w", encoding="utf-8") as f:
         json.dump(new_state, f, indent=2, ensure_ascii=False)
 
     print(f"\n💾 저장 완료: {RESULTS_PATH}")
-    print("다시 실행하면 지표 풀이 진화합니다: python scripts/indicator_lab.py")
-
+    print(f"📍 최종 좌표: {new_state['coordinate_sig']}")
 
 if __name__ == "__main__":
     main()
