@@ -22,7 +22,7 @@ load_dotenv(Path(__file__).parent / ".env")
 APP_KEY    = os.getenv("KIS_APP_KEY", "")
 APP_SECRET = os.getenv("KIS_APP_SECRET", "")
 ACCOUNT_NO = os.getenv("KIS_ACCOUNT_NO", "")
-BASE_URL   = "https://openapivts.koreainvestment.com:29443"  # 모의투자
+BASE_URL   = "https://openapi.koreainvestment.com:9443"  # 실전투자
 DB_PATH    = Path(__file__).parent / "trades.db"
 
 mcp = FastMCP("KIS 한국투자증권 통합 (한국+미국)")
@@ -197,7 +197,7 @@ async def place_kr_order(
             headers={
                 "authorization": f"Bearer {token}",
                 "appkey": APP_KEY, "appsecret": APP_SECRET,
-                "tr_id": "VTTC0802U" if action == "buy" else "VTTC0801U",
+                "tr_id": "TTTC0802U" if action == "buy" else "TTTC0801U",
                 "custtype": "P", "hashkey": hashkey, "content-type": "application/json",
             },
             json=body,
@@ -296,7 +296,7 @@ async def place_us_order(
             headers={
                 "authorization": f"Bearer {token}",
                 "appkey": APP_KEY, "appsecret": APP_SECRET,
-                "tr_id": "VTTT1002U" if action == "buy" else "VTTT1006U",
+                "tr_id": "TTTT1002U" if action == "buy" else "TTTT1006U",
                 "custtype": "P", "hashkey": hashkey, "content-type": "application/json",
             },
             json=body,
@@ -315,7 +315,7 @@ async def get_us_account_balance() -> str:
             headers={
                 "authorization": f"Bearer {token}",
                 "appkey": APP_KEY, "appsecret": APP_SECRET,
-                "tr_id": "VTTS3012R", "custtype": "P",
+                "tr_id": "TTTS3012R", "custtype": "P",
             },
             params={
                 "CANO": cano, "ACNT_PRDT_CD": "01",
@@ -337,7 +337,7 @@ async def get_kr_account_balance() -> str:
             headers={
                 "authorization": f"Bearer {token}",
                 "appkey": APP_KEY, "appsecret": APP_SECRET,
-                "tr_id": "VTTC8434R", "custtype": "P",
+                "tr_id": "TTTC8434R", "custtype": "P",
             },
             params={
                 "CANO": cano, "ACNT_PRDT_CD": "01", "AFHR_FLPR_YN": "N",

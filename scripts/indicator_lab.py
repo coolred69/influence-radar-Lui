@@ -20,10 +20,11 @@ import json, random, math, os, sys, copy
 from datetime import datetime
 
 RESULTS_PATH     = "data/indicator_results.json"
+TRAINING_PATH    = "data/training_data.json"   # build_training_data.py 출력
 DROP_THRESHOLD   = 0.52   # AUC 이 이하면 제거
 ADOPT_THRESHOLD  = 0.003  # 추가 후 AUC 상승 최소치
 GRID_ITER        = 80_000 # 그리드서치 반복 수
-N_SIGNALS        = 400    # 합성 신호 수
+N_SIGNALS        = 400    # 합성 신호 수 (실데이터 없을 때만)
 EQUITY_SEED      = 99     # 시뮬레이션 재현성
 
 # ─────────────────────────────────────────────
@@ -247,10 +248,16 @@ def evolve_indicators(prev_state):
     print(f"{'='*60}")
     print(f"현재 활성 지표 ({len(active)}개): {', '.join(all_defs[k]['label'] for k in sorted(active))}")
 
-    # ── 신호 생성
-    signals = generate_signals(N_SIGNALS, active)
+    # ── 신호 생성 (실데이터 우선, 없으면 합성)
+    real_sigs = load_real_signals()
+    if real_sigs:
+        signals = merge_real_signals(real_sigs, active)
+        data_label = f"실데이터 {len(signals)}건"
+    else:
+        signals = generate_signals(N_SIGNALS, active)
+        data_label = f"합성데이터 {N_SIGNALS}건 (build_training_data.py 미실행)"
     pos = sum(s["outcome"] for s in signals)
-    print(f"\n신호 {N_SIGNALS}건  수익률 {pos/N_SIGNALS*100:.1f}%\n")
+    print(f"\n{data_label}  수익달성 {pos/len(signals)*100:.1f}%\n")
 
     # ── 단변량 AUC
     uni = {}
@@ -355,6 +362,42 @@ def evolve_indicators(prev_state):
     }
 
     return state
+
+
+# ─────────────────────────────────────────────
+# 실데이터 로드 헬퍼
+# ─────────────────────────────────────────────
+
+def load_real_signals():
+    """build_training_data.py 결과 로드. 없으면 None 반환."""
+    if not os.path.exists(TRAINING_PATH):
+        return None
+    with open(TRAINING_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    sigs = data.get("signals", [])
+    if not sigs:
+        return None
+    print(f"  ✅ 실데이터 로드: {len(sigs)}건 (수익달성 {data.get('positive_rate',0)*100:.1f}%)")
+    return sigs
+
+
+def merge_real_signals(real_sigs, active):
+    """
+    실데이터를 active 지표 키에 맞게 변환.
+    실데이터에 없는 지표(후보 추가분)는 합성값으로 보완.
+    """
+    all_defs = {**INITIAL_INDICATORS, **CANDIDATE_POOL}
+    merged = []
+    for s in real_sigs:
+        ind_real = s.get("indicators", {})
+        ind_full = {}
+        for k in active:
+            if k in ind_real:
+                ind_full[k] = float(ind_real[k])
+            else:
+                ind_full[k] = all_defs[k]["gen"]("tech_ceo") if k in all_defs else 0.5
+        merged.append({"id": s.get("id", 0), "outcome": s["outcome"], "indicators": ind_full})
+    return merged
 
 
 # ─────────────────────────────────────────────
