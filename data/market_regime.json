@@ -1,0 +1,63 @@
+{
+  "detected_at": "2026-07-07T22:51:29.124621",
+  "us": {
+    "regime": "SIDEWAYS",
+    "confidence": 0.65,
+    "scores": {
+      "BULL": 0.0,
+      "BEAR": 0.35,
+      "VOLATILE": 0.0,
+      "SIDEWAYS": 0.65
+    },
+    "metrics": {
+      "price": 747.71,
+      "ma50": 737.57,
+      "ma200": NaN,
+      "vol_20d_ann": 15.8,
+      "vol_1y_ann": NaN,
+      "vol_ratio": NaN,
+      "ret_30d_pct": 0.93,
+      "above_ma200": false,
+      "golden_cross": false
+    },
+    "thresholds": {
+      "buy": 0.7,
+      "watch": 0.55
+    }
+  },
+  "kr": {
+    "regime": "SIDEWAYS",
+    "confidence": 0.65,
+    "scores": {
+      "BULL": 0.0,
+      "BEAR": 0.35,
+      "VOLATILE": 0.0,
+      "SIDEWAYS": 0.65
+    },
+    "metrics": {
+      "price": 123710.0,
+      "ma50": 125553.41,
+      "ma200": NaN,
+      "vol_20d_ann": 75.0,
+      "vol_1y_ann": NaN,
+      "vol_ratio": NaN,
+      "ret_30d_pct": 0.29,
+      "above_ma200": false,
+      "golden_cross": false
+    },
+    "thresholds": {
+      "buy": 0.7,
+      "watch": 0.55
+    }
+  },
+  "combined": {
+    "regime": "SIDEWAYS",
+    "confidence": 0.65,
+    "thresholds": {
+      "buy": 0.7,
+      "watch": 0.55
+    },
+    "score_multiplier": 0.93,
+    "note": "🟡 횡보 — BUY 조건 약간 강화"
+  }
+}
