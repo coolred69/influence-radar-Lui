@@ -25,6 +25,8 @@ import yfinance as yf
 RESULTS_PATH  = "data/indicator_results.json"
 TRAINING_PATH = "data/training_data.json"
 OUTPUT_PATH   = "data/signals.json"
+HISTORY_PATH  = "data/signal_history.json"
+PARAMS_PATH   = "data/optimal_params.json"
 
 BUY_THRESHOLD   = 0.65
 WATCH_THRESHOLD = 0.50
@@ -403,8 +405,63 @@ def main():
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
 
+    # ── BUY 신호 히스토리 저장 (Phase 3 피드백 루프용)
+    _save_signal_history(buy_list)
+
     print(f"\n💾 저장: {OUTPUT_PATH} ({len(results)}건)")
     print("=" * 65)
+
+
+def _save_signal_history(buy_signals):
+    """BUY 신호를 signal_history.json에 누적 저장"""
+    existing = []
+    if os.path.exists(HISTORY_PATH):
+        try:
+            with open(HISTORY_PATH) as f:
+                existing = json.load(f).get("signals", [])
+        except Exception:
+            existing = []
+
+    existing_keys = {(s["date"], s["symbol"]) for s in existing}
+    today = datetime.now().strftime("%Y-%m-%d")
+    added = 0
+
+    for s in buy_signals:
+        key = (today, s["symbol"])
+        if key in existing_keys:
+            continue
+        existing.append({
+            "date":         today,
+            "symbol":       s["symbol"],
+            "name":         s.get("name", ""),
+            "market":       s.get("market", ""),
+            "sector":       s.get("sector", ""),
+            "influencer":   s.get("influencer", ""),
+            "signal":       "BUY",
+            "score":        s.get("score", 0),
+            "price":        s.get("price", 0),
+            "entry_price":  s.get("entry_price", 0),
+            "target_price": s.get("target_price", 0),
+            "stop_loss":    s.get("stop_loss", 0),
+            "risk_reward":  s.get("risk_reward", 0),
+            "indicators":   s.get("indicators", {}),
+            "coordinate_sig": s.get("coordinate_sig", ""),
+            "evaluated":    False,
+            "outcome":      None,
+            "return_pct":   None,
+        })
+        existing_keys.add(key)
+        added += 1
+
+    if added > 0:
+        os.makedirs("data", exist_ok=True)
+        with open(HISTORY_PATH, "w", encoding="utf-8") as f:
+            json.dump({
+                "updated_at": datetime.now().isoformat(),
+                "total": len(existing),
+                "signals": existing
+            }, f, indent=2, ensure_ascii=False)
+        print(f"📝 BUY 히스토리 +{added}건 추가 (누계 {len(existing)}건)")
 
 if __name__ == "__main__":
     main()

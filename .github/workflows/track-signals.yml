@@ -1,0 +1,52 @@
+name: 실전 피드백 루프 — Phase 3
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 매주 수요일 KST 09:00 (UTC 00:00)
+    - cron: '0 0 * * 3'
+
+permissions:
+  contents: write
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: pip install yfinance pandas numpy
+
+      - name: 신호 추적 실행
+        run: |
+          mkdir -p data
+          python scripts/track_signals.py
+
+      - name: 성과 출력
+        run: |
+          python -c "
+          import json, os
+          if os.path.exists('data/performance_stats.json'):
+              with open('data/performance_stats.json') as f:
+                  d = json.load(f)
+              print(f'실전 성과: {d[\"total_signals\"]}건  승률 {d[\"win_rate\"]}%  평균수익 {d[\"avg_return_pct\"]:+.2f}%  손익비 {d[\"profit_factor\"]}')
+          else:
+              print('아직 평가 완료된 신호 없음')
+          "
+
+      - name: 커밋 & 푸시
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/signal_history.json data/training_data.json data/performance_stats.json || true
+          git diff --cached --quiet || git commit -m "📊 실전 피드백 루프 $(date +'%Y-%m-%d')"
+          git push
