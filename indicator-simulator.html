@@ -143,13 +143,13 @@
 <header>
   <div>
     <h1>📊 Indicator Lab</h1>
+    <div style="font-size:11px;color:#64748b;margin-top:2px">GitHub Actions 학습 결과 뷰어 — 진짜 학습은 서버에서 자동 실행됨</div>
   </div>
   <span class="tag">Influence Radar</span>
   <span class="gen-badge" id="genBadge">Gen —</span>
   <div style="flex:1"></div>
-  <a href="index.html" class="btn" style="margin-right:6px;background:#1e293b;color:#94a3b8;text-decoration:none">🏠 메인</a>
-  <button class="btn btn-primary" onclick="runEvolution()">▶ Evolution 실행</button>
-  <button class="btn btn-warn" onclick="resetState()" style="margin-left:6px">↺ 초기화</button>
+  <a href="index.html" class="btn" style="background:#1e293b;color:#94a3b8;text-decoration:none">🏠 메인</a>
+  <button class="btn btn-primary" onclick="tryLoadJsonResults()" style="margin-left:6px">⟳ 결과 불러오기</button>
 </header>
 
 <div class="layout">
@@ -298,10 +298,13 @@ function resetState() {
 }
 
 // ─────────────────────────────────────────────
-// Evolution 시뮬레이션 (브라우저 내)
+// Evolution — 브라우저 시뮬레이션 비활성화 (실제 학습은 GitHub Actions)
 // ─────────────────────────────────────────────
 
 function runEvolution() {
+  alert('⚠ 브라우저 시뮬레이션은 실제 학습과 무관합니다.\n\n실제 학습: GitHub Actions → indicator-lab 워크플로우 수동 실행\n결과 확인: "결과 불러오기" 버튼 클릭');
+  return;
+  // 아래 코드는 레거시 — 실행되지 않음
   const btn = document.querySelector('button.btn-primary');
   btn.disabled = true; btn.textContent = '실행 중...';
 
@@ -663,7 +666,7 @@ function renderEquityChart() {
   const eq  = state.equity_equal;
   if (!opt || !eq) {
     ctx.fillStyle='#64748b'; ctx.font='14px sans-serif'; ctx.textAlign='center';
-    ctx.fillText('Evolution 실행 후 수익 곡선이 표시됩니다', canvas.width/2, 80);
+    ctx.fillText('GitHub Actions 학습 완료 후 "결과 불러오기" 클릭', canvas.width/2, 80);
     return;
   }
 
@@ -727,7 +730,7 @@ function renderHistory() {
 function renderCorrMatrix() {
   const wrap = document.getElementById('corrMatrix');
   const corr = state.corr;
-  if (!corr) { wrap.innerHTML='<div style="color:var(--muted);font-size:12px">Evolution 실행 후 표시</div>'; return; }
+  if (!corr) { wrap.innerHTML='<div style="color:var(--muted);font-size:12px">데이터 로드 후 표시</div>'; return; }
 
   const keys = Object.keys(corr);
   const active = state.active;

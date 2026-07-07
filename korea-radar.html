@@ -408,62 +408,51 @@ let currentSort = 'score';
 let lastUpdated = null;
 
 // ═══════════════════════════════════════
-// Yahoo Finance 데이터 조회
+// Firebase — GitHub Actions KIS 데이터 읽기
 // ═══════════════════════════════════════
-// v8/chart 단건 조회 (v7/quote 가 401 차단됨)
-async function fetchKrChart(code) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${code}?interval=1d&range=3mo`;
-  const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-  try {
-    const res = await fetch(proxy);
-    if (!res.ok) throw new Error(`${res.status}`);
-    const json = await res.json();
-    const result = json?.chart?.result?.[0];
-    if (!result) return null;
-    const meta = result.meta;
-    const quotes = result.indicators?.quote?.[0] || {};
-    const volumes = quotes.volume || [];
-    // 3개월 평균 거래량 계산
-    const validVols = volumes.filter(v => v > 0);
-    const avgVol3m = validVols.length > 0
-      ? Math.round(validVols.reduce((s, v) => s + v, 0) / validVols.length)
-      : 0;
-    // 등락률 계산
-    const prevClose = meta.chartPreviousClose || meta.regularMarketPrice;
-    const price = meta.regularMarketPrice;
-    const changePct = prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0;
-
-    return {
-      symbol: meta.symbol,
-      shortName: meta.longName || meta.shortName || code,
-      regularMarketPrice: price,
-      regularMarketChangePercent: changePct,
-      regularMarketVolume: meta.regularMarketVolume || 0,
-      averageDailyVolume3Month: avgVol3m,
-      fiftyTwoWeekHigh: meta.fiftyTwoWeekHigh || 0,
-      fiftyTwoWeekLow: meta.fiftyTwoWeekLow || 0,
-      priceToBook: null, // v8/chart에 없음 — 추후 별도 조회
-      trailingPE: null,
-      marketCap: null,
-    };
-  } catch (e) {
-    console.warn(`fetchKrChart(${code}) error:`, e.message);
-    return null;
+const FB_CONFIG = {
+  apiKey:            "AIzaSyAl9w26mpnGSTHe-lHBtRFWkIv3tRbA0p8",
+  authDomain:        "influence-radar-43a48.firebaseapp.com",
+  projectId:         "influence-radar-43a48",
+  storageBucket:     "influence-radar-43a48.firebasestorage.app",
+  messagingSenderId: "1008784285984",
+  appId:             "1:1008784285984:web:788217edf21b10eb6e3745",
+};
+let _fbApp = null, _db = null;
+async function getDb() {
+  if (_db) return _db;
+  const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js');
+  const { getFirestore } = await import('https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js');
+  _fbApp = getApps().length ? getApps()[0] : initializeApp(FB_CONFIG, 'kr-radar');
+  _db = getFirestore(_fbApp);
+  return _db;
+}
+async function loadFromFirebase() {
+  const { getDoc, doc } = await import('https://www.gstatic.com/firebasejs/11.5.0/firebase-firestore.js');
+  const db   = await getDb();
+  const snap = await getDoc(doc(db, 'radar', 'kr_prices'));
+  if (!snap.exists()) return null;
+  const raw = snap.data().prices || {};
+  const updatedAt = snap.data().updatedAtStr || '';
+  const quotes = [];
+  for (const stock of KR_STOCKS) {
+    const baseCode = stock.code.split('.')[0]; // '005930.KS' → '005930'
+    const d = raw[baseCode];
+    if (!d) continue;
+    quotes.push({
+      symbol:                     stock.code,
+      regularMarketPrice:         d.price     || 0,
+      regularMarketChangePercent: d.changePct || 0,
+      regularMarketVolume:        d.volume    || 0,
+      averageDailyVolume3Month:   d.avgVol3m  || 0,
+      fiftyTwoWeekHigh:           d.high52    || 0,
+      fiftyTwoWeekLow:            d.low52     || 0,
+      priceToBook: null,
+    });
   }
+  return { quotes, updatedAt };
 }
 
-// 배치 조회 래퍼 (병렬 5개씩)
-async function fetchKrQuotesBatch(codes) {
-  const results = [];
-  const BATCH = 5;
-  for (let i = 0; i < codes.length; i += BATCH) {
-    const chunk = codes.slice(i, i + BATCH);
-    const settled = await Promise.allSettled(chunk.map(c => fetchKrChart(c)));
-    settled.forEach(s => { if (s.status === 'fulfilled' && s.value) results.push(s.value); });
-    if (i + BATCH < codes.length) await new Promise(r => setTimeout(r, 500));
-  }
-  return results;
-}
 
 // ═══════════════════════════════════════
 // 점수 계산 (올라가기 직전 신호)
@@ -538,20 +527,20 @@ async function loadAndScreen() {
 
   btn.disabled = true;
   btn.textContent = '⏳ 로딩 중...';
-  cards.innerHTML = '<div class="loading"><div class="loading-spinner"></div>야후 파이낸스 조회 중...</div>';
+  cards.innerHTML = '<div class="loading"><div class="loading-spinner"></div>한국투자증권 데이터 로딩 중...</div>';
+  statusTxt.textContent = 'KIS 데이터 읽는 중...';
 
-  const codes = KR_STOCKS.map(s => s.code);
-  statusTxt.textContent = `데이터 조회 중... (0/${codes.length})`;
+  let allQuotes = [];
+  let updatedLabel = '';
 
-  // v8/chart 5개씩 병렬 조회
-  const allQuotes = [];
-  const BATCH = 5;
-  for (let i = 0; i < codes.length; i += BATCH) {
-    statusTxt.textContent = `데이터 조회 중... (${Math.min(i, codes.length)}/${codes.length})`;
-    const chunk = codes.slice(i, i + BATCH);
-    const settled = await Promise.allSettled(chunk.map(c => fetchKrChart(c)));
-    settled.forEach(s => { if (s.status === 'fulfilled' && s.value) allQuotes.push(s.value); });
-    if (i + BATCH < codes.length) await new Promise(r => setTimeout(r, 400));
+  try {
+    const fb = await loadFromFirebase();
+    if (fb && fb.quotes.length > 0) {
+      allQuotes    = fb.quotes;
+      updatedLabel = fb.updatedAt ? ` · KIS ${fb.updatedAt}` : '';
+    }
+  } catch(e) {
+    console.warn('Firebase 로드 실패:', e.message);
   }
 
   if (allQuotes.length === 0) {
@@ -559,7 +548,7 @@ async function loadAndScreen() {
       <div class="empty-state">
         <div style="font-size:32px;margin-bottom:12px">⚠️</div>
         <div style="font-size:14px;color:#8899bb">데이터를 불러오지 못했어요</div>
-        <div style="font-size:12px;color:#556677;margin-top:8px">잠시 후 다시 시도해주세요</div>
+        <div style="font-size:12px;color:#556677;margin-top:8px">GitHub Actions가 아직 실행 전일 수 있어요.<br>잠시 후 새로고침 해주세요.</div>
       </div>`;
     btn.disabled = false;
     btn.textContent = '🔄 새로고침';
@@ -569,14 +558,14 @@ async function loadAndScreen() {
 
   // 종목 정보와 매핑
   allData = allQuotes.map(q => {
-    const stockInfo = KR_STOCKS.find(s => s.code === q.symbol) || { name: q.shortName || q.symbol, sector: '기타' };
-    const result = scoreStock(q, stockInfo);
+    const stockInfo = KR_STOCKS.find(s => s.code === q.symbol) || { name: q.symbol, sector: '기타' };
+    const result    = scoreStock(q, stockInfo);
     return { ...q, ...result, stockInfo };
   });
 
   lastUpdated = new Date();
   const t = lastUpdated.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  statusTxt.textContent = `마지막 업데이트: ${t}`;
+  statusTxt.textContent = `업데이트: ${t}${updatedLabel}`;
   btn.disabled = false;
   btn.textContent = '🔄 새로고침';
 

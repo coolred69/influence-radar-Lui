@@ -11,8 +11,28 @@ KIS API는 모의투자 토큰으로 가격 조회 가능 (선택).
 """
 
 import os, json, time, sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import urllib.request
+
+try:
+    import yfinance as yf
+    HAS_YF = True
+except ImportError:
+    HAS_YF = False
+
+
+def calc_avg_vol_3m(yahoo_symbol: str) -> int:
+    """yfinance로 3개월 평균 거래량 계산 (GitHub Actions 서버측 실행)"""
+    if not HAS_YF:
+        return 0
+    try:
+        end   = datetime.today()
+        start = (end - timedelta(days=95)).strftime("%Y-%m-%d")
+        df = yf.Ticker(yahoo_symbol).history(start=start, auto_adjust=True)
+        vols = [v for v in df['Volume'].tolist() if v > 0]
+        return int(sum(vols) / len(vols)) if vols else 0
+    except Exception:
+        return 0
 
 # ── Firebase 초기화
 def init_firebase():
@@ -159,7 +179,7 @@ def main():
     # ── KIS 설정 (있으면 우선 사용)
     KIS_APP_KEY    = os.environ.get("KIS_APP_KEY", "")
     KIS_APP_SECRET = os.environ.get("KIS_APP_SECRET", "")
-    KIS_BASE       = "https://openapivts.koreainvestment.com:29443"  # 모의
+    KIS_BASE       = "https://openapi.koreainvestment.com:9443"  # 실전
     kis_token      = None
     if KIS_APP_KEY and KIS_APP_SECRET:
         kis_token = get_kis_token(KIS_APP_KEY, KIS_APP_SECRET, KIS_BASE)
@@ -178,9 +198,11 @@ def main():
             if data:
                 data["source"] = "Yahoo"
         if data:
-            prices[code] = {**data, "name": name}
+            # 3개월 평균 거래량 (스코어링용)
+            avg_vol = calc_avg_vol_3m(yahoo_sym)
+            prices[code] = {**data, "name": name, "avgVol3m": avg_vol}
             src = data.get("source", "Yahoo")
-            print(f"  {code} {name}: {data['price']:,}원 ({data['changePct']:+.2f}%) [{src}]")
+            print(f"  {code} {name}: {data['price']:,}원 ({data['changePct']:+.2f}%) [{src}]  avgVol3m={avg_vol:,}")
         else:
             print(f"  {code} {name}: 조회 실패")
         time.sleep(0.2)
