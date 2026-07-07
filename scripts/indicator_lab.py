@@ -450,12 +450,34 @@ def main():
 
     new_state = evolve(prev_state, all_signals)
 
+    # ── 역대 최고 AUC Gen 추적
+    current_auc = new_state.get("optimal_metrics", {}).get("auc", 0)
+    prev_best    = (prev_state or {}).get("best_ever", {})
+    prev_best_auc = prev_best.get("metrics", {}).get("auc", 0)
+
+    if current_auc >= prev_best_auc:
+        new_state["best_ever"] = {
+            "generation":      new_state["generation"],
+            "coordinate_sig":  new_state["coordinate_sig"],
+            "weights":         new_state["optimal_weights"],
+            "metrics":         new_state["optimal_metrics"],
+            "active_indicators": new_state["active_indicators"],
+            "updated_at":      new_state["generated_at"],
+        }
+        print(f"🏆 역대 최고 갱신! AUC {current_auc:.4f} (이전 최고: {prev_best_auc:.4f})")
+    else:
+        # 이전 best 유지
+        new_state["best_ever"] = prev_best
+        print(f"📊 역대 최고 유지: Gen {prev_best.get('generation','?')} AUC {prev_best_auc:.4f}"
+              f"  (현재 Gen {new_state['generation']}: {current_auc:.4f})")
+
     os.makedirs("data", exist_ok=True)
     with open(RESULTS_PATH, "w", encoding="utf-8") as f:
         json.dump(new_state, f, indent=2, ensure_ascii=False)
 
     print(f"\n💾 저장 완료: {RESULTS_PATH}")
-    print(f"📍 최종 좌표: {new_state['coordinate_sig']}")
+    print(f"📍 현재 좌표: {new_state['coordinate_sig']}")
+    print(f"🏆 최고 좌표: {new_state['best_ever'].get('coordinate_sig','?')}")
 
 if __name__ == "__main__":
     main()

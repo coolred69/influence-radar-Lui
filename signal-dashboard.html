@@ -281,6 +281,64 @@ body {
   margin-bottom: 12px;
 }
 
+/* ── 좌표 패널 */
+.coord-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.coord-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+.coord-box.best { border-color: #d97706aa; }
+.coord-box-title {
+  font-size: 10px;
+  color: var(--dim);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.coord-sig-small {
+  font-size: 9px;
+  color: #93c5fd;
+  background: #1e1e4a;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+  font-family: var(--mono);
+  word-break: break-all;
+}
+.w-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+.w-name { font-size: 10px; color: #8899cc; width: 100px; flex-shrink: 0; }
+.w-bar  { flex: 1; height: 4px; background: #1e1e4a; border-radius: 2px; overflow: hidden; }
+.w-fill { height: 100%; border-radius: 2px; }
+.w-fill-cur  { background: #3b82f6; }
+.w-fill-best { background: #f59e0b; }
+.w-pct  { font-size: 10px; color: var(--dim); width: 30px; text-align: right; }
+.auc-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.auc-cur  { background: #1e3260; color: #93c5fd; }
+.auc-best { background: #451a03; color: #fcd34d; }
+@media (max-width: 480px) {
+  .coord-panel { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 480px) {
   .grid { grid-template-columns: 1fr; }
   .summary { gap: 6px; }
@@ -300,6 +358,22 @@ body {
 </div>
 
 <div id="update-time" class="update-time"></div>
+
+<!-- 좌표 패널 -->
+<div class="coord-panel" id="coord-panel" style="display:none">
+  <div class="coord-box">
+    <div class="coord-box-title">⚡ 1. 현재 적용 중인 가중치</div>
+    <div id="cur-sig" class="coord-sig-small">–</div>
+    <div id="cur-auc" class="auc-badge auc-cur">AUC –</div>
+    <div id="cur-weights"></div>
+  </div>
+  <div class="coord-box best">
+    <div class="coord-box-title">🏆 2. 역대 최고 성능 가중치</div>
+    <div id="best-sig" class="coord-sig-small">–</div>
+    <div id="best-auc" class="auc-badge auc-best">AUC –</div>
+    <div id="best-weights"></div>
+  </div>
+</div>
 
 <div id="summary" class="summary">
   <div class="stat-chip buy-chip">
@@ -462,7 +536,7 @@ async function loadSignals() {
 
     allSignals = data.signals || [];
 
-    // 헤더 업데이트
+    // 헤더
     document.getElementById('coord-sig').textContent = data.coordinate_sig || '좌표 미설정';
     document.getElementById('buy-count').textContent   = data.buy_count   || 0;
     document.getElementById('watch-count').textContent = data.watch_count || 0;
@@ -471,6 +545,9 @@ async function loadSignals() {
     const dt = new Date(data.generated_at);
     document.getElementById('update-time').textContent =
       '마지막 업데이트: ' + dt.toLocaleString('ko-KR');
+
+    // 좌표 패널 렌더링
+    if (data.weight_info) renderCoordPanel(data.weight_info);
 
     renderCards();
   } catch(e) {
@@ -483,6 +560,48 @@ async function loadSignals() {
           로컬에서 <code>python scripts/signal_engine.py</code> 실행
         </div>
       </div>`;
+  }
+}
+
+function renderWeightRows(weights, fillClass) {
+  if (!weights) return '<div style="font-size:10px;color:#556">데이터 없음</div>';
+  const LABELS = {
+    rsi_filter:'RSI 필터', macd_align:'MACD 정렬', volume_surge:'거래량 급증',
+    volume_ratio:'거래량 배율', bollinger_pos:'볼린저밴드', momentum_5d:'5일 모멘텀',
+    gap_up:'갭상승', price_vs_52w:'52주 위치', atr_stability:'ATR 안정도',
+    trend_dir_20:'20일 추세', pre_run_inv:'사전모멘텀(역)', hit_rate:'인물 적중률',
+    sentiment:'감정 분석', signal_strength:'신호 강도'
+  };
+  return Object.entries(weights)
+    .sort((a,b) => b[1]-a[1]).slice(0,8)
+    .map(([k,v]) => {
+      const pct = Math.round(v * 100);
+      return `<div class="w-row">
+        <div class="w-name">${LABELS[k]||k}</div>
+        <div class="w-bar"><div class="w-fill ${fillClass}" style="width:${pct}%"></div></div>
+        <div class="w-pct">${pct}%</div>
+      </div>`;
+    }).join('');
+}
+
+function renderCoordPanel(info) {
+  if (!info) return;
+  document.getElementById('coord-panel').style.display = 'grid';
+
+  // 현재 적용 중
+  document.getElementById('cur-sig').textContent  = info.current_sig  || '–';
+  document.getElementById('cur-auc').textContent  = `AUC ${(info.current_auc||0).toFixed(4)}  Gen ${info.current_gen||'?'}`;
+  document.getElementById('cur-weights').innerHTML = renderWeightRows(info.current_weights, 'w-fill-cur');
+
+  // 역대 최고
+  const hasBest = info.best_sig && info.best_sig !== info.current_sig;
+  document.getElementById('best-sig').textContent  = info.best_sig || info.current_sig || '–';
+  document.getElementById('best-auc').textContent  = `AUC ${(info.best_auc||info.current_auc||0).toFixed(4)}  Gen ${info.best_gen||info.current_gen||'?'}`;
+  document.getElementById('best-weights').innerHTML = renderWeightRows(
+    info.best_weights || info.current_weights, 'w-fill-best'
+  );
+  if (!hasBest) {
+    document.getElementById('best-auc').textContent += '  ← 현재와 동일';
   }
 }
 

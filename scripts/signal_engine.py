@@ -84,16 +84,30 @@ DEFAULT_HIT_RATES = {
 # ──────────────────────────────────────────────────────────────
 
 def load_weights():
-    """IR-COORD 가중치 로드. 없으면 균등 가중치 반환."""
+    """IR-COORD 가중치 로드 — 역대 최고 AUC Gen 우선 사용."""
     if os.path.exists(RESULTS_PATH):
         with open(RESULTS_PATH) as f:
             data = json.load(f)
-        weights = data.get("optimal_weights", {})
-        coord_sig = data.get("coordinate_sig", "IR-COORD-DEFAULT")
-        generation = data.get("generation", 0)
+
+        best = data.get("best_ever", {})
+        current_auc = data.get("optimal_metrics", {}).get("auc", 0)
+        best_auc    = best.get("metrics", {}).get("auc", 0)
+
+        # 역대 최고가 현재보다 나으면 best 사용
+        if best and best_auc >= current_auc:
+            weights   = best.get("weights", {})
+            coord_sig = best.get("coordinate_sig", "IR-COORD-DEFAULT")
+            gen       = best.get("generation", 0)
+            print(f"🏆 역대 최고 좌표 사용: {coord_sig}  (Gen {gen}, AUC {best_auc:.4f})")
+        else:
+            weights   = data.get("optimal_weights", {})
+            coord_sig = data.get("coordinate_sig", "IR-COORD-DEFAULT")
+            gen       = data.get("generation", 0)
+            print(f"✅ 현재 좌표 사용: {coord_sig}  (Gen {gen}, AUC {current_auc:.4f})")
+
         if weights:
-            print(f"✅ IR-COORD 로드: {coord_sig}  (Generation {generation})")
-            return weights, coord_sig, generation
+            return weights, coord_sig, gen
+
     # 기본 균등 가중치
     default_keys = ["rsi_filter","macd_align","volume_surge","volume_ratio",
                     "bollinger_pos","momentum_5d","sentiment","hit_rate","signal_strength"]
@@ -335,6 +349,20 @@ def main():
     weights, coord_sig, generation = load_weights()
     hit_rates = load_hit_rates()
 
+    # weight_info: 현재 vs 역대최고 정보 수집
+    weight_info = {"current_sig": coord_sig, "current_gen": generation,
+                   "current_weights": weights, "current_auc": 0}
+    if os.path.exists(RESULTS_PATH):
+        with open(RESULTS_PATH) as f:
+            _rd = json.load(f)
+        weight_info["current_auc"] = _rd.get("optimal_metrics", {}).get("auc", 0)
+        best = _rd.get("best_ever", {})
+        if best:
+            weight_info["best_sig"]     = best.get("coordinate_sig", coord_sig)
+            weight_info["best_gen"]     = best.get("generation", generation)
+            weight_info["best_weights"] = best.get("weights", weights)
+            weight_info["best_auc"]     = best.get("metrics", {}).get("auc", 0)
+
     print(f"\n감시 종목: {len(WATCHLIST)}개\n")
     results = []
     for item in WATCHLIST:
@@ -369,6 +397,7 @@ def main():
         "total_scored": len(results),
         "buy_count":   len(buy_list),
         "watch_count": len(watch_list),
+        "weight_info": weight_info,
         "signals": results,
     }
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
