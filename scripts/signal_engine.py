@@ -178,6 +178,28 @@ def calc_atr_stability(df, window=14):
     ratio = atr / (close.iloc[-1] + 1e-9)
     return float(np.clip(1 - ratio * 10, 0, 1))
 
+def calc_atr_raw(df, window=14):
+    """실제 ATR 값 반환 (정규화 없이)"""
+    high = df['High']; low = df['Low']; close = df['Close']
+    tr = pd.concat([
+        high - low,
+        (high - close.shift()).abs(),
+        (low  - close.shift()).abs()
+    ], axis=1).max(axis=1)
+    return float(tr.rolling(window).mean().iloc[-1])
+
+def calc_support_level(close, window=20):
+    """최근 N일 저점 (지지선)"""
+    return float(close.rolling(window).min().iloc[-1])
+
+def price_round(price, market):
+    """시장별 가격 반올림"""
+    if market == "KR":
+        if price >= 100000: return round(price / 500) * 500
+        if price >= 10000:  return round(price / 100) * 100
+        return round(price / 50) * 50
+    return round(price, 2)
+
 def calc_trend_dir(close, window=20):
     if len(close) < window: return 0.5
     y = close.values[-window:]
@@ -227,6 +249,16 @@ def score_stock(item, weights, hit_rates):
         atr_stab   = round(calc_atr_stability(df), 3)
         trend      = calc_trend_dir(close, 20)
         pre_run    = round(calc_pre_run_inv(close, 5), 3)
+
+        # ── 매매 레벨 계산 (ATR 기반)
+        atr_raw      = calc_atr_raw(df)
+        support      = calc_support_level(close, 20)
+        market_code  = item.get("market", "US")
+        entry_price  = price_round(max(price_now - 0.3 * atr_raw, support), market_code)
+        target_price = price_round(price_now + 2.0 * atr_raw, market_code)
+        stop_loss    = price_round(max(price_now - 1.0 * atr_raw, support * 0.98), market_code)
+        rr_denom     = max(entry_price - stop_loss, price_now * 0.001)
+        risk_reward  = round((target_price - entry_price) / rr_denom, 1)
 
         hr          = hit_rates.get(influencer, DEFAULT_HIT_RATES.get(influencer, 0.55))
         sig_str     = round((macd + rsi_filter + trend) / 3.0, 3)
@@ -280,6 +312,11 @@ def score_stock(item, weights, hit_rates):
             "signal":     signal,
             "top_indicators": top3,
             "indicators": all_indicators,
+            "entry_price":  entry_price,
+            "target_price": target_price,
+            "stop_loss":    stop_loss,
+            "risk_reward":  risk_reward,
+            "atr":          round(atr_raw, 2),
         }
 
     except Exception as e:

@@ -205,6 +205,35 @@ body {
 }
 .tag.influencer { background: #1e3260; color: #93c5fd; }
 
+/* ── 매매 레벨 */
+.trade-levels {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  margin: 10px 0;
+  padding: 10px;
+  background: #060612;
+  border-radius: 6px;
+  border: 1px solid #1a1a3a;
+}
+.tl-item { text-align: center; }
+.tl-label { font-size: 9px; color: var(--dim); margin-bottom: 3px; }
+.tl-val { font-size: 13px; font-weight: 700; }
+.tl-entry  { color: #60a5fa; }
+.tl-target { color: #4ade80; }
+.tl-stop   { color: #f87171; }
+.rr-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #1e2a4a;
+  color: #93c5fd;
+  margin-top: 6px;
+  width: 100%;
+  text-align: center;
+}
+
 /* ── 지표 미니 바 */
 .ind-section { margin-top: 8px; }
 .ind-title { font-size: 10px; color: var(--dim); margin-bottom: 5px; }
@@ -397,6 +426,24 @@ function renderCards() {
         <span class="tag influencer">👤 ${s.influencer}</span>
         <span class="tag">${s.sector}</span>
       </div>
+
+      ${s.entry_price ? `
+      <div class="trade-levels">
+        <div class="tl-item">
+          <div class="tl-label">📌 추천 매수가</div>
+          <div class="tl-val tl-entry">${s.entry_price.toLocaleString()}</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">🎯 목표가</div>
+          <div class="tl-val tl-target">${s.target_price.toLocaleString()}</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">🛑 손절가</div>
+          <div class="tl-val tl-stop">${s.stop_loss.toLocaleString()}</div>
+        </div>
+      </div>
+      <div class="rr-badge">손익비 ${s.risk_reward}:1 &nbsp;|&nbsp; ATR ${s.atr ? s.atr.toLocaleString() : '–'}</div>
+      ` : ''}
 
       <div class="ind-section">
         <div class="ind-title">주요 지표 기여</div>
