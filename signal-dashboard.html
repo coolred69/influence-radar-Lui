@@ -354,7 +354,10 @@ body {
     <div class="header-title">📡 매수 신호 대시보드</div>
     <div id="coord-sig" class="coord-badge" style="margin-top:4px">로딩 중...</div>
   </div>
-  <button class="refresh-btn" onclick="loadSignals()">⟳ 새로고침</button>
+  <div style="display:flex;gap:8px;align-items:center">
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:4px;padding:6px 14px;border-radius:6px;background:#1e293b;color:#94a3b8;font-size:13px;font-weight:600;text-decoration:none;border:1px solid #334155">🏠 메인</a>
+    <button class="refresh-btn" onclick="loadSignals()">⟳ 새로고침</button>
+  </div>
 </div>
 
 <div id="update-time" class="update-time"></div>
