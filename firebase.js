@@ -9,7 +9,7 @@ import { getMessaging, getToken, onMessage }
   from 'https://www.gstatic.com/firebasejs/11.5.0/firebase-messaging.js';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAl9w26mpnGSTHe-lHBtRFWkIv3tRbA0p8",
+  apiKey: "AIzaSyCB_s7Hs0BwsftRlU99nOC2FxMXw9kwhf8",
   authDomain: "influence-radar-43a48.firebaseapp.com",
   projectId: "influence-radar-43a48",
   storageBucket: "influence-radar-43a48.firebasestorage.app",
