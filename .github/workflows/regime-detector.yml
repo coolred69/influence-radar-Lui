@@ -1,0 +1,52 @@
+name: 시장 국면 감지 — Regime Detector
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 매일 KST 07:00 (UTC 22:00 전날) — 장 시작 전 국면 업데이트
+    - cron: '0 22 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: pip install yfinance pandas numpy
+
+      - name: 국면 감지 실행
+        run: |
+          mkdir -p data
+          python scripts/regime_detector.py
+
+      - name: 결과 출력
+        run: |
+          python -c "
+          import json
+          with open('data/market_regime.json') as f:
+              d = json.load(f)
+          c = d.get('combined', {})
+          print(f'국면: {c.get(\"regime\",\"?\")}  신뢰도: {c.get(\"confidence\",0)*100:.0f}%')
+          print(f'BUY기준: {c.get(\"thresholds\",{}).get(\"buy\",0.65)*100:.0f}%  점수보정: {c.get(\"score_multiplier\",1.0):.2f}x')
+          print(c.get(\"note\", \"\"))
+          "
+
+      - name: 커밋 & 푸시
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/market_regime.json || true
+          git diff --cached --quiet || git commit -m "🌐 시장 국면 업데이트 $(date +'%Y-%m-%d')"
+          git push

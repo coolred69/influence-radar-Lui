@@ -27,6 +27,7 @@ TRAINING_PATH = "data/training_data.json"
 OUTPUT_PATH   = "data/signals.json"
 HISTORY_PATH  = "data/signal_history.json"
 PARAMS_PATH   = "data/optimal_params.json"
+REGIME_PATH   = "data/market_regime.json"
 
 BUY_THRESHOLD   = 0.65
 WATCH_THRESHOLD = 0.50
@@ -116,6 +117,32 @@ def load_weights():
     w = {k: round(1/len(default_keys), 4) for k in default_keys}
     print("⚠ indicator_results.json 없음. 균등 가중치 사용.")
     return w, "IR-COORD-DEFAULT", 0
+
+def load_regime():
+    """시장 국면 로드 → BUY/WATCH 임계값 동적 조정"""
+    default = {
+        "regime":           "SIDEWAYS",
+        "thresholds":       {"buy": 0.65, "watch": 0.50},
+        "score_multiplier": 1.0,
+        "note":             "국면 데이터 없음 — 기본값 사용",
+    }
+    if not os.path.exists(REGIME_PATH):
+        return default
+    try:
+        with open(REGIME_PATH) as f:
+            data = json.load(f)
+        combined = data.get("combined", {})
+        if combined:
+            return {
+                "regime":           combined.get("regime", "SIDEWAYS"),
+                "thresholds":       combined.get("thresholds", default["thresholds"]),
+                "score_multiplier": combined.get("score_multiplier", 1.0),
+                "note":             combined.get("note", ""),
+            }
+    except Exception:
+        pass
+    return default
+
 
 def load_hit_rates():
     """training_data.json에서 인물별 적중률 로드."""
@@ -350,6 +377,18 @@ def main():
 
     weights, coord_sig, generation = load_weights()
     hit_rates = load_hit_rates()
+    regime_info = load_regime()
+
+    # 국면 기반 임계값 동적 조정
+    regime_name   = regime_info["regime"]
+    regime_buy    = regime_info["thresholds"]["buy"]
+    regime_watch  = regime_info["thresholds"]["watch"]
+    regime_mult   = regime_info["score_multiplier"]
+
+    print(f"\n🌐 시장 국면: {regime_name}  "
+          f"BUY기준 {regime_buy*100:.0f}%  WATCH기준 {regime_watch*100:.0f}%  "
+          f"점수보정 {regime_mult:.2f}x")
+    print(f"   {regime_info['note']}")
 
     # weight_info: 현재 vs 역대최고 정보 수집
     weight_info = {"current_sig": coord_sig, "current_gen": generation,
@@ -371,9 +410,23 @@ def main():
         print(f"  {item['symbol']:12s} {item['name']:<18s} 분석 중...")
         r = score_stock(item, weights, hit_rates)
         if r:
+            # 국면 보정 적용
+            raw_score = r["score"]
+            adj_score = round(raw_score * regime_mult, 1)
+            r["score"] = adj_score
+            r["score_raw"] = raw_score
+            r["regime"] = regime_name
+
+            # 국면 기반 신호 재판정
+            prob_adj = adj_score / 100.0
+            r["signal"] = ("BUY"   if prob_adj >= regime_buy   else
+                           "WATCH" if prob_adj >= regime_watch else "WAIT")
+
             results.append(r)
-            bar = "█" * int(r["score"] / 5)
-            print(f"    → {r['signal']:5s}  {r['score']:5.1f}%  {bar}  {r['price']:>10.2f} ({r['change_pct']:+.2f}%)")
+            bar = "█" * int(adj_score / 5)
+            adj_tag = f"(보정 {raw_score:.1f}→{adj_score:.1f})" if regime_mult != 1.0 else ""
+            print(f"    → {r['signal']:5s}  {adj_score:5.1f}%  {bar}  "
+                  f"{r['price']:>10.2f} ({r['change_pct']:+.2f}%) {adj_tag}")
 
     if not results:
         print("❌ 스코어링된 종목 없음")
@@ -394,8 +447,11 @@ def main():
         "generated_at": datetime.now().isoformat(),
         "coordinate_sig": coord_sig,
         "generation": generation,
-        "buy_threshold":   BUY_THRESHOLD,
-        "watch_threshold": WATCH_THRESHOLD,
+        "buy_threshold":   regime_buy,
+        "watch_threshold": regime_watch,
+        "regime":          regime_name,
+        "regime_note":     regime_info["note"],
+        "score_multiplier": regime_mult,
         "total_scored": len(results),
         "buy_count":   len(buy_list),
         "watch_count": len(watch_list),

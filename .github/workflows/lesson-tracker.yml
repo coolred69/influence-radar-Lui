@@ -1,0 +1,60 @@
+name: 실패 교훈 누적 — Lesson Tracker (Phase 4)
+
+on:
+  workflow_dispatch:
+  # track-signals 완료 후 연계 실행 (매주 수요일 KST 09:30 = UTC 00:30)
+  schedule:
+    - cron: '30 0 * * 3'
+
+permissions:
+  contents: write
+
+jobs:
+  track-lessons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: pip install pandas numpy
+
+      - name: 교훈 분석 실행
+        run: |
+          mkdir -p data
+          python scripts/lesson_tracker.py
+
+      - name: 결과 출력
+        run: |
+          python -c "
+          import json, os
+          if os.path.exists('data/lessons_learned.json'):
+              with open('data/lessons_learned.json') as f:
+                  d = json.load(f)
+              print(f'실패 분석: 총 {d[\"total_failed\"]}건  실패율 {d.get(\"overall_fail_rate\",0)}%')
+              alerts = d.get('alerts', [])
+              if alerts:
+                  print(f'교정 권고 {len(alerts)}건:')
+                  for a in alerts[:5]:
+                      print(f'  [{a[\"priority\"]}] {a[\"reason\"]} - {a[\"count\"]}건 ({a[\"rate_pct\"]:.0f}%)')
+              else:
+                  print('교정 권고 없음')
+              cum = d.get('cumulative_stats', {})
+              if cum:
+                  print(f'누적 교훈: {len(cum)}가지 실패 패턴')
+          "
+
+      - name: 커밋 & 푸시
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/lessons_learned.json || true
+          git diff --cached --quiet || git commit -m "📚 실패 교훈 누적 $(date +'%Y-%m-%d')"
+          git push

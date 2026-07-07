@@ -1,0 +1,58 @@
+name: 과적합 방지 검증 — Anti-Overfitting
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 매주 일요일 KST 04:00 (UTC 19:00 토) — 주간 건강 검진
+    - cron: '0 19 * * 6'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: pip install pandas numpy
+
+      - name: 과적합 검증 실행
+        run: |
+          mkdir -p data
+          python scripts/anti_overfit.py
+
+      - name: 결과 출력
+        run: |
+          python -c "
+          import json, os
+          if os.path.exists('data/overfit_report.json'):
+              with open('data/overfit_report.json') as f:
+                  d = json.load(f)
+              print(f'상태: {d[\"status\"]}')
+              print(f'판정: {d[\"verdict\"]}')
+              print(f'권고: {d.get(\"recommendation\",\"\")}')
+              wf = d.get('walk_forward', {})
+              if wf and wf.get('avg_test_auc'):
+                  print(f'Walk-Forward AUC: {wf[\"avg_test_auc\"]:.4f}')
+              mc = d.get('monte_carlo', {})
+              if mc:
+                  print(f'Monte Carlo p={mc[\"p_value\"]:.4f}  z={mc[\"z_score\"]:.2f}')
+          "
+
+      - name: 커밋 & 푸시
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/overfit_report.json || true
+          git diff --cached --quiet || git commit -m "🔬 과적합 검증 $(date +'%Y-%m-%d')"
+          git push
