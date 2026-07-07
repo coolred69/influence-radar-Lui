@@ -5,7 +5,7 @@ importScripts('https://www.gstatic.com/firebasejs/11.5.0/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/11.5.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey: "AIzaSyCB_s7Hs0BwsftRlU99nOC2FxMXw9kwhf8",
+  apiKey: "AIzaSyAzXJJTR6pKMjS776ruaT99l5I53H6BFDo",
   authDomain: "influence-radar-43a48.firebaseapp.com",
   projectId: "influence-radar-43a48",
   storageBucket: "influence-radar-43a48.firebasestorage.app",
