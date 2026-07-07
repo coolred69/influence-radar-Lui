@@ -1,0 +1,27 @@
+rules_version = '2';
+// ════════════════════════════════════════════════════════════
+// Influence Radar — Firestore Security Rules
+// ════════════════════════════════════════════════════════════
+// 정책:
+//   읽기 — 공개 허용 (브라우저에서 주가/신호 데이터 읽기)
+//   쓰기 — 완전 차단 (GitHub Actions Service Account만 씀)
+//
+// 쓰기가 차단되어도 GitHub Actions는 정상 작동:
+//   Firebase Admin SDK는 Security Rules를 우회함 (서버측 권한)
+// ════════════════════════════════════════════════════════════
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── radar 컬렉션 (kr_prices, main, 신호 데이터)
+    match /radar/{document} {
+      allow read:  if true;   // 브라우저 읽기 허용
+      allow write: if false;  // 클라이언트 쓰기 차단
+    }
+
+    // ── 그 외 모든 컬렉션 완전 차단
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
