@@ -1,0 +1,11 @@
+{
+  "validated_at": "2026-07-11T19:56:57.384309",
+  "event_count": 0,
+  "weight_count": 0,
+  "status": "SKIPPED",
+  "warnings": [],
+  "walk_forward": null,
+  "monte_carlo": null,
+  "verdict": "이벤트 부족 (0/25) — 검증 스킵",
+  "recommendation": "훈련 데이터를 더 쌓은 후 재실행 (목표: 100개 이상)"
+}
