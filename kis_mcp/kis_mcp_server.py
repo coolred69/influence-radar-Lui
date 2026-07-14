@@ -39,7 +39,7 @@ async def _get_token() -> str:
     now = datetime.now()
     if _token_cache["token"] and _token_cache["expires"] and _token_cache["expires"] > now:
         return _token_cache["token"]
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.post(
             f"{BASE_URL}/oauth2/tokenP",
             headers={"content-type": "application/json"},
@@ -54,7 +54,7 @@ async def _get_token() -> str:
 
 
 async def _hashkey(body: dict) -> str:
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.post(
             f"{BASE_URL}/uapi/hashkey",
             headers={"content-type": "application/json", "appkey": APP_KEY, "appsecret": APP_SECRET},
@@ -119,7 +119,7 @@ async def get_kr_stock_price(stock_code: str) -> str:
     stock_code: 종목코드 6자리 (예: 005930=삼성전자, 000660=SK하이닉스)
     """
     token = await _get_token()
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.get(
             f"{BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-price",
             headers={
@@ -153,7 +153,7 @@ async def get_kr_stock_history(stock_code: str, period: str = "D") -> str:
     period: D=일봉, W=주봉, M=월봉
     """
     token = await _get_token()
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.get(
             f"{BASE_URL}/uapi/domestic-stock/v1/quotations/inquire-daily-price",
             headers={
@@ -191,7 +191,7 @@ async def place_kr_order(
         "ORD_QTY": str(quantity), "ORD_UNPR": str(price),
     }
     hashkey = await _hashkey(body)
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.post(
             f"{BASE_URL}/uapi/domestic-stock/v1/trading/order-cash",
             headers={
@@ -217,7 +217,7 @@ async def get_us_stock_price(symbol: str, exchange: str = "NASD") -> str:
     exchange: NASD=나스닥, NYSE=뉴욕, AMEX=아멕스
     """
     token = await _get_token()
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.get(
             f"{BASE_URL}/uapi/overseas-price/v1/quotations/price",
             headers={
@@ -253,7 +253,7 @@ async def get_us_stock_history(symbol: str, exchange: str = "NASD", period: str 
     exchange: NASD/NYSE/AMEX | period: 0=일봉, 1=주봉, 2=월봉
     """
     token = await _get_token()
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.get(
             f"{BASE_URL}/uapi/overseas-price/v1/quotations/dailyprice",
             headers={
@@ -290,7 +290,7 @@ async def place_us_order(
         "OVRS_ORD_UNPR": str(price),
     }
     hashkey = await _hashkey(body)
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.post(
             f"{BASE_URL}/uapi/overseas-stock/v1/trading/order",
             headers={
@@ -309,7 +309,7 @@ async def get_us_account_balance() -> str:
     """미국 주식 모의투자 계좌 잔고 조회."""
     token = await _get_token()
     cano  = _cano()
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.get(
             f"{BASE_URL}/uapi/overseas-stock/v1/trading/inquire-balance",
             headers={
@@ -331,7 +331,7 @@ async def get_kr_account_balance() -> str:
     """한국 주식 모의투자 계좌 잔고 조회."""
     token = await _get_token()
     cano  = _cano()
-    async with httpx.AsyncClient(verify=False) as c:
+    async with httpx.AsyncClient(verify=True) as c:
         r = await c.get(
             f"{BASE_URL}/uapi/domestic-stock/v1/trading/inquire-balance",
             headers={
