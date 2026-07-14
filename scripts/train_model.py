@@ -38,7 +38,8 @@ class InfluenceRadarML:
             data = json.load(f)
         
         self.signals = data['signals']
-        print(f"✅ Loaded {len(self.signals)} signals from {data['metadata']['period']}")
+        period = data.get('metadata', {}).get('period', 'unknown')
+        print(f"✅ Loaded {len(self.signals)} signals from {period}")
         return self.signals
     
     def prepare_features(self):
