@@ -35,6 +35,8 @@ EVENTS = [
     ("2025-01-20", "이재용",   "005930.KS", "AI메모리 수요증가",   "positive", "KR_SEMICON", 5),
     ("2025-03-15", "이재용",   "000660.KS", "HBM4 개발완료",       "positive", "KR_SEMICON", 4),
     ("2025-05-08", "이재용",   "005930.KS", "2분기 실적가이던스",  "positive", "KR_SEMICON", 4),
+    ("2025-07-31", "이재용",   "005930.KS", "2Q25 실적부진(영업이익 -56%YoY)", "negative", "KR_SEMICON", 4),
+    ("2025-10-30", "이재용",   "005930.KS", "3Q25 실적급증(영업이익 +159%QoQ)", "positive", "KR_SEMICON", 5),
 
     # ═══ 🇰🇷 정의선 (현대차/기아) ═══
     ("2023-05-25", "정의선",   "005380.KS", "E-GMP 플랫폼 확대",  "positive", "KR_AUTO", 3),
@@ -47,6 +49,8 @@ EVENTS = [
     ("2024-10-14", "정의선",   "005380.KS", "로보틱스투자",        "positive", "KR_AUTO", 3),
     ("2025-02-10", "정의선",   "000270.KS", "하이브리드전략",      "positive", "KR_AUTO", 4),
     ("2025-04-17", "정의선",   "005380.KS", "1Q 실적발표",         "positive", "KR_AUTO", 4),
+    ("2025-07-24", "정의선",   "005380.KS", "2Q25 실적부진(관세영향 영업이익 -15.8%)", "negative", "KR_AUTO", 4),
+    ("2025-10-30", "정의선",   "005380.KS", "3Q25 관세영향 본격화(영업이익 -29.2%)", "negative", "KR_AUTO", 4),
 
     # ═══ 🇰🇷 최태원 (SK하이닉스/SK이노) ═══
     ("2023-07-26", "최태원",   "000660.KS", "HBM3 양산 시작",      "positive", "KR_SEMICON", 5),
@@ -56,6 +60,8 @@ EVENTS = [
     ("2024-09-23", "최태원",   "000660.KS", "HBM 점유율확대",      "positive", "KR_SEMICON", 5),
     ("2025-01-08", "최태원",   "000660.KS", "엔비디아 공급망",     "positive", "KR_SEMICON", 5),
     ("2025-04-24", "최태원",   "000660.KS", "1Q 사상최대 실적",    "positive", "KR_SEMICON", 6),
+    ("2025-07-24", "최태원",   "000660.KS", "2Q25 실적호조(영업이익 9.2조)", "positive", "KR_SEMICON", 6),
+    ("2025-10-29", "최태원",   "000660.KS", "3Q25 사상최대실적(영업이익 11.4조)", "positive", "KR_SEMICON", 6),
 
     # ═══ 🇰🇷 이재명 (정책 수혜주) ═══
     ("2023-09-14", "이재명",   "373220.KS", "배터리 보조금 공약",  "positive", "KR_BATTERY", 4),
@@ -98,6 +104,8 @@ EVENTS = [
     ("2025-01-06", "Jensen Huang", "NVDA", "CES2025 GB200",       "positive", "AI/GPU", 6),
     ("2025-03-17", "Jensen Huang", "NVDA", "GTC2025 Blackwell",   "positive", "AI/GPU", 6),
     ("2025-05-28", "Jensen Huang", "NVDA", "FQ1FY26 실적발표",    "positive", "AI/GPU", 6),
+    ("2025-08-27", "Jensen Huang", "NVDA", "FQ2FY26 실적서프라이즈(네트워킹 98%↑)", "positive", "AI/GPU", 6),
+    ("2025-11-19", "Jensen Huang", "NVDA", "FQ3FY26 사상최대매출 570억 서프라이즈", "positive", "AI/GPU", 6),
 
     # ═══ 🇺🇸 Elon Musk (Tesla/X) ═══
     ("2023-04-19", "Elon Musk", "TSLA", "가격인하 마진압박",    "negative", "EV/Auto", 5),
@@ -110,6 +118,8 @@ EVENTS = [
     ("2024-10-23", "Elon Musk", "TSLA", "Q3 실적서프라이즈",    "positive", "EV/Auto", 5),
     ("2025-01-29", "Elon Musk", "TSLA", "Q4 실적발표 부진",     "negative", "EV/Auto", 5),
     ("2025-04-22", "Elon Musk", "TSLA", "Q1 실적발표",          "negative", "EV/Auto", 5),
+    ("2025-07-23", "Elon Musk", "TSLA", "Q2 실적부진(마진압박,관세우려)", "negative", "EV/Auto", 5),
+    ("2025-10-22", "Elon Musk", "TSLA", "Q3 매출기록 그러나 이익감소", "negative", "EV/Auto", 5),
 
     # ═══ 🇺🇸 Jerome Powell (매크로) ═══
     ("2023-02-01", "Jerome Powell", "SPY",  "금리 0.25% 인상",   "negative", "Macro/Rates", 6),
@@ -123,6 +133,8 @@ EVENTS = [
     ("2024-12-18", "Jerome Powell", "SPY",  "인하속도 조절",      "negative", "Macro/Rates", 6),
     ("2025-01-29", "Jerome Powell", "QQQ",  "금리동결 유지",      "neutral",  "Macro/Rates", 5),
     ("2025-03-19", "Jerome Powell", "SPY",  "스태그플레이션 경고","negative", "Macro/Rates", 6),
+    ("2025-09-17", "Jerome Powell", "SPY",  "9월 0.25%p 인하(리스크관리 컷)", "neutral", "Macro/Rates", 6),
+    ("2025-12-10", "Jerome Powell", "SPY",  "12월 0.25%p 인하 매파적 코멘트", "positive", "Macro/Rates", 6),
 
     # ═══ 🇺🇸 Sam Altman (OpenAI/AI관련주) ═══
     ("2023-03-14", "Sam Altman", "MSFT", "GPT-4 발표",          "positive", "Cloud/AI", 6),
@@ -163,6 +175,8 @@ EVENTS = [
     ("2024-08-01", "Tim Cook", "AAPL", "FQ3 서프라이즈",        "positive", "Tech", 5),
     ("2025-01-30", "Tim Cook", "AAPL", "FQ1 실적발표",          "positive", "Tech", 5),
     ("2025-05-01", "Tim Cook", "AAPL", "FQ2 실적발표",          "positive", "Tech", 5),
+    ("2025-07-31", "Tim Cook", "AAPL", "FQ3 실적서프라이즈(아이폰 강세)", "positive", "Tech", 5),
+    ("2025-10-30", "Tim Cook", "AAPL", "FQ4 실적서프라이즈+가이던스 상회", "positive", "Tech", 5),
 
     # ═══ 🇺🇸 Satya Nadella (Microsoft) ═══
     ("2023-04-25", "Satya Nadella", "MSFT", "FQ3 클라우드 호조", "positive", "Cloud/AI", 5),
@@ -171,6 +185,7 @@ EVENTS = [
     ("2024-04-25", "Satya Nadella", "MSFT", "FQ3 Azure AI 폭발","positive", "Cloud/AI", 6),
     ("2024-10-30", "Satya Nadella", "MSFT", "FQ1FY25 실적발표",  "positive", "Cloud/AI", 5),
     ("2025-01-29", "Satya Nadella", "MSFT", "FQ2FY25 클라우드↑", "positive", "Cloud/AI", 5),
+    ("2025-10-29", "Satya Nadella", "MSFT", "FY26Q1 실적beat 그러나 Capex우려 급락", "negative", "Cloud/AI", 5),
 
     # ═══ 🇺🇸 Mark Zuckerberg (Meta) ═══
     ("2023-02-01", "Mark Zuckerberg", "META", "효율의 해 발표",  "positive", "Social/AI", 6),
