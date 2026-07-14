@@ -21,7 +21,7 @@ import os
 from datetime import datetime
 
 class InfluenceRadarML:
-    def __init__(self, data_file="data/training_data.json", model_dir="models"):
+    def __init__(self, data_file="data/legacy_training_data.json", model_dir="models"):
         self.data_file = data_file
         self.model_dir = model_dir
         self.buy_price_model = None

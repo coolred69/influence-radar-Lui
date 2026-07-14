@@ -17,7 +17,7 @@ from datetime import datetime
 import os
 
 class BacktestEngine:
-    def __init__(self, data_file="data/training_data.json"):
+    def __init__(self, data_file="data/legacy_training_data.json"):
         self.data_file = data_file
         self.signals = None
         self.results = {
