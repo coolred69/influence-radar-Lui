@@ -12,33 +12,33 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install scikit-learn numpy pandas
-      
+
       - name: Train ML Model
         run: python3 scripts/train_model.py
-      
+
       - name: Run Backtest
         run: python3 scripts/backtest.py
-      
+
       - name: Generate Predictions
         run: python3 scripts/predict.py
-      
+
       - name: Update Dashboard Data
         run: echo "Dashboard data updated at $(date)" > data/last_update.txt
-      
+
       - name: Commit and Push
         run: |
           git config --local user.email "radar-ml@github.com"
@@ -48,26 +48,39 @@ jobs:
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
   weekly-retrain:
     runs-on: ubuntu-latest
-    if: github.event.schedule == '0 0 * * 0'  # 일요일만
-    
+    needs: update
+    # 일요일 스케줄 실행 시에만 전체 재학습
+    if: github.event_name == 'schedule' && github.run_attempt == '1'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install scikit-learn numpy pandas
-      
-      - name: Full Retraining
+
+      - name: Full Retraining (weekly)
         run: |
-          python3 scripts/train_model.py --full-retrain
-          python3 scripts/backtest.py --detailed
+          python3 scripts/train_model.py
+          python3 scripts/backtest.py
+
+      - name: Commit retrained models
+        run: |
+          git config --local user.email "radar-ml@github.com"
+          git config --local user.name "Radar ML Bot"
+          git pull --rebase
+          git add -A
+          git commit -m "chore: weekly full retrain - $(date +'%Y-%m-%d')" || true
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
