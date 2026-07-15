@@ -1,165 +1,191 @@
 {
-  "timestamp": "2026-07-14T04:17:39.052615",
-  "period": "2023-01-10 to 2023-10-30",
+  "timestamp": "2026-07-15T01:29:28.046688",
+  "period": "2023-02-01 to 2025-05-28",
   "results": {
-    "total_signals": 10,
-    "correct_predictions": 10,
-    "accuracy": 100.0,
+    "total_signals": 127,
+    "correct_predictions": 43,
+    "accuracy": 33.86,
+    "avg_return": 1.06,
     "by_person": {
+      "이재용": {
+        "total": 12,
+        "hits": 3,
+        "accuracy_pct": 25.0,
+        "avg_return": -0.47
+      },
+      "정의선": {
+        "total": 10,
+        "hits": 2,
+        "accuracy_pct": 20.0,
+        "avg_return": -1.83
+      },
+      "최태원": {
+        "total": 7,
+        "hits": 5,
+        "accuracy_pct": 71.4,
+        "avg_return": 7.21
+      },
+      "이재명": {
+        "total": 6,
+        "hits": 0,
+        "accuracy_pct": 0.0,
+        "avg_return": -3.47
+      },
+      "구광모": {
+        "total": 6,
+        "hits": 2,
+        "accuracy_pct": 33.3,
+        "avg_return": 1.12
+      },
+      "김범수": {
+        "total": 4,
+        "hits": 0,
+        "accuracy_pct": 0.0,
+        "avg_return": -9.46
+      },
+      "최수연": {
+        "total": 4,
+        "hits": 2,
+        "accuracy_pct": 50.0,
+        "avg_return": 0.55
+      },
       "Jensen Huang": {
-        "total": 2,
-        "correct": 2,
-        "avg_accuracy": 1.0,
-        "signals": [
-          {
-            "date": "2023-01-10",
-            "ticker": "NVDA",
-            "accuracy": 1.0
-          },
-          {
-            "date": "2023-06-10",
-            "ticker": "NVDA",
-            "accuracy": 1.0
-          }
-        ],
-        "accuracy_pct": 100.0
-      },
-      "Jerome Powell": {
-        "total": 3,
-        "correct": 3,
-        "avg_accuracy": 1.0,
-        "signals": [
-          {
-            "date": "2023-02-03",
-            "ticker": "^DXY",
-            "accuracy": 1.0
-          },
-          {
-            "date": "2023-07-25",
-            "ticker": "^DXY",
-            "accuracy": 1.0
-          },
-          {
-            "date": "2023-10-30",
-            "ticker": "^DXY",
-            "accuracy": 1.0
-          }
-        ],
-        "accuracy_pct": 100.0
-      },
-      "Satya Nadella": {
-        "total": 2,
-        "correct": 2,
-        "avg_accuracy": 1.0,
-        "signals": [
-          {
-            "date": "2023-03-15",
-            "ticker": "MSFT",
-            "accuracy": 1.0
-          },
-          {
-            "date": "2023-08-14",
-            "ticker": "MSFT",
-            "accuracy": 1.0
-          }
-        ],
-        "accuracy_pct": 100.0
+        "total": 12,
+        "hits": 5,
+        "accuracy_pct": 41.7,
+        "avg_return": 5.37
       },
       "Elon Musk": {
-        "total": 2,
-        "correct": 2,
-        "avg_accuracy": 1.0,
-        "signals": [
-          {
-            "date": "2023-04-22",
-            "ticker": "TSLA",
-            "accuracy": 1.0
-          },
-          {
-            "date": "2023-09-22",
-            "ticker": "TSLA",
-            "accuracy": 1.0
-          }
-        ],
-        "accuracy_pct": 100.0
+        "total": 10,
+        "hits": 4,
+        "accuracy_pct": 40.0,
+        "avg_return": 0.19
       },
-      "Nancy Pelosi": {
-        "total": 1,
-        "correct": 1,
-        "avg_accuracy": 1.0,
-        "signals": [
-          {
-            "date": "2023-05-18",
-            "ticker": "AAPL",
-            "accuracy": 1.0
-          }
-        ],
-        "accuracy_pct": 100.0
+      "Jerome Powell": {
+        "total": 11,
+        "hits": 3,
+        "accuracy_pct": 27.3,
+        "avg_return": 1.24
+      },
+      "Sam Altman": {
+        "total": 8,
+        "hits": 3,
+        "accuracy_pct": 37.5,
+        "avg_return": 1.12
+      },
+      "Warren Buffett": {
+        "total": 7,
+        "hits": 2,
+        "accuracy_pct": 28.6,
+        "avg_return": 1.4
+      },
+      "Donald Trump": {
+        "total": 8,
+        "hits": 1,
+        "accuracy_pct": 12.5,
+        "avg_return": -1.82
+      },
+      "Tim Cook": {
+        "total": 9,
+        "hits": 5,
+        "accuracy_pct": 55.6,
+        "avg_return": 2.73
+      },
+      "Satya Nadella": {
+        "total": 6,
+        "hits": 2,
+        "accuracy_pct": 33.3,
+        "avg_return": -0.35
+      },
+      "Mark Zuckerberg": {
+        "total": 7,
+        "hits": 4,
+        "accuracy_pct": 57.1,
+        "avg_return": 7.36
       }
     },
     "by_sector": {
+      "KR_SEMICON": {
+        "total": 20,
+        "hits": 8,
+        "accuracy_pct": 40.0,
+        "avg_return": 2.06
+      },
+      "KR_AUTO": {
+        "total": 10,
+        "hits": 2,
+        "accuracy_pct": 20.0,
+        "avg_return": -2.01
+      },
+      "KR_BATTERY": {
+        "total": 11,
+        "hits": 2,
+        "accuracy_pct": 18.2,
+        "avg_return": -0.78
+      },
+      "KR_TECH": {
+        "total": 8,
+        "hits": 2,
+        "accuracy_pct": 25.0,
+        "avg_return": -4.46
+      },
       "AI/GPU": {
-        "total": 2,
-        "correct": 2,
-        "avg_accuracy": 1.0,
-        "signals": [
-          1.0,
-          1.0
-        ],
-        "accuracy_pct": 100.0
+        "total": 14,
+        "hits": 6,
+        "accuracy_pct": 42.9,
+        "avg_return": 4.52
+      },
+      "EV/Auto": {
+        "total": 10,
+        "hits": 4,
+        "accuracy_pct": 40.0,
+        "avg_return": 0.19
       },
       "Macro/Rates": {
-        "total": 3,
-        "correct": 3,
-        "avg_accuracy": 1.0,
-        "signals": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "accuracy_pct": 100.0
+        "total": 11,
+        "hits": 3,
+        "accuracy_pct": 27.3,
+        "avg_return": 1.24
       },
       "Cloud/AI": {
-        "total": 2,
-        "correct": 2,
-        "avg_accuracy": 1.0,
-        "signals": [
-          1.0,
-          1.0
-        ],
-        "accuracy_pct": 100.0
+        "total": 12,
+        "hits": 4,
+        "accuracy_pct": 33.3,
+        "avg_return": 0.66
       },
-      "Auto/Energy": {
-        "total": 2,
-        "correct": 2,
-        "avg_accuracy": 1.0,
-        "signals": [
-          1.0,
-          1.0
-        ],
-        "accuracy_pct": 100.0
+      "Finance": {
+        "total": 4,
+        "hits": 1,
+        "accuracy_pct": 25.0,
+        "avg_return": 0.34
       },
       "Tech/Finance": {
-        "total": 1,
-        "correct": 1,
-        "avg_accuracy": 1.0,
-        "signals": [
-          1.0
-        ],
-        "accuracy_pct": 100.0
+        "total": 3,
+        "hits": 1,
+        "accuracy_pct": 33.3,
+        "avg_return": 2.82
+      },
+      "Political": {
+        "total": 8,
+        "hits": 1,
+        "accuracy_pct": 12.5,
+        "avg_return": -1.82
+      },
+      "Tech": {
+        "total": 9,
+        "hits": 5,
+        "accuracy_pct": 55.6,
+        "avg_return": 2.73
+      },
+      "Social/AI": {
+        "total": 7,
+        "hits": 4,
+        "accuracy_pct": 57.1,
+        "avg_return": 7.36
       }
     },
-    "price_metrics": {
-      "correct_predictions": 10,
-      "accuracy_pct": 100.0,
-      "avg_buy_error_pct": 0.21,
-      "avg_sell_error_pct": 0.31,
-      "buy_mape": 0.21,
-      "sell_mape": 0.31
-    },
-    "date_metrics": {},
-    "avg_return": 11.79,
-    "max_return": 18.03,
-    "min_return": 3.03
+    "max_return": 35.05,
+    "min_return": -18.56,
+    "positive_return_rate": 49.61
   }
 }
