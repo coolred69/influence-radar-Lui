@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-07-12T04:20:04.895945",
+  "generated_at": "2026-07-15T07:05:33.005315",
   "version": "v2",
-  "total_signals": 127,
-  "positive_rate": 0.339,
+  "total_signals": 142,
+  "positive_rate": 0.331,
   "hold_days": 10,
   "target_return": 0.03,
   "hit_rates_by_person": {
-    "이재용": 0.25,
-    "정의선": 0.2,
-    "최태원": 0.714,
+    "이재용": 0.214,
+    "정의선": 0.25,
+    "최태원": 0.667,
     "이재명": 0.0,
     "구광모": 0.333,
     "김범수": 0.0,
     "최수연": 0.5,
-    "Jensen Huang": 0.417,
-    "Elon Musk": 0.4,
-    "Jerome Powell": 0.273,
+    "Jensen Huang": 0.357,
+    "Elon Musk": 0.417,
+    "Jerome Powell": 0.231,
     "Sam Altman": 0.375,
     "Warren Buffett": 0.286,
     "Donald Trump": 0.125,
-    "Tim Cook": 0.556,
-    "Satya Nadella": 0.333,
+    "Tim Cook": 0.545,
+    "Satya Nadella": 0.286,
     "Mark Zuckerberg": 0.571
   },
   "signals": [
@@ -33,7 +33,7 @@
       "sentiment": "positive",
       "statement": "AI반도체 로드맵",
       "outcome": 0,
-      "signal_price": 66885.375,
+      "signal_price": 66885.3672,
       "result_price": 68204.2344,
       "actual_return": 1.97,
       "indicators": {
@@ -49,7 +49,7 @@
         "atr_stability": 0.824,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.55,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -65,8 +65,8 @@
       "sentiment": "positive",
       "statement": "실적개선 발표",
       "outcome": 1,
-      "signal_price": 63053.457,
-      "result_price": 67408.4922,
+      "signal_price": 63053.4609,
+      "result_price": 67408.5,
       "actual_return": 6.91,
       "indicators": {
         "rsi_filter": 1.0,
@@ -81,7 +81,7 @@
         "atr_stability": 0.81,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.54,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -97,8 +97,8 @@
       "sentiment": "positive",
       "statement": "3Q실적서프라이즈",
       "outcome": 1,
-      "signal_price": 63478.3359,
-      "result_price": 66904.4375,
+      "signal_price": 63478.332,
+      "result_price": 66904.4453,
       "actual_return": 5.4,
       "indicators": {
         "rsi_filter": 1.0,
@@ -113,7 +113,7 @@
         "atr_stability": 0.772,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.621,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -129,8 +129,8 @@
       "sentiment": "positive",
       "statement": "실적발표예고",
       "outcome": 0,
-      "signal_price": 70663.5781,
-      "result_price": 71141.6797,
+      "signal_price": 70663.5859,
+      "result_price": 71141.6875,
       "actual_return": 0.68,
       "indicators": {
         "rsi_filter": 1.0,
@@ -145,7 +145,7 @@
         "atr_stability": 0.799,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.602,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -161,7 +161,7 @@
       "sentiment": "positive",
       "statement": "AI칩 투자발표",
       "outcome": 1,
-      "signal_price": 73532.2109,
+      "signal_price": 73532.1953,
       "result_price": 80782.3281,
       "actual_return": 9.86,
       "indicators": {
@@ -177,7 +177,7 @@
         "atr_stability": 0.814,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.387,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -193,7 +193,7 @@
       "sentiment": "positive",
       "statement": "글로벌파트너십",
       "outcome": 0,
-      "signal_price": 76075.6406,
+      "signal_price": 76075.6328,
       "result_price": 74154.5234,
       "actual_return": -2.53,
       "indicators": {
@@ -209,7 +209,7 @@
         "atr_stability": 0.738,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.454,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.5,
         "news_freq": 0.5,
@@ -225,8 +225,8 @@
       "sentiment": "positive",
       "statement": "HBM 공급확대",
       "outcome": 0,
-      "signal_price": 230235.6719,
-      "result_price": 202134.0938,
+      "signal_price": 230235.6875,
+      "result_price": 202134.125,
       "actual_return": -12.21,
       "indicators": {
         "rsi_filter": 1.0,
@@ -241,7 +241,7 @@
         "atr_stability": 0.595,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.525,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -257,8 +257,8 @@
       "sentiment": "negative",
       "statement": "실적부진 우려",
       "outcome": 0,
-      "signal_price": 63968.5664,
-      "result_price": 59670.2891,
+      "signal_price": 63968.5625,
+      "result_price": 59670.293,
       "actual_return": -6.72,
       "indicators": {
         "rsi_filter": 0.0,
@@ -273,7 +273,7 @@
         "atr_stability": 0.729,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.617,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 0.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -290,7 +290,7 @@
       "statement": "파운드리 전략",
       "outcome": 0,
       "signal_price": 55886.3203,
-      "result_price": 54625.0039,
+      "result_price": 54625.0,
       "actual_return": -2.26,
       "indicators": {
         "rsi_filter": 1.0,
@@ -305,7 +305,7 @@
         "atr_stability": 0.7,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.601,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.5,
         "news_freq": 0.5,
@@ -337,7 +337,7 @@
         "atr_stability": 0.728,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.539,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -369,7 +369,7 @@
         "atr_stability": 0.652,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.211,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -385,7 +385,7 @@
       "sentiment": "positive",
       "statement": "2분기 실적가이던스",
       "outcome": 0,
-      "signal_price": 53653.6797,
+      "signal_price": 53653.6836,
       "result_price": 53751.9492,
       "actual_return": 0.18,
       "indicators": {
@@ -401,7 +401,7 @@
         "atr_stability": 0.833,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.565,
-        "hit_rate": 0.25,
+        "hit_rate": 0.214,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -410,6 +410,70 @@
     },
     {
       "id": 12,
+      "date": "2025-07-31",
+      "person": "이재용",
+      "symbol": "005930.KS",
+      "sector": "KR_SEMICON",
+      "sentiment": "negative",
+      "statement": "2Q25 실적부진(영업이익 -56%YoY)",
+      "outcome": 0,
+      "signal_price": 70592.8672,
+      "result_price": 70790.6094,
+      "actual_return": 0.28,
+      "indicators": {
+        "rsi_filter": 0.0,
+        "rsi_raw": 77.5,
+        "macd_align": 1.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.247,
+        "bollinger_pos": 0.9,
+        "momentum_5d": 0.909,
+        "gap_up": 0.555,
+        "price_vs_52w": 0.983,
+        "atr_stability": 0.714,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.255,
+        "hit_rate": 0.214,
+        "sentiment": 0.0,
+        "cross_val": 0.6666666666666666,
+        "news_freq": 0.667,
+        "signal_strength": 0.333
+      }
+    },
+    {
+      "id": 13,
+      "date": "2025-10-30",
+      "person": "이재용",
+      "symbol": "005930.KS",
+      "sector": "KR_SEMICON",
+      "sentiment": "positive",
+      "statement": "3Q25 실적급증(영업이익 +159%QoQ)",
+      "outcome": 0,
+      "signal_price": 103382.4219,
+      "result_price": 102091.3828,
+      "actual_return": -1.25,
+      "indicators": {
+        "rsi_filter": 0.0,
+        "rsi_raw": 68.9,
+        "macd_align": 1.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.286,
+        "bollinger_pos": 0.878,
+        "momentum_5d": 0.894,
+        "gap_up": 0.689,
+        "price_vs_52w": 1.0,
+        "atr_stability": 0.695,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.264,
+        "hit_rate": 0.214,
+        "sentiment": 1.0,
+        "cross_val": 0.8333333333333334,
+        "news_freq": 0.833,
+        "signal_strength": 0.667
+      }
+    },
+    {
+      "id": 14,
       "date": "2023-05-25",
       "person": "정의선",
       "symbol": "005380.KS",
@@ -417,8 +481,8 @@
       "sentiment": "positive",
       "statement": "E-GMP 플랫폼 확대",
       "outcome": 0,
-      "signal_price": 175817.0,
-      "result_price": 169510.0781,
+      "signal_price": 175817.0312,
+      "result_price": 169510.0469,
       "actual_return": -3.59,
       "indicators": {
         "rsi_filter": 1.0,
@@ -433,7 +497,7 @@
         "atr_stability": 0.8,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.544,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.5,
         "news_freq": 0.5,
@@ -441,7 +505,7 @@
       }
     },
     {
-      "id": 13,
+      "id": 15,
       "date": "2023-07-26",
       "person": "정의선",
       "symbol": "005380.KS",
@@ -450,7 +514,7 @@
       "statement": "2Q 실적호조",
       "outcome": 0,
       "signal_price": 172929.1562,
-      "result_price": 164835.3594,
+      "result_price": 164835.3438,
       "actual_return": -4.68,
       "indicators": {
         "rsi_filter": 1.0,
@@ -465,7 +529,7 @@
         "atr_stability": 0.793,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.549,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -473,7 +537,7 @@
       }
     },
     {
-      "id": 14,
+      "id": 16,
       "date": "2023-10-19",
       "person": "정의선",
       "symbol": "000270.KS",
@@ -481,7 +545,7 @@
       "sentiment": "positive",
       "statement": "전기차 보조금 확대",
       "outcome": 0,
-      "signal_price": 71970.3516,
+      "signal_price": 71970.3594,
       "result_price": 67178.0312,
       "actual_return": -6.66,
       "indicators": {
@@ -497,7 +561,7 @@
         "atr_stability": 0.752,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.514,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.5,
         "news_freq": 0.5,
@@ -505,7 +569,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 17,
       "date": "2024-02-14",
       "person": "정의선",
       "symbol": "005380.KS",
@@ -513,8 +577,8 @@
       "sentiment": "positive",
       "statement": "전기차 판매목표",
       "outcome": 1,
-      "signal_price": 215333.7969,
-      "result_price": 225467.6094,
+      "signal_price": 215333.75,
+      "result_price": 225467.5938,
       "actual_return": 4.71,
       "indicators": {
         "rsi_filter": 0.0,
@@ -529,7 +593,7 @@
         "atr_stability": 0.602,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.405,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -537,7 +601,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 18,
       "date": "2024-04-22",
       "person": "정의선",
       "symbol": "000270.KS",
@@ -561,7 +625,7 @@
         "atr_stability": 0.574,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.487,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.5,
         "news_freq": 0.5,
@@ -569,7 +633,7 @@
       }
     },
     {
-      "id": 17,
+      "id": 19,
       "date": "2024-06-18",
       "person": "정의선",
       "symbol": "005380.KS",
@@ -577,8 +641,8 @@
       "sentiment": "positive",
       "statement": "배터리내재화",
       "outcome": 0,
-      "signal_price": 259413.9688,
-      "result_price": 251526.7656,
+      "signal_price": 259413.9219,
+      "result_price": 251526.7031,
       "actual_return": -3.04,
       "indicators": {
         "rsi_filter": 1.0,
@@ -593,7 +657,7 @@
         "atr_stability": 0.664,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.367,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -601,7 +665,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 20,
       "date": "2024-08-27",
       "person": "정의선",
       "symbol": "000270.KS",
@@ -625,7 +689,7 @@
         "atr_stability": 0.736,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.546,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 0.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -633,7 +697,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 21,
       "date": "2024-10-14",
       "person": "정의선",
       "symbol": "005380.KS",
@@ -641,8 +705,8 @@
       "sentiment": "positive",
       "statement": "로보틱스투자",
       "outcome": 0,
-      "signal_price": 231158.9062,
-      "result_price": 210694.1406,
+      "signal_price": 231158.9219,
+      "result_price": 210694.1562,
       "actual_return": -8.85,
       "indicators": {
         "rsi_filter": 1.0,
@@ -657,7 +721,7 @@
         "atr_stability": 0.722,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.387,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.5,
         "news_freq": 0.5,
@@ -665,7 +729,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 22,
       "date": "2025-02-10",
       "person": "정의선",
       "symbol": "000270.KS",
@@ -673,7 +737,7 @@
       "sentiment": "positive",
       "statement": "하이브리드전략",
       "outcome": 0,
-      "signal_price": 84659.8125,
+      "signal_price": 84659.8203,
       "result_price": 84928.2891,
       "actual_return": 0.32,
       "indicators": {
@@ -689,7 +753,7 @@
         "atr_stability": 0.678,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.547,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -697,7 +761,7 @@
       }
     },
     {
-      "id": 21,
+      "id": 23,
       "date": "2025-04-17",
       "person": "정의선",
       "symbol": "005380.KS",
@@ -706,7 +770,7 @@
       "statement": "1Q 실적발표",
       "outcome": 1,
       "signal_price": 174116.5156,
-      "result_price": 181495.125,
+      "result_price": 181495.1406,
       "actual_return": 4.24,
       "indicators": {
         "rsi_filter": 1.0,
@@ -721,7 +785,7 @@
         "atr_stability": 0.605,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.585,
-        "hit_rate": 0.2,
+        "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.6666666666666666,
         "news_freq": 0.667,
@@ -729,7 +793,71 @@
       }
     },
     {
-      "id": 22,
+      "id": 24,
+      "date": "2025-07-24",
+      "person": "정의선",
+      "symbol": "005380.KS",
+      "sector": "KR_AUTO",
+      "sentiment": "negative",
+      "statement": "2Q25 실적부진(관세영향 영업이익 -15.8%)",
+      "outcome": 0,
+      "signal_price": 211263.4375,
+      "result_price": 206406.8125,
+      "actual_return": -2.3,
+      "indicators": {
+        "rsi_filter": 1.0,
+        "rsi_raw": 56.6,
+        "macd_align": 1.0,
+        "volume_surge": 1.0,
+        "volume_ratio": 0.354,
+        "bollinger_pos": 0.886,
+        "momentum_5d": 0.679,
+        "gap_up": 0.455,
+        "price_vs_52w": 0.98,
+        "atr_stability": 0.698,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.393,
+        "hit_rate": 0.25,
+        "sentiment": 0.0,
+        "cross_val": 0.6666666666666666,
+        "news_freq": 0.667,
+        "signal_strength": 0.667
+      }
+    },
+    {
+      "id": 25,
+      "date": "2025-10-30",
+      "person": "정의선",
+      "symbol": "005380.KS",
+      "sector": "KR_AUTO",
+      "sentiment": "negative",
+      "statement": "3Q25 관세영향 본격화(영업이익 -29.2%)",
+      "outcome": 1,
+      "signal_price": 260360.0781,
+      "result_price": 273623.6875,
+      "actual_return": 5.09,
+      "indicators": {
+        "rsi_filter": 0.0,
+        "rsi_raw": 82.4,
+        "macd_align": 1.0,
+        "volume_surge": 1.0,
+        "volume_ratio": 0.599,
+        "bollinger_pos": 0.87,
+        "momentum_5d": 0.758,
+        "gap_up": 1.0,
+        "price_vs_52w": 1.0,
+        "atr_stability": 0.586,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.345,
+        "hit_rate": 0.25,
+        "sentiment": 0.0,
+        "cross_val": 0.6666666666666666,
+        "news_freq": 0.667,
+        "signal_strength": 0.333
+      }
+    },
+    {
+      "id": 26,
       "date": "2023-07-26",
       "person": "최태원",
       "symbol": "000660.KS",
@@ -737,8 +865,8 @@
       "sentiment": "positive",
       "statement": "HBM3 양산 시작",
       "outcome": 1,
-      "signal_price": 110574.1719,
-      "result_price": 115956.125,
+      "signal_price": 110574.1875,
+      "result_price": 115956.1172,
       "actual_return": 4.87,
       "indicators": {
         "rsi_filter": 1.0,
@@ -753,7 +881,7 @@
         "atr_stability": 0.726,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.615,
-        "hit_rate": 0.714,
+        "hit_rate": 0.667,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -761,7 +889,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 27,
       "date": "2023-11-08",
       "person": "최태원",
       "symbol": "000660.KS",
@@ -769,7 +897,7 @@
       "sentiment": "positive",
       "statement": "엔비디아 HBM 독점",
       "outcome": 0,
-      "signal_price": 125181.75,
+      "signal_price": 125181.7344,
       "result_price": 128811.625,
       "actual_return": 2.9,
       "indicators": {
@@ -785,7 +913,7 @@
         "atr_stability": 0.653,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.318,
-        "hit_rate": 0.714,
+        "hit_rate": 0.667,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -793,7 +921,7 @@
       }
     },
     {
-      "id": 24,
+      "id": 28,
       "date": "2024-03-07",
       "person": "최태원",
       "symbol": "000660.KS",
@@ -801,8 +929,8 @@
       "sentiment": "positive",
       "statement": "AI반도체 수혜",
       "outcome": 1,
-      "signal_price": 162120.0312,
-      "result_price": 167134.0469,
+      "signal_price": 162120.0,
+      "result_price": 167134.0625,
       "actual_return": 3.09,
       "indicators": {
         "rsi_filter": 0.0,
@@ -817,7 +945,7 @@
         "atr_stability": 0.619,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.369,
-        "hit_rate": 0.714,
+        "hit_rate": 0.667,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -825,7 +953,7 @@
       }
     },
     {
-      "id": 25,
+      "id": 29,
       "date": "2024-06-03",
       "person": "최태원",
       "symbol": "096770.KS",
@@ -849,7 +977,7 @@
         "atr_stability": 0.654,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.466,
-        "hit_rate": 0.714,
+        "hit_rate": 0.667,
         "sentiment": 1.0,
         "cross_val": 0.5,
         "news_freq": 0.5,
@@ -857,7 +985,7 @@
       }
     },
     {
-      "id": 26,
+      "id": 30,
       "date": "2024-09-23",
       "person": "최태원",
       "symbol": "000660.KS",
@@ -865,7 +993,7 @@
       "sentiment": "positive",
       "statement": "HBM 점유율확대",
       "outcome": 1,
-      "signal_price": 159735.25,
+      "signal_price": 159735.2344,
       "result_price": 184395.7344,
       "actual_return": 15.44,
       "indicators": {
@@ -881,7 +1009,7 @@
         "atr_stability": 0.469,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.408,
-        "hit_rate": 0.714,
+        "hit_rate": 0.667,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -889,7 +1017,7 @@
       }
     },
     {
-      "id": 27,
+      "id": 31,
       "date": "2025-01-08",
       "person": "최태원",
       "symbol": "000660.KS",
@@ -898,7 +1026,7 @@
       "statement": "엔비디아 공급망",
       "outcome": 1,
       "signal_price": 192297.0,
-      "result_price": 222716.875,
+      "result_price": 222716.8594,
       "actual_return": 15.82,
       "indicators": {
         "rsi_filter": 1.0,
@@ -913,7 +1041,7 @@
         "atr_stability": 0.635,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.141,
-        "hit_rate": 0.714,
+        "hit_rate": 0.667,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -921,7 +1049,7 @@
       }
     },
     {
-      "id": 28,
+      "id": 32,
       "date": "2025-04-24",
       "person": "최태원",
       "symbol": "000660.KS",
@@ -929,7 +1057,7 @@
       "sentiment": "positive",
       "statement": "1Q 사상최대 실적",
       "outcome": 1,
-      "signal_price": 177237.9219,
+      "signal_price": 177237.9062,
       "result_price": 197317.6094,
       "actual_return": 11.33,
       "indicators": {
@@ -945,7 +1073,7 @@
         "atr_stability": 0.56,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.443,
-        "hit_rate": 0.714,
+        "hit_rate": 0.667,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -953,7 +1081,71 @@
       }
     },
     {
-      "id": 29,
+      "id": 33,
+      "date": "2025-07-24",
+      "person": "최태원",
+      "symbol": "000660.KS",
+      "sector": "KR_SEMICON",
+      "sentiment": "positive",
+      "statement": "2Q25 실적호조(영업이익 9.2조)",
+      "outcome": 0,
+      "signal_price": 268378.5,
+      "result_price": 260909.7344,
+      "actual_return": -2.78,
+      "indicators": {
+        "rsi_filter": 1.0,
+        "rsi_raw": 49.3,
+        "macd_align": 1.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.186,
+        "bollinger_pos": 0.24,
+        "momentum_5d": 0.5,
+        "gap_up": 0.797,
+        "price_vs_52w": 0.898,
+        "atr_stability": 0.589,
+        "trend_dir_20": 0.0,
+        "pre_run_inv": 0.5,
+        "hit_rate": 0.667,
+        "sentiment": 1.0,
+        "cross_val": 1.0,
+        "news_freq": 1.0,
+        "signal_strength": 1.0
+      }
+    },
+    {
+      "id": 34,
+      "date": "2025-10-29",
+      "person": "최태원",
+      "symbol": "000660.KS",
+      "sector": "KR_SEMICON",
+      "sentiment": "positive",
+      "statement": "3Q25 사상최대실적(영업이익 11.4조)",
+      "outcome": 1,
+      "signal_price": 556480.5625,
+      "result_price": 615319.9375,
+      "actual_return": 10.57,
+      "indicators": {
+        "rsi_filter": 0.0,
+        "rsi_raw": 83.5,
+        "macd_align": 1.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.239,
+        "bollinger_pos": 0.939,
+        "momentum_5d": 1.0,
+        "gap_up": 0.826,
+        "price_vs_52w": 1.0,
+        "atr_stability": 0.515,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.023,
+        "hit_rate": 0.667,
+        "sentiment": 1.0,
+        "cross_val": 1.0,
+        "news_freq": 1.0,
+        "signal_strength": 0.667
+      }
+    },
+    {
+      "id": 35,
       "date": "2023-09-14",
       "person": "이재명",
       "symbol": "373220.KS",
@@ -985,7 +1177,7 @@
       }
     },
     {
-      "id": 30,
+      "id": 36,
       "date": "2024-04-11",
       "person": "이재명",
       "symbol": "373220.KS",
@@ -1017,7 +1209,7 @@
       }
     },
     {
-      "id": 31,
+      "id": 37,
       "date": "2024-07-15",
       "person": "이재명",
       "symbol": "005380.KS",
@@ -1025,8 +1217,8 @@
       "sentiment": "positive",
       "statement": "전기차 보조금확대",
       "outcome": 0,
-      "signal_price": 247834.5938,
-      "result_price": 235835.125,
+      "signal_price": 247834.6094,
+      "result_price": 235835.1406,
       "actual_return": -4.84,
       "indicators": {
         "rsi_filter": 1.0,
@@ -1049,7 +1241,7 @@
       }
     },
     {
-      "id": 32,
+      "id": 38,
       "date": "2024-10-28",
       "person": "이재명",
       "symbol": "000660.KS",
@@ -1057,7 +1249,7 @@
       "sentiment": "positive",
       "statement": "반도체 국가지원",
       "outcome": 0,
-      "signal_price": 193580.9688,
+      "signal_price": 193580.9531,
       "result_price": 190222.9062,
       "actual_return": -1.73,
       "indicators": {
@@ -1081,7 +1273,7 @@
       }
     },
     {
-      "id": 33,
+      "id": 39,
       "date": "2025-03-05",
       "person": "이재명",
       "symbol": "373220.KS",
@@ -1113,7 +1305,7 @@
       }
     },
     {
-      "id": 34,
+      "id": 40,
       "date": "2025-05-12",
       "person": "이재명",
       "symbol": "005930.KS",
@@ -1145,7 +1337,7 @@
       }
     },
     {
-      "id": 35,
+      "id": 41,
       "date": "2023-08-08",
       "person": "구광모",
       "symbol": "373220.KS",
@@ -1177,7 +1369,7 @@
       }
     },
     {
-      "id": 36,
+      "id": 42,
       "date": "2023-11-07",
       "person": "구광모",
       "symbol": "373220.KS",
@@ -1209,7 +1401,7 @@
       }
     },
     {
-      "id": 37,
+      "id": 43,
       "date": "2024-02-06",
       "person": "구광모",
       "symbol": "373220.KS",
@@ -1241,7 +1433,7 @@
       }
     },
     {
-      "id": 38,
+      "id": 44,
       "date": "2024-05-09",
       "person": "구광모",
       "symbol": "373220.KS",
@@ -1273,7 +1465,7 @@
       }
     },
     {
-      "id": 39,
+      "id": 45,
       "date": "2024-09-03",
       "person": "구광모",
       "symbol": "373220.KS",
@@ -1305,7 +1497,7 @@
       }
     },
     {
-      "id": 40,
+      "id": 46,
       "date": "2025-02-06",
       "person": "구광모",
       "symbol": "373220.KS",
@@ -1337,7 +1529,7 @@
       }
     },
     {
-      "id": 41,
+      "id": 47,
       "date": "2023-06-15",
       "person": "김범수",
       "symbol": "035720.KS",
@@ -1369,7 +1561,7 @@
       }
     },
     {
-      "id": 42,
+      "id": 48,
       "date": "2023-09-21",
       "person": "김범수",
       "symbol": "035720.KS",
@@ -1401,7 +1593,7 @@
       }
     },
     {
-      "id": 43,
+      "id": 49,
       "date": "2024-01-11",
       "person": "김범수",
       "symbol": "035720.KS",
@@ -1410,7 +1602,7 @@
       "statement": "구조조정 발표",
       "outcome": 0,
       "signal_price": 60558.2734,
-      "result_price": 55777.3555,
+      "result_price": 55777.3594,
       "actual_return": -7.89,
       "indicators": {
         "rsi_filter": 0.0,
@@ -1433,7 +1625,7 @@
       }
     },
     {
-      "id": 44,
+      "id": 50,
       "date": "2024-07-22",
       "person": "김범수",
       "symbol": "035720.KS",
@@ -1465,7 +1657,7 @@
       }
     },
     {
-      "id": 45,
+      "id": 51,
       "date": "2023-10-24",
       "person": "최수연",
       "symbol": "035420.KS",
@@ -1497,7 +1689,7 @@
       }
     },
     {
-      "id": 46,
+      "id": 52,
       "date": "2024-02-27",
       "person": "최수연",
       "symbol": "035420.KS",
@@ -1505,7 +1697,7 @@
       "sentiment": "negative",
       "statement": "라인 지분 매각압박",
       "outcome": 0,
-      "signal_price": 196954.875,
+      "signal_price": 196954.8594,
       "result_price": 185531.4688,
       "actual_return": -5.8,
       "indicators": {
@@ -1529,7 +1721,7 @@
       }
     },
     {
-      "id": 47,
+      "id": 53,
       "date": "2024-06-04",
       "person": "최수연",
       "symbol": "035420.KS",
@@ -1561,7 +1753,7 @@
       }
     },
     {
-      "id": 48,
+      "id": 54,
       "date": "2025-01-16",
       "person": "최수연",
       "symbol": "035420.KS",
@@ -1569,7 +1761,7 @@
       "sentiment": "positive",
       "statement": "AI 검색 강화",
       "outcome": 1,
-      "signal_price": 203355.9062,
+      "signal_price": 203355.8906,
       "result_price": 215173.1875,
       "actual_return": 5.81,
       "indicators": {
@@ -1593,7 +1785,7 @@
       }
     },
     {
-      "id": 49,
+      "id": 55,
       "date": "2023-02-22",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1617,7 +1809,7 @@
         "atr_stability": 0.501,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.79,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1625,7 +1817,7 @@
       }
     },
     {
-      "id": 50,
+      "id": 56,
       "date": "2023-05-24",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1649,7 +1841,7 @@
         "atr_stability": 0.708,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.464,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1657,7 +1849,7 @@
       }
     },
     {
-      "id": 51,
+      "id": 57,
       "date": "2023-08-23",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1681,7 +1873,7 @@
         "atr_stability": 0.583,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.25,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1689,7 +1881,7 @@
       }
     },
     {
-      "id": 52,
+      "id": 58,
       "date": "2023-11-21",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1713,7 +1905,7 @@
         "atr_stability": 0.741,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.483,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1721,7 +1913,7 @@
       }
     },
     {
-      "id": 53,
+      "id": 59,
       "date": "2024-01-08",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1745,7 +1937,7 @@
         "atr_stability": 0.752,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.335,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1753,7 +1945,7 @@
       }
     },
     {
-      "id": 54,
+      "id": 60,
       "date": "2024-03-18",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1777,7 +1969,7 @@
         "atr_stability": 0.505,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.406,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1785,7 +1977,7 @@
       }
     },
     {
-      "id": 55,
+      "id": 61,
       "date": "2024-05-22",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1809,7 +2001,7 @@
         "atr_stability": 0.712,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.49,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1817,7 +2009,7 @@
       }
     },
     {
-      "id": 56,
+      "id": 62,
       "date": "2024-08-28",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1841,7 +2033,7 @@
         "atr_stability": 0.57,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.567,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 0.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -1849,7 +2041,7 @@
       }
     },
     {
-      "id": 57,
+      "id": 63,
       "date": "2024-11-20",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1873,7 +2065,7 @@
         "atr_stability": 0.678,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.508,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1881,7 +2073,7 @@
       }
     },
     {
-      "id": 58,
+      "id": 64,
       "date": "2025-01-06",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1905,7 +2097,7 @@
         "atr_stability": 0.638,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.228,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1913,7 +2105,7 @@
       }
     },
     {
-      "id": 59,
+      "id": 65,
       "date": "2025-03-17",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1937,7 +2129,7 @@
         "atr_stability": 0.359,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.148,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1945,7 +2137,7 @@
       }
     },
     {
-      "id": 60,
+      "id": 66,
       "date": "2025-05-28",
       "person": "Jensen Huang",
       "symbol": "NVDA",
@@ -1969,7 +2161,7 @@
         "atr_stability": 0.688,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.49,
-        "hit_rate": 0.417,
+        "hit_rate": 0.357,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -1977,7 +2169,71 @@
       }
     },
     {
-      "id": 61,
+      "id": 67,
+      "date": "2025-08-27",
+      "person": "Jensen Huang",
+      "symbol": "NVDA",
+      "sector": "AI/GPU",
+      "sentiment": "positive",
+      "statement": "FQ2FY26 실적서프라이즈(네트워킹 98%↑)",
+      "outcome": 0,
+      "signal_price": 181.3585,
+      "result_price": 176.9443,
+      "actual_return": -2.43,
+      "indicators": {
+        "rsi_filter": 1.0,
+        "rsi_raw": 51.8,
+        "macd_align": 1.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.285,
+        "bollinger_pos": 0.68,
+        "momentum_5d": 0.677,
+        "gap_up": 0.512,
+        "price_vs_52w": 0.991,
+        "atr_stability": 0.752,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.394,
+        "hit_rate": 0.357,
+        "sentiment": 1.0,
+        "cross_val": 1.0,
+        "news_freq": 1.0,
+        "signal_strength": 1.0
+      }
+    },
+    {
+      "id": 68,
+      "date": "2025-11-19",
+      "person": "Jensen Huang",
+      "symbol": "NVDA",
+      "sector": "AI/GPU",
+      "sentiment": "positive",
+      "statement": "FQ3FY26 사상최대매출 570억 서프라이즈",
+      "outcome": 0,
+      "signal_price": 186.2824,
+      "result_price": 183.1566,
+      "actual_return": -1.68,
+      "indicators": {
+        "rsi_filter": 1.0,
+        "rsi_raw": 37.5,
+        "macd_align": 0.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.25,
+        "bollinger_pos": 0.283,
+        "momentum_5d": 0.312,
+        "gap_up": 0.689,
+        "price_vs_52w": 0.901,
+        "atr_stability": 0.553,
+        "trend_dir_20": 0.0,
+        "pre_run_inv": 0.613,
+        "hit_rate": 0.357,
+        "sentiment": 1.0,
+        "cross_val": 1.0,
+        "news_freq": 1.0,
+        "signal_strength": 0.667
+      }
+    },
+    {
+      "id": 69,
       "date": "2023-04-19",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2001,7 +2257,7 @@
         "atr_stability": 0.573,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.499,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 0.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2009,7 +2265,7 @@
       }
     },
     {
-      "id": 62,
+      "id": 70,
       "date": "2023-07-19",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2033,7 +2289,7 @@
         "atr_stability": 0.679,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.287,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2041,7 +2297,7 @@
       }
     },
     {
-      "id": 63,
+      "id": 71,
       "date": "2023-10-18",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2065,7 +2321,7 @@
         "atr_stability": 0.596,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.732,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 0.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2073,7 +2329,7 @@
       }
     },
     {
-      "id": 64,
+      "id": 72,
       "date": "2024-01-24",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2097,7 +2353,7 @@
         "atr_stability": 0.635,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.607,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 0.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2105,7 +2361,7 @@
       }
     },
     {
-      "id": 65,
+      "id": 73,
       "date": "2024-04-23",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2129,7 +2385,7 @@
         "atr_stability": 0.492,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.737,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2137,7 +2393,7 @@
       }
     },
     {
-      "id": 66,
+      "id": 74,
       "date": "2024-07-23",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2161,7 +2417,7 @@
         "atr_stability": 0.402,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.619,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2169,7 +2425,7 @@
       }
     },
     {
-      "id": 67,
+      "id": 75,
       "date": "2024-10-10",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2193,7 +2449,7 @@
         "atr_stability": 0.587,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.524,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2201,7 +2457,7 @@
       }
     },
     {
-      "id": 68,
+      "id": 76,
       "date": "2024-10-23",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2225,7 +2481,7 @@
         "atr_stability": 0.633,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.604,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2233,7 +2489,7 @@
       }
     },
     {
-      "id": 69,
+      "id": 77,
       "date": "2025-01-29",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2257,7 +2513,7 @@
         "atr_stability": 0.489,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.688,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 0.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2265,7 +2521,7 @@
       }
     },
     {
-      "id": 70,
+      "id": 78,
       "date": "2025-04-22",
       "person": "Elon Musk",
       "symbol": "TSLA",
@@ -2289,7 +2545,7 @@
         "atr_stability": 0.0,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.671,
-        "hit_rate": 0.4,
+        "hit_rate": 0.417,
         "sentiment": 0.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2297,7 +2553,71 @@
       }
     },
     {
-      "id": 71,
+      "id": 79,
+      "date": "2025-07-23",
+      "person": "Elon Musk",
+      "symbol": "TSLA",
+      "sector": "EV/Auto",
+      "sentiment": "negative",
+      "statement": "Q2 실적부진(마진압박,관세우려)",
+      "outcome": 0,
+      "signal_price": 332.56,
+      "result_price": 319.91,
+      "actual_return": -3.8,
+      "indicators": {
+        "rsi_filter": 1.0,
+        "rsi_raw": 60.2,
+        "macd_align": 1.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.2,
+        "bollinger_pos": 0.836,
+        "momentum_5d": 0.669,
+        "gap_up": 0.464,
+        "price_vs_52w": 0.916,
+        "atr_stability": 0.664,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.398,
+        "hit_rate": 0.417,
+        "sentiment": 0.0,
+        "cross_val": 0.8333333333333334,
+        "news_freq": 0.833,
+        "signal_strength": 0.667
+      }
+    },
+    {
+      "id": 80,
+      "date": "2025-10-22",
+      "person": "Elon Musk",
+      "symbol": "TSLA",
+      "sector": "EV/Auto",
+      "sentiment": "negative",
+      "statement": "Q3 매출기록 그러나 이익감소",
+      "outcome": 1,
+      "signal_price": 438.97,
+      "result_price": 462.07,
+      "actual_return": 5.26,
+      "indicators": {
+        "rsi_filter": 1.0,
+        "rsi_raw": 51.0,
+        "macd_align": 1.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.192,
+        "bollinger_pos": 0.538,
+        "momentum_5d": 0.544,
+        "gap_up": 0.519,
+        "price_vs_52w": 0.955,
+        "atr_stability": 0.576,
+        "trend_dir_20": 0.0,
+        "pre_run_inv": 0.474,
+        "hit_rate": 0.417,
+        "sentiment": 0.0,
+        "cross_val": 0.8333333333333334,
+        "news_freq": 0.833,
+        "signal_strength": 0.667
+      }
+    },
+    {
+      "id": 81,
       "date": "2023-02-01",
       "person": "Jerome Powell",
       "symbol": "SPY",
@@ -2305,7 +2625,7 @@
       "sentiment": "negative",
       "statement": "금리 0.25% 인상",
       "outcome": 0,
-      "signal_price": 392.8003,
+      "signal_price": 392.8004,
       "result_price": 395.841,
       "actual_return": 0.77,
       "indicators": {
@@ -2321,7 +2641,7 @@
         "atr_stability": 0.851,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.422,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 0.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2329,7 +2649,7 @@
       }
     },
     {
-      "id": 72,
+      "id": 82,
       "date": "2023-05-03",
       "person": "Jerome Powell",
       "symbol": "QQQ",
@@ -2337,8 +2657,8 @@
       "sentiment": "positive",
       "statement": "금리 5.25% 동결암시",
       "outcome": 1,
-      "signal_price": 311.4178,
-      "result_price": 324.9917,
+      "signal_price": 311.4179,
+      "result_price": 324.9919,
       "actual_return": 4.36,
       "indicators": {
         "rsi_filter": 1.0,
@@ -2353,7 +2673,7 @@
         "atr_stability": 0.858,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.448,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2361,7 +2681,7 @@
       }
     },
     {
-      "id": 73,
+      "id": 83,
       "date": "2023-07-26",
       "person": "Jerome Powell",
       "symbol": "SPY",
@@ -2385,7 +2705,7 @@
         "atr_stability": 0.926,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.498,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2393,7 +2713,7 @@
       }
     },
     {
-      "id": 74,
+      "id": 84,
       "date": "2023-11-01",
       "person": "Jerome Powell",
       "symbol": "SPY",
@@ -2417,7 +2737,7 @@
         "atr_stability": 0.861,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.463,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2425,7 +2745,7 @@
       }
     },
     {
-      "id": 75,
+      "id": 85,
       "date": "2024-01-31",
       "person": "Jerome Powell",
       "symbol": "SPY",
@@ -2449,7 +2769,7 @@
         "atr_stability": 0.916,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.516,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 0.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2457,7 +2777,7 @@
       }
     },
     {
-      "id": 76,
+      "id": 86,
       "date": "2024-03-20",
       "person": "Jerome Powell",
       "symbol": "QQQ",
@@ -2481,7 +2801,7 @@
         "atr_stability": 0.853,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.472,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2489,7 +2809,7 @@
       }
     },
     {
-      "id": 77,
+      "id": 87,
       "date": "2024-07-31",
       "person": "Jerome Powell",
       "symbol": "SPY",
@@ -2497,8 +2817,8 @@
       "sentiment": "positive",
       "statement": "9월 인하 시사",
       "outcome": 0,
-      "signal_price": 538.0719,
-      "result_price": 531.1753,
+      "signal_price": 538.072,
+      "result_price": 531.1752,
       "actual_return": -1.28,
       "indicators": {
         "rsi_filter": 1.0,
@@ -2513,7 +2833,7 @@
         "atr_stability": 0.862,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.447,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2521,7 +2841,7 @@
       }
     },
     {
-      "id": 78,
+      "id": 88,
       "date": "2024-09-18",
       "person": "Jerome Powell",
       "symbol": "SPY",
@@ -2529,7 +2849,7 @@
       "sentiment": "positive",
       "statement": "빅컷 0.5% 인하",
       "outcome": 0,
-      "signal_price": 548.4171,
+      "signal_price": 548.4172,
       "result_price": 557.4091,
       "actual_return": 1.64,
       "indicators": {
@@ -2545,7 +2865,7 @@
         "atr_stability": 0.863,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.462,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2553,7 +2873,7 @@
       }
     },
     {
-      "id": 79,
+      "id": 89,
       "date": "2024-12-18",
       "person": "Jerome Powell",
       "symbol": "SPY",
@@ -2577,7 +2897,7 @@
         "atr_stability": 0.92,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.605,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 0.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2585,7 +2905,7 @@
       }
     },
     {
-      "id": 80,
+      "id": 90,
       "date": "2025-01-29",
       "person": "Jerome Powell",
       "symbol": "QQQ",
@@ -2593,7 +2913,7 @@
       "sentiment": "neutral",
       "statement": "금리동결 유지",
       "outcome": 0,
-      "signal_price": 516.9811,
+      "signal_price": 516.9813,
       "result_price": 524.3959,
       "actual_return": 1.43,
       "indicators": {
@@ -2609,7 +2929,7 @@
         "atr_stability": 0.829,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.56,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 0.5,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -2617,7 +2937,7 @@
       }
     },
     {
-      "id": 81,
+      "id": 91,
       "date": "2025-03-19",
       "person": "Jerome Powell",
       "symbol": "SPY",
@@ -2641,7 +2961,7 @@
         "atr_stability": 0.788,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.456,
-        "hit_rate": 0.273,
+        "hit_rate": 0.231,
         "sentiment": 0.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -2649,7 +2969,71 @@
       }
     },
     {
-      "id": 82,
+      "id": 92,
+      "date": "2025-09-17",
+      "person": "Jerome Powell",
+      "symbol": "SPY",
+      "sector": "Macro/Rates",
+      "sentiment": "neutral",
+      "statement": "9월 0.25%p 인하(리스크관리 컷)",
+      "outcome": 0,
+      "signal_price": 651.9561,
+      "result_price": 662.9575,
+      "actual_return": 1.69,
+      "indicators": {
+        "rsi_filter": 0.0,
+        "rsi_raw": 66.7,
+        "macd_align": 1.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.292,
+        "bollinger_pos": 0.857,
+        "momentum_5d": 0.553,
+        "gap_up": 0.5,
+        "price_vs_52w": 0.997,
+        "atr_stability": 0.923,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.468,
+        "hit_rate": 0.231,
+        "sentiment": 0.5,
+        "cross_val": 1.0,
+        "news_freq": 1.0,
+        "signal_strength": 0.5
+      }
+    },
+    {
+      "id": 93,
+      "date": "2025-12-10",
+      "person": "Jerome Powell",
+      "symbol": "SPY",
+      "sector": "Macro/Rates",
+      "sentiment": "positive",
+      "statement": "12월 0.25%p 인하 매파적 코멘트",
+      "outcome": 0,
+      "signal_price": 681.9204,
+      "result_price": 686.7305,
+      "actual_return": 0.71,
+      "indicators": {
+        "rsi_filter": 0.0,
+        "rsi_raw": 72.0,
+        "macd_align": 1.0,
+        "volume_surge": 0.0,
+        "volume_ratio": 0.207,
+        "bollinger_pos": 0.795,
+        "momentum_5d": 0.527,
+        "gap_up": 0.493,
+        "price_vs_52w": 1.0,
+        "atr_stability": 0.887,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.484,
+        "hit_rate": 0.231,
+        "sentiment": 1.0,
+        "cross_val": 1.0,
+        "news_freq": 1.0,
+        "signal_strength": 0.667
+      }
+    },
+    {
+      "id": 94,
       "date": "2023-03-14",
       "person": "Sam Altman",
       "symbol": "MSFT",
@@ -2681,7 +3065,7 @@
       }
     },
     {
-      "id": 83,
+      "id": 95,
       "date": "2023-11-17",
       "person": "Sam Altman",
       "symbol": "MSFT",
@@ -2713,7 +3097,7 @@
       }
     },
     {
-      "id": 84,
+      "id": 96,
       "date": "2024-02-15",
       "person": "Sam Altman",
       "symbol": "MSFT",
@@ -2745,7 +3129,7 @@
       }
     },
     {
-      "id": 85,
+      "id": 97,
       "date": "2024-05-13",
       "person": "Sam Altman",
       "symbol": "MSFT",
@@ -2777,7 +3161,7 @@
       }
     },
     {
-      "id": 86,
+      "id": 98,
       "date": "2024-09-12",
       "person": "Sam Altman",
       "symbol": "NVDA",
@@ -2809,7 +3193,7 @@
       }
     },
     {
-      "id": 87,
+      "id": 99,
       "date": "2025-01-21",
       "person": "Sam Altman",
       "symbol": "MSFT",
@@ -2841,7 +3225,7 @@
       }
     },
     {
-      "id": 88,
+      "id": 100,
       "date": "2025-02-10",
       "person": "Sam Altman",
       "symbol": "NVDA",
@@ -2873,7 +3257,7 @@
       }
     },
     {
-      "id": 89,
+      "id": 101,
       "date": "2025-05-13",
       "person": "Sam Altman",
       "symbol": "MSFT",
@@ -2882,7 +3266,7 @@
       "statement": "GPT-4o 이미지 붐",
       "outcome": 0,
       "signal_price": 444.7644,
-      "result_price": 453.7358,
+      "result_price": 453.7357,
       "actual_return": 2.02,
       "indicators": {
         "rsi_filter": 0.0,
@@ -2905,7 +3289,7 @@
       }
     },
     {
-      "id": 90,
+      "id": 102,
       "date": "2023-02-25",
       "person": "Warren Buffett",
       "symbol": "BRK-B",
@@ -2937,7 +3321,7 @@
       }
     },
     {
-      "id": 91,
+      "id": 103,
       "date": "2023-11-14",
       "person": "Warren Buffett",
       "symbol": "AAPL",
@@ -2945,7 +3329,7 @@
       "sentiment": "positive",
       "statement": "애플 추가매입",
       "outcome": 0,
-      "signal_price": 185.342,
+      "signal_price": 185.3421,
       "result_price": 187.2504,
       "actual_return": 1.03,
       "indicators": {
@@ -2969,7 +3353,7 @@
       }
     },
     {
-      "id": 92,
+      "id": 104,
       "date": "2024-02-24",
       "person": "Warren Buffett",
       "symbol": "BRK-B",
@@ -3001,7 +3385,7 @@
       }
     },
     {
-      "id": 93,
+      "id": 105,
       "date": "2024-05-04",
       "person": "Warren Buffett",
       "symbol": "AAPL",
@@ -3010,7 +3394,7 @@
       "statement": "애플매도 발표",
       "outcome": 1,
       "signal_price": 179.9055,
-      "result_price": 189.3993,
+      "result_price": 189.3994,
       "actual_return": 5.28,
       "indicators": {
         "rsi_filter": 0.0,
@@ -3033,7 +3417,7 @@
       }
     },
     {
-      "id": 94,
+      "id": 106,
       "date": "2024-08-14",
       "person": "Warren Buffett",
       "symbol": "AAPL",
@@ -3065,7 +3449,7 @@
       }
     },
     {
-      "id": 95,
+      "id": 107,
       "date": "2024-11-14",
       "person": "Warren Buffett",
       "symbol": "BRK-B",
@@ -3097,7 +3481,7 @@
       }
     },
     {
-      "id": 96,
+      "id": 108,
       "date": "2025-02-22",
       "person": "Warren Buffett",
       "symbol": "BRK-B",
@@ -3129,7 +3513,7 @@
       }
     },
     {
-      "id": 97,
+      "id": 109,
       "date": "2023-06-13",
       "person": "Donald Trump",
       "symbol": "SPY",
@@ -3138,7 +3522,7 @@
       "statement": "연방법원 기소",
       "outcome": 0,
       "signal_price": 419.1208,
-      "result_price": 420.4175,
+      "result_price": 420.4176,
       "actual_return": 0.31,
       "indicators": {
         "rsi_filter": 0.0,
@@ -3161,7 +3545,7 @@
       }
     },
     {
-      "id": 98,
+      "id": 110,
       "date": "2024-01-15",
       "person": "Donald Trump",
       "symbol": "SPY",
@@ -3169,7 +3553,7 @@
       "sentiment": "positive",
       "statement": "아이오와 압승",
       "outcome": 1,
-      "signal_price": 461.0225,
+      "signal_price": 461.0224,
       "result_price": 476.515,
       "actual_return": 3.36,
       "indicators": {
@@ -3193,7 +3577,7 @@
       }
     },
     {
-      "id": 99,
+      "id": 111,
       "date": "2024-07-13",
       "person": "Donald Trump",
       "symbol": "SPY",
@@ -3225,7 +3609,7 @@
       }
     },
     {
-      "id": 100,
+      "id": 112,
       "date": "2024-11-06",
       "person": "Donald Trump",
       "symbol": "SPY",
@@ -3234,7 +3618,7 @@
       "statement": "대선 승리",
       "outcome": 0,
       "signal_price": 579.1426,
-      "result_price": 578.6135,
+      "result_price": 578.6134,
       "actual_return": -0.09,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3257,7 +3641,7 @@
       }
     },
     {
-      "id": 101,
+      "id": 113,
       "date": "2025-01-20",
       "person": "Donald Trump",
       "symbol": "SPY",
@@ -3289,7 +3673,7 @@
       }
     },
     {
-      "id": 102,
+      "id": 114,
       "date": "2025-02-01",
       "person": "Donald Trump",
       "symbol": "TSLA",
@@ -3321,7 +3705,7 @@
       }
     },
     {
-      "id": 103,
+      "id": 115,
       "date": "2025-04-02",
       "person": "Donald Trump",
       "symbol": "SPY",
@@ -3329,7 +3713,7 @@
       "sentiment": "negative",
       "statement": "상호관세 발표",
       "outcome": 0,
-      "signal_price": 556.6877,
+      "signal_price": 556.6878,
       "result_price": 518.3669,
       "actual_return": -6.88,
       "indicators": {
@@ -3353,7 +3737,7 @@
       }
     },
     {
-      "id": 104,
+      "id": 116,
       "date": "2025-04-09",
       "person": "Donald Trump",
       "symbol": "SPY",
@@ -3385,7 +3769,7 @@
       }
     },
     {
-      "id": 105,
+      "id": 117,
       "date": "2023-05-04",
       "person": "Tim Cook",
       "symbol": "AAPL",
@@ -3409,7 +3793,7 @@
         "atr_stability": 0.846,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.547,
-        "hit_rate": 0.556,
+        "hit_rate": 0.545,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3417,7 +3801,7 @@
       }
     },
     {
-      "id": 106,
+      "id": 118,
       "date": "2023-08-03",
       "person": "Tim Cook",
       "symbol": "AAPL",
@@ -3441,7 +3825,7 @@
         "atr_stability": 0.842,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.532,
-        "hit_rate": 0.556,
+        "hit_rate": 0.545,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3449,7 +3833,7 @@
       }
     },
     {
-      "id": 107,
+      "id": 119,
       "date": "2023-11-02",
       "person": "Tim Cook",
       "symbol": "AAPL",
@@ -3458,7 +3842,7 @@
       "statement": "FQ4 실적발표",
       "outcome": 1,
       "signal_price": 175.3515,
-      "result_price": 187.5866,
+      "result_price": 187.5867,
       "actual_return": 6.98,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3473,7 +3857,7 @@
         "atr_stability": 0.818,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.308,
-        "hit_rate": 0.556,
+        "hit_rate": 0.545,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3481,7 +3865,7 @@
       }
     },
     {
-      "id": 108,
+      "id": 120,
       "date": "2024-02-01",
       "person": "Tim Cook",
       "symbol": "AAPL",
@@ -3505,7 +3889,7 @@
         "atr_stability": 0.819,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.613,
-        "hit_rate": 0.556,
+        "hit_rate": 0.545,
         "sentiment": 0.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3513,7 +3897,7 @@
       }
     },
     {
-      "id": 109,
+      "id": 121,
       "date": "2024-05-02",
       "person": "Tim Cook",
       "symbol": "AAPL",
@@ -3521,8 +3905,8 @@
       "sentiment": "positive",
       "statement": "FQ2 250B 자사주매입",
       "outcome": 1,
-      "signal_price": 171.3116,
-      "result_price": 188.2097,
+      "signal_price": 171.3117,
+      "result_price": 188.2096,
       "actual_return": 9.86,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3537,7 +3921,7 @@
         "atr_stability": 0.797,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.445,
-        "hit_rate": 0.556,
+        "hit_rate": 0.545,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -3545,7 +3929,7 @@
       }
     },
     {
-      "id": 110,
+      "id": 122,
       "date": "2024-06-10",
       "person": "Tim Cook",
       "symbol": "AAPL",
@@ -3569,7 +3953,7 @@
         "atr_stability": 0.847,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.514,
-        "hit_rate": 0.556,
+        "hit_rate": 0.545,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -3577,7 +3961,7 @@
       }
     },
     {
-      "id": 111,
+      "id": 123,
       "date": "2024-08-01",
       "person": "Tim Cook",
       "symbol": "AAPL",
@@ -3601,7 +3985,7 @@
         "atr_stability": 0.747,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.488,
-        "hit_rate": 0.556,
+        "hit_rate": 0.545,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3609,7 +3993,7 @@
       }
     },
     {
-      "id": 112,
+      "id": 124,
       "date": "2025-01-30",
       "person": "Tim Cook",
       "symbol": "AAPL",
@@ -3633,7 +4017,7 @@
         "atr_stability": 0.72,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.313,
-        "hit_rate": 0.556,
+        "hit_rate": 0.545,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3641,7 +4025,7 @@
       }
     },
     {
-      "id": 113,
+      "id": 125,
       "date": "2025-05-01",
       "person": "Tim Cook",
       "symbol": "AAPL",
@@ -3665,7 +4049,7 @@
         "atr_stability": 0.665,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.429,
-        "hit_rate": 0.556,
+        "hit_rate": 0.545,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3673,7 +4057,71 @@
       }
     },
     {
-      "id": 114,
+      "id": 126,
+      "date": "2025-07-31",
+      "person": "Tim Cook",
+      "symbol": "AAPL",
+      "sector": "Tech",
+      "sentiment": "positive",
+      "statement": "FQ3 실적서프라이즈(아이폰 강세)",
+      "outcome": 1,
+      "signal_price": 206.7498,
+      "result_price": 232.1233,
+      "actual_return": 12.27,
+      "indicators": {
+        "rsi_filter": 1.0,
+        "rsi_raw": 38.8,
+        "macd_align": 1.0,
+        "volume_surge": 1.0,
+        "volume_ratio": 0.346,
+        "bollinger_pos": 0.042,
+        "momentum_5d": 0.355,
+        "gap_up": 0.473,
+        "price_vs_52w": 0.928,
+        "atr_stability": 0.855,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.587,
+        "hit_rate": 0.545,
+        "sentiment": 1.0,
+        "cross_val": 0.8333333333333334,
+        "news_freq": 0.833,
+        "signal_strength": 1.0
+      }
+    },
+    {
+      "id": 127,
+      "date": "2025-10-30",
+      "person": "Tim Cook",
+      "symbol": "AAPL",
+      "sector": "Tech",
+      "sentiment": "positive",
+      "statement": "FQ4 실적서프라이즈+가이던스 상회",
+      "outcome": 0,
+      "signal_price": 270.6343,
+      "result_price": 272.4438,
+      "actual_return": 0.67,
+      "indicators": {
+        "rsi_filter": 0.0,
+        "rsi_raw": 83.9,
+        "macd_align": 1.0,
+        "volume_surge": 1.0,
+        "volume_ratio": 0.304,
+        "bollinger_pos": 0.919,
+        "momentum_5d": 0.728,
+        "gap_up": 0.585,
+        "price_vs_52w": 1.0,
+        "atr_stability": 0.811,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.363,
+        "hit_rate": 0.545,
+        "sentiment": 1.0,
+        "cross_val": 0.8333333333333334,
+        "news_freq": 0.833,
+        "signal_strength": 0.667
+      }
+    },
+    {
+      "id": 128,
       "date": "2023-04-25",
       "person": "Satya Nadella",
       "symbol": "MSFT",
@@ -3681,7 +4129,7 @@
       "sentiment": "positive",
       "statement": "FQ3 클라우드 호조",
       "outcome": 1,
-      "signal_price": 268.4669,
+      "signal_price": 268.467,
       "result_price": 299.2497,
       "actual_return": 11.47,
       "indicators": {
@@ -3697,7 +4145,7 @@
         "atr_stability": 0.787,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.635,
-        "hit_rate": 0.333,
+        "hit_rate": 0.286,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3705,7 +4153,7 @@
       }
     },
     {
-      "id": 115,
+      "id": 129,
       "date": "2023-07-25",
       "person": "Satya Nadella",
       "symbol": "MSFT",
@@ -3713,7 +4161,7 @@
       "sentiment": "positive",
       "statement": "FQ4 AI 매출급증",
       "outcome": 0,
-      "signal_price": 342.8673,
+      "signal_price": 342.8672,
       "result_price": 318.5135,
       "actual_return": -7.1,
       "indicators": {
@@ -3729,7 +4177,7 @@
         "atr_stability": 0.743,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.571,
-        "hit_rate": 0.333,
+        "hit_rate": 0.286,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3737,7 +4185,7 @@
       }
     },
     {
-      "id": 116,
+      "id": 130,
       "date": "2024-01-30",
       "person": "Satya Nadella",
       "symbol": "MSFT",
@@ -3746,7 +4194,7 @@
       "statement": "FQ2 코파일럿 성과",
       "outcome": 0,
       "signal_price": 400.8026,
-      "result_price": 398.5759,
+      "result_price": 398.5758,
       "actual_return": -0.56,
       "indicators": {
         "rsi_filter": 0.0,
@@ -3761,7 +4209,7 @@
         "atr_stability": 0.853,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.427,
-        "hit_rate": 0.333,
+        "hit_rate": 0.286,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3769,7 +4217,7 @@
       }
     },
     {
-      "id": 117,
+      "id": 131,
       "date": "2024-04-25",
       "person": "Satya Nadella",
       "symbol": "MSFT",
@@ -3778,7 +4226,7 @@
       "statement": "FQ3 Azure AI 폭발",
       "outcome": 1,
       "signal_price": 392.1585,
-      "result_price": 405.2094,
+      "result_price": 405.2095,
       "actual_return": 3.33,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3793,7 +4241,7 @@
         "atr_stability": 0.794,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.539,
-        "hit_rate": 0.333,
+        "hit_rate": 0.286,
         "sentiment": 1.0,
         "cross_val": 1.0,
         "news_freq": 1.0,
@@ -3801,7 +4249,7 @@
       }
     },
     {
-      "id": 118,
+      "id": 132,
       "date": "2024-10-30",
       "person": "Satya Nadella",
       "symbol": "MSFT",
@@ -3825,7 +4273,7 @@
         "atr_stability": 0.844,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.444,
-        "hit_rate": 0.333,
+        "hit_rate": 0.286,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3833,7 +4281,7 @@
       }
     },
     {
-      "id": 119,
+      "id": 133,
       "date": "2025-01-29",
       "person": "Satya Nadella",
       "symbol": "MSFT",
@@ -3857,7 +4305,7 @@
         "atr_stability": 0.778,
         "trend_dir_20": 1.0,
         "pre_run_inv": 0.526,
-        "hit_rate": 0.333,
+        "hit_rate": 0.286,
         "sentiment": 1.0,
         "cross_val": 0.8333333333333334,
         "news_freq": 0.833,
@@ -3865,7 +4313,39 @@
       }
     },
     {
-      "id": 120,
+      "id": 134,
+      "date": "2025-10-29",
+      "person": "Satya Nadella",
+      "symbol": "MSFT",
+      "sector": "Cloud/AI",
+      "sentiment": "negative",
+      "statement": "FY26Q1 실적beat 그러나 Capex우려 급락",
+      "outcome": 0,
+      "signal_price": 538.1418,
+      "result_price": 507.9232,
+      "actual_return": -5.62,
+      "indicators": {
+        "rsi_filter": 0.0,
+        "rsi_raw": 70.0,
+        "macd_align": 1.0,
+        "volume_surge": 1.0,
+        "volume_ratio": 0.389,
+        "bollinger_pos": 1.0,
+        "momentum_5d": 0.702,
+        "gap_up": 0.553,
+        "price_vs_52w": 0.999,
+        "atr_stability": 0.836,
+        "trend_dir_20": 1.0,
+        "pre_run_inv": 0.379,
+        "hit_rate": 0.286,
+        "sentiment": 0.0,
+        "cross_val": 0.8333333333333334,
+        "news_freq": 0.833,
+        "signal_strength": 0.333
+      }
+    },
+    {
+      "id": 135,
       "date": "2023-02-01",
       "person": "Mark Zuckerberg",
       "symbol": "META",
@@ -3897,7 +4377,7 @@
       }
     },
     {
-      "id": 121,
+      "id": 136,
       "date": "2023-04-26",
       "person": "Mark Zuckerberg",
       "symbol": "META",
@@ -3929,7 +4409,7 @@
       }
     },
     {
-      "id": 122,
+      "id": 137,
       "date": "2023-07-26",
       "person": "Mark Zuckerberg",
       "symbol": "META",
@@ -3937,8 +4417,8 @@
       "sentiment": "positive",
       "statement": "Q2 실적서프라이즈",
       "outcome": 0,
-      "signal_price": 295.971,
-      "result_price": 302.5532,
+      "signal_price": 295.9709,
+      "result_price": 302.5531,
       "actual_return": 2.22,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3961,7 +4441,7 @@
       }
     },
     {
-      "id": 123,
+      "id": 138,
       "date": "2024-01-31",
       "person": "Mark Zuckerberg",
       "symbol": "META",
@@ -3969,7 +4449,7 @@
       "sentiment": "positive",
       "statement": "Q4 배당 첫 발표",
       "outcome": 1,
-      "signal_price": 386.7438,
+      "signal_price": 386.7437,
       "result_price": 469.16,
       "actual_return": 21.31,
       "indicators": {
@@ -3993,7 +4473,7 @@
       }
     },
     {
-      "id": 124,
+      "id": 139,
       "date": "2024-04-24",
       "person": "Mark Zuckerberg",
       "symbol": "META",
@@ -4002,7 +4482,7 @@
       "statement": "AI투자 과잉 우려",
       "outcome": 0,
       "signal_price": 489.7231,
-      "result_price": 468.983,
+      "result_price": 468.9831,
       "actual_return": -4.24,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4025,7 +4505,7 @@
       }
     },
     {
-      "id": 125,
+      "id": 140,
       "date": "2024-10-30",
       "person": "Mark Zuckerberg",
       "symbol": "META",
@@ -4034,7 +4514,7 @@
       "statement": "Q3 실적서프라이즈",
       "outcome": 0,
       "signal_price": 588.4146,
-      "result_price": 576.6821,
+      "result_price": 576.6822,
       "actual_return": -1.99,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4057,7 +4537,7 @@
       }
     },
     {
-      "id": 126,
+      "id": 141,
       "date": "2025-01-29",
       "person": "Mark Zuckerberg",
       "symbol": "META",
@@ -4066,7 +4546,7 @@
       "statement": "AI 에이전트 공개",
       "outcome": 1,
       "signal_price": 673.1627,
-      "result_price": 721.8123,
+      "result_price": 721.8122,
       "actual_return": 7.23,
       "indicators": {
         "rsi_filter": 0.0,
