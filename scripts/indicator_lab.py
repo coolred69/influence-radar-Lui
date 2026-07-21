@@ -63,6 +63,14 @@ CANDIDATE_INDICATORS = [
     "trend_dir_20",
     "pre_run_inv",
     "cross_val",
+    # 2026-07-21 확장 (build_training_data.py에 신규 계산 추가됨)
+    "rsi_7",
+    "rsi_21",
+    "momentum_10d",
+    "momentum_20d",
+    "volume_trend",
+    "support_proximity",
+    "volatility_20d",
 ]
 
 INDICATOR_LABELS = {
@@ -82,6 +90,13 @@ INDICATOR_LABELS = {
     "trend_dir_20":  "20일 추세 방향",
     "pre_run_inv":   "사전 모멘텀(역)",
     "cross_val":     "다중 검증 점수",
+    "rsi_7":         "RSI(7일)",
+    "rsi_21":        "RSI(21일)",
+    "momentum_10d":  "10일 모멘텀",
+    "momentum_20d":  "20일 모멘텀",
+    "volume_trend":  "거래량 추세(단기/장기)",
+    "support_proximity": "지지선 근접도",
+    "volatility_20d": "20일 변동성",
 }
 
 
@@ -310,26 +325,58 @@ def evolve(prev_state, all_signals):
     print(f"  Train → 정확도 {base_m['accuracy']}%  AUC {base_m['auc']}  Sharpe {base_m['sharpe']:.3f}")
     print(f"  Test  → 정확도 {base_test_m['accuracy']}%  AUC {base_test_m['auc']}  Overfit gap {overfit_gap:+.4f}")
 
-    # ── 후보 지표 추가 시험
+    # ── Phase 1.5: 기여도 기반 후진 제거
+    # "완전히 좋지 않다고 판단되는" 지표를 매 세대 삭제 시도 — 랜덤이 아니라
+    # 실제로 빼봤을 때 AUC가 나빠지지 않거나(거의) 오히려 좋아지는 지표를 제거.
+    removed = []
+    if len(active) > 3:
+        print(f"\n[Phase 1.5] 기여도 최하위 지표 제거 시험 ({len(active)}개 전수 평가)...")
+        worst_key, worst_delta = None, -9999
+        for k in sorted(active):
+            trial_active = active - {k}
+            if len(trial_active) < 2:
+                continue
+            trial_train = extract_indicators(train_sigs, trial_active)
+            trial_w, trial_m = optimize_weights(trial_train, trial_active, n_random=3_000)
+            delta = trial_m["auc"] - base_m["auc"]  # 양수=제거해도 AUC 안 나빠짐(오히려 개선)
+            if delta > worst_delta:
+                worst_delta, worst_key = delta, k
+        if worst_key is not None and worst_delta > -0.001:
+            active.discard(worst_key)
+            removed.append(worst_key)
+            label = INDICATOR_LABELS.get(worst_key, worst_key)
+            print(f"  🗑️ 제거: {label:<24} (제거해도 ΔAUC {worst_delta:+.4f})")
+            base_train_ext = extract_indicators(train_sigs, active)
+            base_w, base_m = optimize_weights(base_train_ext, active)
+        else:
+            print(f"  (제거할 만한 지표 없음 — 전부 유의미하게 기여 중)")
+
+    # ── Phase 2: 후보 지표 전수 평가(랜덤 셔플 폐기) → 최고 기여 1개 채택
+    # 남은 후보 전체를 다 시험해서 ΔAUC 기준 최선의 조합으로 방향성 있게 확장.
     candidates_to_try = [k for k in CANDIDATE_INDICATORS if k not in active and k in available_keys]
-    random.shuffle(candidates_to_try)
     added = []
 
-    print(f"\n[Phase 2] 후보 지표 시험 ({len(candidates_to_try)}개)...")
-    for cand in candidates_to_try[:5]:
+    print(f"\n[Phase 2] 후보 지표 전수 시험 ({len(candidates_to_try)}개, 랜덤 아님)...")
+    candidate_results = []
+    for cand in candidates_to_try:
         trial_active = active | {cand}
         trial_train  = extract_indicators(train_sigs, trial_active)
-        trial_w, trial_m = optimize_weights(trial_train, trial_active, n_random=15_000)
+        trial_w, trial_m = optimize_weights(trial_train, trial_active, n_random=3_000)
         delta_auc = trial_m["auc"] - base_m["auc"]
+        candidate_results.append((delta_auc, cand, trial_w, trial_m))
         label = INDICATOR_LABELS.get(cand, cand)
-        if delta_auc >= ADOPT_MIN_ΔAUC:
-            active.add(cand)
-            base_m = trial_m
-            base_w = trial_w
-            print(f"  ✅ 채택: {label:<24} ΔAUC {delta_auc:+.4f}")
-            added.append(cand)
-        else:
-            print(f"  ⬜ 기각: {label:<24} ΔAUC {delta_auc:+.4f}")
+        print(f"  · {label:<24} ΔAUC {delta_auc:+.4f}")
+
+    candidate_results.sort(key=lambda x: -x[0])
+    if candidate_results and candidate_results[0][0] >= ADOPT_MIN_ΔAUC:
+        delta_auc, best_cand, best_w, best_m = candidate_results[0]
+        active.add(best_cand)
+        base_m, base_w = best_m, best_w
+        label = INDICATOR_LABELS.get(best_cand, best_cand)
+        print(f"  ✅ 채택(최고 기여): {label:<24} ΔAUC {delta_auc:+.4f}")
+        added.append(best_cand)
+    else:
+        print(f"  ⬜ 이번 세대 채택 없음 (최고 ΔAUC가 기준 {ADOPT_MIN_ΔAUC} 미달)")
 
     # ── 최종 최적화 (전체 데이터)
     print(f"\n[Phase 3] 최종 최적화 — {len(active)}개 지표 전체 데이터...")
@@ -395,6 +442,7 @@ def evolve(prev_state, all_signals):
         "timestamp": datetime.now().isoformat(),
         "active_count": len(active),
         "dropped": dropped,
+        "removed_by_contribution": removed,
         "added": added,
         "train_auc": final_train_m["auc"],
         "test_auc":  final_test_m["auc"],

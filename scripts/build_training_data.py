@@ -199,6 +199,68 @@ EVENTS = [
 
 
 # ──────────────────────────────────────────────────────────────
+# 자동 실적 이벤트 수집 (미국, 2026-07-21 추가)
+# yfinance Ticker.earnings_dates 기반 — EPS surprise% 부호로
+# 객관적 sentiment 분류(사람 판단 개입 없음). KIS는 국내주식
+# 재무 API가 '현재 시점 스냅샷'만 제공해 과거 이벤트 재현이
+# 불가능하므로(불가능 영역 명시), 이번 확장은 미국 쪽만 자동화.
+# ──────────────────────────────────────────────────────────────
+AUTO_US_TARGETS = [
+    ("Jensen Huang",   "NVDA", "AI/GPU"),
+    ("Elon Musk",      "TSLA", "EV/Auto"),
+    ("Tim Cook",       "AAPL", "Tech"),
+    ("Satya Nadella",  "MSFT", "Cloud/AI"),
+    ("Mark Zuckerberg","META", "Social/AI"),
+]
+
+def fetch_us_earnings_events(person, symbol, sector, max_events=16):
+    """yfinance 실적발표 이력을 EVENTS 튜플 포맷으로 자동 생성.
+    Reported EPS/Surprise%가 있는(=이미 발표된) 분기만 사용 — 예정된 미래 실적은 제외."""
+    try:
+        df = yf.Ticker(symbol).earnings_dates
+        if df is None or df.empty:
+            return []
+        events = []
+        for dt, row in df.iterrows():
+            eps_act  = row.get("Reported EPS")
+            surprise = row.get("Surprise(%)")
+            if pd.isna(eps_act) or pd.isna(surprise):
+                continue
+            if surprise > 3:
+                sentiment = "positive"
+            elif surprise < -3:
+                sentiment = "negative"
+            else:
+                sentiment = "neutral"
+            dt_naive = dt.tz_localize(None) if getattr(dt, "tzinfo", None) else dt
+            date_str = dt_naive.strftime("%Y-%m-%d")
+            events.append((
+                date_str, person, symbol,
+                f"실적발표 EPS서프라이즈 {surprise:+.1f}%(자동수집)",
+                sentiment, sector, 5,
+            ))
+        return events[:max_events]
+    except Exception as e:
+        print(f"  ⚠️ {symbol} 실적 자동수집 실패: {e}")
+        return []
+
+def build_full_event_list():
+    """수동 큐레이션 EVENTS + yfinance 자동수집 이벤트를 날짜·심볼 기준 중복 제거하여 병합"""
+    events = list(EVENTS)
+    existing_keys = {(e[0], e[2]) for e in events}
+    auto_count = 0
+    for person, symbol, sector in AUTO_US_TARGETS:
+        for ev in fetch_us_earnings_events(person, symbol, sector):
+            key = (ev[0], ev[2])
+            if key not in existing_keys:
+                events.append(ev)
+                existing_keys.add(key)
+                auto_count += 1
+    print(f"📡 자동수집: {auto_count}건 추가 (수동 {len(EVENTS)}건 + 자동 {auto_count}건 = 총 {len(events)}건)")
+    return events
+
+
+# ──────────────────────────────────────────────────────────────
 # 기술지표 계산 (12개)
 # ──────────────────────────────────────────────────────────────
 
@@ -287,6 +349,39 @@ def calc_volume_surge(volume, window=20):
     return 1.0 if ratio >= 1.5 else 0.0
 
 
+# ── 신규 지표 (지표 조합 경우의 수 확장용, 2026-07-21 추가) ──
+
+def calc_rsi_period(close, period):
+    """다른 기간의 RSI (기존 calc_rsi와 동일 로직, period만 파라미터화)"""
+    return calc_rsi(close, period=period)
+
+def calc_momentum_n(close, days):
+    """다른 기간의 모멘텀 (기존 calc_momentum과 동일 로직, days만 파라미터화)"""
+    return calc_momentum(close, days=days)
+
+def calc_volume_trend(volume, short=5, long=20):
+    """단기(5일) vs 장기(20일) 평균거래량 비율 — 거래량 '추세', volume_surge(순간급증)와 구분됨"""
+    avg_s = volume.rolling(short).mean().iloc[-1]
+    avg_l = volume.rolling(long).mean().iloc[-1]
+    if avg_l <= 0: return 0.5
+    ratio = avg_s / avg_l
+    return float(np.clip(ratio / 2.0, 0, 1))
+
+def calc_support_proximity(close, window=20):
+    """20일 최저가 대비 현재가 근접도 — 낮을수록 지지선 근처(반등 기대)"""
+    if len(close) < window: return 0.5
+    low_20 = close.rolling(window).min().iloc[-1]
+    dist = (close.iloc[-1] - low_20) / (low_20 + 1e-9)
+    return float(np.clip(1 - dist * 5, 0, 1))
+
+def calc_volatility_20d(close, window=20):
+    """20일 일간수익률 표준편차 — 변동성 원값(atr_stability와 다른 산출방식으로 교차검증용)"""
+    if len(close) < window + 1: return 0.5
+    rets = close.pct_change().dropna().iloc[-window:]
+    vol = float(rets.std())
+    return float(np.clip(1 - vol * 20, 0, 1))
+
+
 # ──────────────────────────────────────────────────────────────
 # 이벤트 → 훈련 데이터 변환
 # ──────────────────────────────────────────────────────────────
@@ -341,6 +436,16 @@ def fetch_event_data(date_str, symbol, hold_days=HOLD_DAYS):
                 "atr_stability": round(calc_atr_ratio(pre), 3),
                 "trend_dir_20": calc_trend_dir(close, 20),
                 "pre_run_inv":  round(calc_pre_run(close, 5), 3),
+                # ── 신규 지표 (경우의 수 확장, 2026-07-21) ──
+                # rsi_7/21은 0~1 정규화(÷100) — 다른 지표들과 동일 스케일 유지
+                # (원본 rsi_raw는 0~100 스케일이라 그대로 두면 가중합에서 지표 하나가 과대 반영됨)
+                "rsi_7":           round(calc_rsi_period(close, 7) / 100.0, 3),
+                "rsi_21":          round(calc_rsi_period(close, 21) / 100.0, 3),
+                "momentum_10d":    round(calc_momentum_n(close, 10), 3),
+                "momentum_20d":    round(calc_momentum_n(close, 20), 3),
+                "volume_trend":    round(calc_volume_trend(volume), 3),
+                "support_proximity": round(calc_support_proximity(close), 3),
+                "volatility_20d":  round(calc_volatility_20d(close), 3),
             }
         }
     except Exception as e:
@@ -368,13 +473,15 @@ def compute_person_hit_rates(results):
 
 def main():
     print("=" * 65)
-    print("📊 훈련 데이터 빌더 v2 — 실이벤트 200+ · 지표 12개")
+    print("📊 훈련 데이터 빌더 v2 — 실이벤트(수동+자동) · 지표 19개")
     print("=" * 65)
-    print(f"총 이벤트: {len(EVENTS)}건  |  보유기간: {HOLD_DAYS}일  |  목표수익: {TARGET_RET*100}%\n")
+
+    all_events = build_full_event_list()
+    print(f"총 이벤트: {len(all_events)}건  |  보유기간: {HOLD_DAYS}일  |  목표수익: {TARGET_RET*100}%\n")
 
     raw_results = []
-    for i, (date_str, person, symbol, statement, sentiment, sector, cv) in enumerate(EVENTS):
-        print(f"[{i+1:03d}/{len(EVENTS)}] {person:18s} {symbol:12s} {date_str} — {statement}")
+    for i, (date_str, person, symbol, statement, sentiment, sector, cv) in enumerate(all_events):
+        print(f"[{i+1:03d}/{len(all_events)}] {person:18s} {symbol:12s} {date_str} — {statement}")
         data = fetch_event_data(date_str, symbol)
         if data is None:
             continue
