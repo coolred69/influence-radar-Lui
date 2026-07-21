@@ -311,9 +311,15 @@ def evolve(prev_state, all_signals):
         if not keep:
             dropped.append(k)
 
+    # 단변량 AUC는 참고용 진단 정보로만 출력하고 실제 제거는 하지 않음.
+    # 이유: pre_run_inv 같은 역방향 설계 지표는 단독 AUC가 구조적으로 낮지만
+    # 다변량 조합에서는 기여할 수 있음 — Phase 1.5(기여도 기반 후진 제거, 실제
+    # 모델에서 빼봤을 때 AUC 변화를 측정)가 이미 이 역할을 더 정확히 수행하므로
+    # 여기서 또 지우면 두 로직이 매 세대 같은 지표를 뺐다 넣었다 반복하는
+    # 무한 루프(Gen27-30에서 실측됨, AUC 변화 없이 세대만 소모)가 발생함.
     if dropped:
-        print(f"\n  → 제거 지표: {', '.join(INDICATOR_LABELS.get(k,k) for k in dropped)}")
-        active -= set(dropped)
+        print(f"\n  ⚠ 단변량 AUC 낮음(참고용, 제거 안 함): {', '.join(INDICATOR_LABELS.get(k,k) for k in dropped)}")
+        dropped = []
 
     # ── 기준 성능 (현재 활성 지표)
     print(f"\n[Phase 1] 현재 {len(active)}개 지표 최적화 중...")
