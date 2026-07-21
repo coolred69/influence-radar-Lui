@@ -329,7 +329,8 @@ def evolve(prev_state, all_signals):
     # "완전히 좋지 않다고 판단되는" 지표를 매 세대 삭제 시도 — 랜덤이 아니라
     # 실제로 빼봤을 때 AUC가 나빠지지 않거나(거의) 오히려 좋아지는 지표를 제거.
     removed = []
-    if len(active) > 3:
+    MIN_ACTIVE_FLOOR = 7  # 탐색 취지(더 많은 조합) 보호 — 이 이하로는 제거 안 함
+    if len(active) > MIN_ACTIVE_FLOOR:
         print(f"\n[Phase 1.5] 기여도 최하위 지표 제거 시험 ({len(active)}개 전수 평가)...")
         worst_key, worst_delta = None, -9999
         for k in sorted(active):
@@ -341,7 +342,10 @@ def evolve(prev_state, all_signals):
             delta = trial_m["auc"] - base_m["auc"]  # 양수=제거해도 AUC 안 나빠짐(오히려 개선)
             if delta > worst_delta:
                 worst_delta, worst_key = delta, k
-        if worst_key is not None and worst_delta > -0.001:
+        # 채택 기준(ADOPT_MIN_ΔAUC)과 대칭 — "거의 안 나빠짐" 정도의 관용 없이
+        # 제거해도 AUC가 진짜 나빠지지 않을 때만(0 이상) 제거. 비대칭 관용이
+        # 누적 순삭제(11→4개)를 유발한 원인이었음.
+        if worst_key is not None and worst_delta >= 0:
             active.discard(worst_key)
             removed.append(worst_key)
             label = INDICATOR_LABELS.get(worst_key, worst_key)
