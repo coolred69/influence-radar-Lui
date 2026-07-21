@@ -23,8 +23,8 @@ pip install mcp httpx python-dotenv
 `.env` 파일에 계좌번호 앞 8자리 입력:
 
 ```
-KIS_APP_KEY=PSjhp8gfyBBwyL5IJxRvCtSyQXtQMddfK10d
-KIS_APP_SECRET=6h4cjf1VM1sEAfCR9gwOWlhP5...
+KIS_APP_KEY=발급받은_APP_KEY_입력
+KIS_APP_SECRET=발급받은_APP_SECRET_입력
 KIS_ACCOUNT_NO=12345678   ← 여기 입력
 ```
 
