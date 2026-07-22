@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-07-21T01:51:49.882157",
-  "period": "2023-02-01 to 2025-12-10",
+  "timestamp": "2026-07-22T01:50:38.683798",
+  "period": "2022-07-20 to 2026-05-20",
   "results": {
-    "total_signals": 142,
-    "correct_predictions": 47,
-    "accuracy": 33.1,
-    "avg_return": 1.07,
+    "total_signals": 178,
+    "correct_predictions": 63,
+    "accuracy": 35.39,
+    "avg_return": 1.6,
     "by_person": {
       "이재용": {
         "total": 14,
@@ -50,16 +50,16 @@
         "avg_return": 0.55
       },
       "Jensen Huang": {
-        "total": 14,
-        "hits": 5,
-        "accuracy_pct": 35.7,
-        "avg_return": 4.31
+        "total": 20,
+        "hits": 7,
+        "accuracy_pct": 35.0,
+        "avg_return": 3.1
       },
       "Elon Musk": {
-        "total": 12,
-        "hits": 5,
-        "accuracy_pct": 41.7,
-        "avg_return": 0.28
+        "total": 17,
+        "hits": 7,
+        "accuracy_pct": 41.2,
+        "avg_return": 3.88
       },
       "Jerome Powell": {
         "total": 13,
@@ -86,22 +86,22 @@
         "avg_return": -1.82
       },
       "Tim Cook": {
-        "total": 11,
-        "hits": 6,
-        "accuracy_pct": 54.5,
-        "avg_return": 3.41
+        "total": 17,
+        "hits": 8,
+        "accuracy_pct": 47.1,
+        "avg_return": 3.58
       },
       "Satya Nadella": {
-        "total": 7,
-        "hits": 2,
-        "accuracy_pct": 28.6,
-        "avg_return": -1.1
+        "total": 16,
+        "hits": 6,
+        "accuracy_pct": 37.5,
+        "avg_return": 0.54
       },
       "Mark Zuckerberg": {
-        "total": 7,
-        "hits": 4,
-        "accuracy_pct": 57.1,
-        "avg_return": 7.36
+        "total": 17,
+        "hits": 10,
+        "accuracy_pct": 58.8,
+        "avg_return": 4.74
       }
     },
     "by_sector": {
@@ -130,16 +130,16 @@
         "avg_return": -4.46
       },
       "AI/GPU": {
-        "total": 16,
-        "hits": 6,
-        "accuracy_pct": 37.5,
-        "avg_return": 3.7
+        "total": 22,
+        "hits": 8,
+        "accuracy_pct": 36.4,
+        "avg_return": 2.77
       },
       "EV/Auto": {
-        "total": 12,
-        "hits": 5,
-        "accuracy_pct": 41.7,
-        "avg_return": 0.28
+        "total": 17,
+        "hits": 7,
+        "accuracy_pct": 41.2,
+        "avg_return": 3.88
       },
       "Macro/Rates": {
         "total": 13,
@@ -148,10 +148,10 @@
         "avg_return": 1.24
       },
       "Cloud/AI": {
-        "total": 13,
-        "hits": 4,
-        "accuracy_pct": 30.8,
-        "avg_return": 0.18
+        "total": 22,
+        "hits": 8,
+        "accuracy_pct": 36.4,
+        "avg_return": 0.85
       },
       "Finance": {
         "total": 4,
@@ -172,20 +172,20 @@
         "avg_return": -1.82
       },
       "Tech": {
-        "total": 11,
-        "hits": 6,
-        "accuracy_pct": 54.5,
-        "avg_return": 3.41
+        "total": 17,
+        "hits": 8,
+        "accuracy_pct": 47.1,
+        "avg_return": 3.58
       },
       "Social/AI": {
-        "total": 7,
-        "hits": 4,
-        "accuracy_pct": 57.1,
-        "avg_return": 7.36
+        "total": 17,
+        "hits": 10,
+        "accuracy_pct": 58.8,
+        "avg_return": 4.74
       }
     },
-    "max_return": 35.05,
-    "min_return": -18.56,
-    "positive_return_rate": 50.0
+    "max_return": 39.37,
+    "min_return": -21.84,
+    "positive_return_rate": 52.25
   }
 }
