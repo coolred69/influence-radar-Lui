@@ -78,9 +78,9 @@ jobs:
         run: |
           git config --local user.email "radar-ml@github.com"
           git config --local user.name "Radar ML Bot"
-          git pull --rebase
           git add -A
           git commit -m "chore: weekly full retrain - $(date +'%Y-%m-%d')" || true
+          git pull --rebase --autostash
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
