@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-07-26T01:56:59.365342",
-  "period": "2022-07-20 to 2026-05-20",
+  "timestamp": "2026-07-27T02:04:50.765152",
+  "period": "2022-07-26 to 2026-07-22",
   "results": {
     "total_signals": 178,
-    "correct_predictions": 63,
-    "accuracy": 35.39,
-    "avg_return": 1.6,
+    "correct_predictions": 62,
+    "accuracy": 34.83,
+    "avg_return": 1.37,
     "by_person": {
       "이재용": {
         "total": 14,
@@ -57,9 +57,9 @@
       },
       "Elon Musk": {
         "total": 17,
-        "hits": 7,
-        "accuracy_pct": 41.2,
-        "avg_return": 3.88
+        "hits": 6,
+        "accuracy_pct": 35.3,
+        "avg_return": 1.49
       },
       "Jerome Powell": {
         "total": 13,
@@ -137,9 +137,9 @@
       },
       "EV/Auto": {
         "total": 17,
-        "hits": 7,
-        "accuracy_pct": 41.2,
-        "avg_return": 3.88
+        "hits": 6,
+        "accuracy_pct": 35.3,
+        "avg_return": 1.49
       },
       "Macro/Rates": {
         "total": 13,
@@ -186,6 +186,6 @@
     },
     "max_return": 39.37,
     "min_return": -21.84,
-    "positive_return_rate": 52.25
+    "positive_return_rate": 51.69
   }
 }
