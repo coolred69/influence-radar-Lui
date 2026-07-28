@@ -1,7 +1,28 @@
 # Influence Radar — 개발 로드맵
 
 > 루이 관리 문서 | 매 세션 시작 시 참조할 것
-> 마지막 업데이트: 2026-06-28
+> 마지막 업데이트: 2026-07-28 (커밋 이력 기준 재검증 후 갱신)
+
+---
+
+## ⚠️ 긴급 — GitHub 동기화 끊김 (2026-07-28 발견)
+
+**증상:** GitHub `origin/main`이 **2026-07-14 09:13 KST 커밋(`f189e2c`, Signal Engine 봇 업데이트)에서 멈춰 있음.** 로컬 저장소는 그 이후로도 계속 커밋되어 **2026-07-23 12:39 KST(`0410341`)까지 진행됨** — 즉 로컬에만 존재하고 GitHub엔 반영 안 된 커밋이 **약 17개, 9일치.**
+
+| 구분 | 상태 |
+|---|---|
+| 로컬 최신 커밋 | `0410341` — 2026-07-23 12:39 KST |
+| GitHub(origin/main) 최신 커밋 | `f189e2c` — 2026-07-14 09:13 KST |
+| 미반영 커밋 수 | 약 17개 (ML 파이프라인 v2, 보안 패치 3건, 지표 튜닝 등 포함) |
+| 영향 범위 | GitHub Pages 배포본, GitHub Actions 자동 워크플로우가 보는 코드 — 모두 07-14 시점 코드로 정지 |
+
+**원인 추정 (미확정 — 검증 필요):** `git push`가 실패했는데 이후 `git pull --rebase origin main`이 매번 "성공"으로 표시되면서 동기화된 것처럼 보였을 가능성이 높음. 코드/로직 문제 아님 — **push 누락 문제.**
+
+**Action Plan (최우선)**
+1. GitHub Desktop 또는 터미널에서 `origin/main` 대비 로컬 `ahead` 커밋 수 확인
+2. push 재시도 — 실패 시 에러 메시지 확인 (인증 만료/브랜치 보호 규칙/충돌 여부)
+3. push 성공 후 GitHub Actions(Signal Engine, Indicator Lab, Regime Detector, KIS 가격수집)가 07-14 이후 코드로 재개되는지 확인
+4. **본 세션에서는 로컬 shell 접근이 막혀 있어 Claude가 직접 push 실행 불가 — 사용자 측에서 push 필요**
 
 ---
 
@@ -9,81 +30,75 @@
 
 **목적:** 글로벌 영향력자(Trump·Musk 등) 발언을 실시간 감지 → 주식 시그널 자동 생성 → 누적 학습으로 정확도 향상
 
-**스택:** 단일 HTML(GitHub Pages) + Flask 백엔드(Render.com 무료) + Firebase(데이터 동기화)
+**스택:** 단일 HTML(GitHub Pages) + Flask 백엔드(Render.com 무료) + Firebase(데이터 동기화) + Python ML 파이프라인(GitHub Actions)
 
 **핵심 파일:**
-- `influence-radar.html` — 메인 앱 (~5700줄)
-- `data.js` — 인물·섹터·패턴 데이터 (분리 완료)
+- `influence-radar.html` — 메인 앱 (미국)
+- `korea-radar.html` — 한국 퀀트 스크리너
+- `signal-dashboard.html` — 매수 신호 대시보드
+- `data.js` / `firebase.js` / `utils.js` — 공유 모듈
+- `indicator_lab.py` / `signal_engine.py` / `optimize_params.py` / `track_signals.py` — ML/시그널 파이프라인
 - `app.py` — Render 백엔드 (ML API)
 
 ---
 
 ## 완료된 작업
 
+### 데이터 파이프라인·보안 (2026-07-01 ~ 07-23, 로컬 기준)
+- [x] **한국주식 KIS 연동** — data.js KR 인플루언서 4인 추가, GitHub Actions KR 가격 수집
+- [x] **Indicator Lab v2** — 실데이터 200건+, 지표 12개, scipy 최적화, Train/Test split, 5세대 자동 진화(GitHub Actions), 지표풀 17→23 확장 + stepwise 탐색
+- [x] **Signal Engine** — 매수가/목표가/손절가/손익비(ATR 기반) 자동 계산, signal-dashboard.html
+- [x] **Phase 2+3** — 파라미터 최적화(optimize_params.py) + 실전 피드백 루프(track_signals.py)
+- [x] **Phase 4** — AI 트레이딩 실패 교훈 누적 시스템
+- [x] **ML 파이프라인 v2** — training_data.json 127→142건 실전 데이터 연동, backtest/predict 스키마 통일
+- [x] **보안 패치 3건** — Firebase API 키 노출 교체, KIS API SSL 검증 활성화(verify=True), README 노출 키 예시 제거
+- [x] **Firestore 보안 규칙** — read-only public 적용
+- [x] **weekly-retrain 워크플로우 버그 수정** — dirty tree exit 128 해결
+
 ### 모듈화 (2026-06-28)
 - [x] **firebase.js** 분리 — Firebase 초기화·Firestore·FCM
-- [x] **utils.js** 공유 모듈 — 순수 헬퍼 함수 (opp, fmtKRW, tag, bar 등)
+- [x] **utils.js** 공유 모듈
 - [x] **index.html** 메인 허브 개편 — 미국/한국 탭 분기
-- [x] **korea-radar.html** 한국 퀀트 스크리너 구축
-  - Yahoo Finance v8/chart API (v7 401 차단 → v8 우회)
-  - 28종목 스캔, 5개 병렬 배치 조회
-  - 거래량 급증 · 52주 돌파 직전 · 저PBR 점수화
+- [x] **korea-radar.html** 한국 퀀트 스크리너 — Yahoo Finance v8/chart API, 28종목 스캔
 
 ### 기반 구조
-- [x] Firebase Firestore 연동 (데이터 영구 보존)
-- [x] FCM 푸시 알림
-- [x] PWA 설정 (홈화면 추가)
+- [x] Firebase Firestore 연동, FCM 푸시, PWA 설정
 - [x] Render.com 배포 + keepalive (8분마다)
-- [x] `data.js` 분리 — FIGS·SM·PATTERNS·INIT_LOGS 모듈화 (2026-06-07)
-- [x] HTML 내부 섹션 마커 추가 (STATE / HELPERS / LOGIC / UI)
+- [x] `data.js` 분리 — FIGS·SM·PATTERNS·INIT_LOGS 모듈화
 
 ### 인물·섹터
-- [x] 9명 고정: Trump·Musk·Powell·Xi·Jensen·Buffett·Dimon·Altman·MBS
-- [x] 12개 섹터: AI·반도체·EV·크립토·에너지·금융·중국테크·로봇·방위·의료·소비·부동산
-- [x] 인물별 twitter·googleAlert 필드 추가
+- [x] 9명 고정(미국) + 4명(한국): Trump·Musk·Powell·Xi·Jensen·Buffett·Dimon·Altman·MBS
+- [x] 12개 섹터 매핑
 
 ### 뉴스 수집
-- [x] Currents API (실시간, 상위 2명)
-- [x] GNews API (12시간 지연, 나머지 인물)
-- [x] **Nitter RSS** — Trump·Musk·Jensen·Altman 자동 감시, 15분 폴링, 4개 인스턴스 fallback (2026-06-07)
-- [x] **Google Alerts RSS** — 9명 전원, 설정 UI (종목발굴 탭 하단) (2026-06-07)
+- [x] Currents API / GNews API / Nitter RSS(15분 폴링) / Google Alerts RSS(9명 전원)
 
 ### 시그널·학습
-- [x] 감성분석 (키워드 기반 규칙)
-- [x] 기회점수 계산 (영향력 × 섹터강도 × 하락폭)
-- [x] 가상 투자 시뮬레이션 (딥바이 + 트레일링 스탑)
-- [x] 자동 결과 추적 (예측 기일 도달 시 Yahoo Finance 실가 수집)
-- [x] 인물별 트레일링% 자동 학습
-- [x] 학습 대시보드
+- [x] 감성분석(키워드 기반), 기회점수 계산, 가상 투자 시뮬레이션(딥바이+트레일링 스탑)
+- [x] 자동 결과 추적, 인물별 트레일링% 자동 학습, 학습 대시보드
+- [x] 과잉반응 딥바이 판별 (Yahoo Finance 펀더멘털 체크)
+
+### 백테스트 (2026-06-28 기준, 갱신 필요)
+- [x] T+3 백테스트 28이벤트 — 전체 적중률 40.6% / Trump EV+6.85% / Musk EV+9.01%
+- [x] data.js 가중치 업데이트 (COIN/TSLA/MSTR 상향, AMD/BABA 하향)
+- [x] INIT_LOGS 10건 → 이후 15건 추가 (142건 규모로 확대)
 
 ---
 
 ## 진행 중 / 단기 과제
 
-### 품질 개선 (우선순위 높음)
-- [ ] **감성분석 고도화** — 키워드 카운팅 → 맥락 기반 (예: "tariff relief" vs "tariff hike" 구분)
-- [ ] **Google Alerts 키워드 최적화** — 노이즈 줄이고 발언·결정 중심으로 정제
+### 최우선
+- [ ] **GitHub push 동기화 복구** (위 긴급 섹션 참조)
+- [ ] push 실패 재발 방지 — commit 후 push 성공 여부 명시적 확인 습관화
+
+### 품질 개선
+- [ ] **감성분석 고도화** — 키워드 카운팅 → 맥락 기반 구분
+- [ ] **Google Alerts 키워드 최적화** — 노이즈 감소
 - [ ] Nitter 인스턴스 생존율 모니터링 + 자동 교체 로직
-
-### 백테스트 (2026-06-28 완료)
-- [x] **T+3 백테스트 28이벤트 실행** — Node.js + Yahoo Finance API (`outputs/backtest_t3.mjs`)
-  - 전체 적중률 40.6% / Trump EV+6.85% / Musk EV+9.01%
-  - COIN 100%, TSLA 83%, AMD 0%, BABA 25%
-- [x] **data.js 가중치 업데이트** (commit ec215c3)
-  - COIN f:65→92, TSLA f:61→88, MSTR f:58→85
-  - AMD f:78→50, BABA f:67→48 (신뢰도 하향)
-  - Jensen inf:84→72 (발표 선반영, 기댓값 -2.82%)
-- [x] **INIT_LOGS 10건** 실측 검증 데이터로 보강
-- [x] **과잉반응 딥바이 판별** — fetchFundamentals → evalOverreaction → renderOverreactionSection (💎 카드)
-
-**백테스트 핵심 인사이트:**
-- 유효 신호: Trump·Musk (기댓값 양수, 집중 종목 COIN·TSLA)
-- 무효 신호: Jensen (선반영), AMD·BABA (방향 역전 빈번)
-- 현재 28건 → 통계 유의성 위해 50건+ 필요
+- [ ] 백테스트 갱신 — 07-14 이후 축적된 데이터(142건+) 기준 재실행 필요 (06-28 결과는 28건 기준으로 낡음)
 
 ### 데이터 축적
-- [ ] 실제 시그널 50건 이상 누적 (현재 28건 백테스트 + 10건 INIT_LOGS)
-- [ ] 실 신호 지속 축적 → 가중치 자동 업데이트
+- [ ] 실 신호 지속 축적 → 가중치 자동 업데이트 (push 복구 후 재개)
 
 ---
 
@@ -92,23 +107,21 @@
 ### 아키텍처
 - [ ] `logic.js` 분리 — ML 호출·트레일링·학습 로직
 - [ ] `ui.js` 분리 — 렌더링·이벤트 핸들러
-- [ ] 기능 추가 시 패치 스크립트 → 모듈 직접 수정 방식으로 전환
 
 ### 기능 확장
-- [ ] **"원인불명 급락" 스크리너** (미국) — SPY/섹터ETF 대비 괴리율 계산, 발언 충격 의심 종목
-- [ ] **korea-radar PBR 보강** — v10/quoteSummary 추가 조회 (현재 PBR 미지원)
-- [ ] 감성분석 ML 모델 연동 (Render 백엔드 활용)
-- [ ] 인물별 발언 캘린더 (FOMC 일정 등 고정 일정 자동 등록)
-- [ ] 시그널 히스토리 차트 (인물별 적중률 시각화)
-- [ ] 알림 커스터마이징 (인물별 ON/OFF, 점수 임계값 설정)
+- [ ] "원인불명 급락" 스크리너 (미국)
+- [ ] korea-radar PBR 보강 (v10/quoteSummary)
+- [ ] 감성분석 ML 모델 연동
+- [ ] 인물별 발언 캘린더 (FOMC 등)
+- [ ] 시그널 히스토리 차트, 알림 커스터마이징
 
 ---
 
 ## 장기 과제 (수익화 관련)
 
-- [ ] 뉴스 속도 개선 — X API Basic($100/월) 검토 (현재 Nitter RSS로 대체 중)
-- [ ] 실제 매매 연동 검토 (현재는 시뮬레이션만)
-- [ ] 멀티유저 지원 (현재 단일 유저)
+- [ ] 뉴스 속도 개선 — X API Basic($100/월) 검토
+- [ ] 실제 매매 연동 검토
+- [ ] 멀티유저 지원
 
 ---
 
@@ -116,11 +129,12 @@
 
 | 문제 | 원인 | 상태 |
 |---|---|---|
+| **GitHub push 미반영 (9일, 17커밋)** | push 실패 후 감지 안 됨 | 🔴 최우선 조치 필요 |
 | GNews 12시간 지연 | 무료 플랜 한계 | Nitter RSS로 보완 중 |
 | Nitter 인스턴스 불안정 | 비공식 서비스 | fallback 4개로 대응 |
 | Render 15분 슬립 | 무료 티어 | keepalive로 대응 |
 | 감성분석 노이즈 | 키워드 카운팅 방식 | 개선 예정 |
-| 학습 데이터 부족 | 실제 누적 필요 | 시간 해결 |
+| 백테스트 결과 낡음 | 06-28 이후 데이터 미반영 | 재실행 필요 |
 
 ---
 
@@ -129,5 +143,4 @@
 1. **데이터 수정** → `data.js`만 건드릴 것
 2. **기능 추가** → 섹션 마커 확인 후 해당 위치에 삽입
 3. **수정 전** → git commit으로 스냅샷 저장
-4. **파일 접근** → `mcp__Windows-MCP__PowerShell` 또는 Python 패치 스크립트 사용
-5. **배포** → 항상 `git add -A && git commit && git push`까지
+4. **배포** → 항상 `git add -A && git commit && git push`까지 — **push 후 origin 반영 여부 확인 필수 (이번 사고 재발 방지)**
