@@ -1,0 +1,62 @@
+name: Health Check — 파이프라인 생존 확인 (앱/PC 무관)
+
+# 목적: Cowork 앱/PC가 꺼져있어도 GitHub 서버에서 자체적으로 24시간 도는 감시.
+# Signal Engine이 예정 시각에 안 돌았으면 (1) 재실행 시도 (2) 그래도 안 되면 워크플로우
+# 자체를 실패 처리해서 GitHub 기본 이메일 알림(ttclock@gmail.com)이 자동으로 가게 함.
+
+on:
+  schedule:
+    - cron: '30 0 * * 1-5'   # KST 09:30 평일 — 한국장 Signal Engine(KST 08:30 트리거) 완료 확인
+    - cron: '30 14 * * 1-5'  # KST 23:30 평일 — 미국장 Signal Engine(KST 23:00 트리거) 완료 확인
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write   # 다른 워크플로우 재실행(dispatch)을 위해 필요
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Signal Engine 최근 실행 시각 확인
+        id: check
+        run: |
+          LAST_TS=$(git log --all --grep="Signal Engine 자동 업데이트" -1 --format=%ct || echo 0)
+          NOW=$(date +%s)
+          if [ "$LAST_TS" -eq 0 ]; then
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "::error::Signal Engine 커밋을 아예 찾을 수 없음"
+            exit 0
+          fi
+          DIFF_HOURS=$(( (NOW - LAST_TS) / 3600 ))
+          echo "마지막 Signal Engine 커밋: ${DIFF_HOURS}시간 전"
+          if [ "$DIFF_HOURS" -gt 20 ]; then
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Signal Engine이 ${DIFF_HOURS}시간째 안 돌았음"
+          else
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+            echo "정상 — ${DIFF_HOURS}시간 전 실행 확인됨"
+          fi
+
+      - name: Signal Engine 재실행 시도 (stale일 때만)
+        if: steps.check.outputs.stale == 'true'
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/signal-engine.yml/dispatches \
+            -d '{"ref":"main"}'
+          echo "Signal Engine 수동 재실행 요청 보냄"
+
+      - name: 재실행해도 계속 이상이면 이 워크플로우 자체를 실패시켜 이메일 알림 발생
+        if: steps.check.outputs.stale == 'true'
+        run: |
+          echo "::error::Signal Engine 지연 감지 → 재실행 요청 완료. 그래도 반복되면 코드/API 문제일 수 있음 — GitHub 알림 이메일(ttclock@gmail.com) 확인 요망"
+          exit 1
