@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-08-02T01:55:50.561382",
-  "period": "2022-07-26 to 2026-07-22",
+  "timestamp": "2026-08-03T01:58:37.038801",
+  "period": "2022-08-24 to 2026-07-30",
   "results": {
     "total_signals": 178,
-    "correct_predictions": 62,
-    "accuracy": 34.83,
-    "avg_return": 1.37,
+    "correct_predictions": 60,
+    "accuracy": 33.71,
+    "avg_return": 1.27,
     "by_person": {
       "이재용": {
         "total": 14,
@@ -59,7 +59,7 @@
         "total": 17,
         "hits": 6,
         "accuracy_pct": 35.3,
-        "avg_return": 1.49
+        "avg_return": 1.46
       },
       "Jerome Powell": {
         "total": 13,
@@ -87,21 +87,21 @@
       },
       "Tim Cook": {
         "total": 17,
-        "hits": 8,
-        "accuracy_pct": 47.1,
-        "avg_return": 3.58
+        "hits": 7,
+        "accuracy_pct": 41.2,
+        "avg_return": 2.73
       },
       "Satya Nadella": {
         "total": 16,
         "hits": 6,
         "accuracy_pct": 37.5,
-        "avg_return": 0.54
+        "avg_return": 0.97
       },
       "Mark Zuckerberg": {
         "total": 17,
-        "hits": 10,
-        "accuracy_pct": 58.8,
-        "avg_return": 4.74
+        "hits": 9,
+        "accuracy_pct": 52.9,
+        "avg_return": 4.15
       }
     },
     "by_sector": {
@@ -139,7 +139,7 @@
         "total": 17,
         "hits": 6,
         "accuracy_pct": 35.3,
-        "avg_return": 1.49
+        "avg_return": 1.46
       },
       "Macro/Rates": {
         "total": 13,
@@ -151,7 +151,7 @@
         "total": 22,
         "hits": 8,
         "accuracy_pct": 36.4,
-        "avg_return": 0.85
+        "avg_return": 1.16
       },
       "Finance": {
         "total": 4,
@@ -173,19 +173,19 @@
       },
       "Tech": {
         "total": 17,
-        "hits": 8,
-        "accuracy_pct": 47.1,
-        "avg_return": 3.58
+        "hits": 7,
+        "accuracy_pct": 41.2,
+        "avg_return": 2.73
       },
       "Social/AI": {
         "total": 17,
-        "hits": 10,
-        "accuracy_pct": 58.8,
-        "avg_return": 4.74
+        "hits": 9,
+        "accuracy_pct": 52.9,
+        "avg_return": 4.15
       }
     },
     "max_return": 39.37,
     "min_return": -21.84,
-    "positive_return_rate": 51.69
+    "positive_return_rate": 50.56
   }
 }
