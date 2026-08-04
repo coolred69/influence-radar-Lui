@@ -1,22 +1,22 @@
 {
-  "detected_at": "2026-08-03T22:52:15.114395",
+  "detected_at": "2026-08-04T22:52:00.760598",
   "us": {
     "regime": "SIDEWAYS",
-    "confidence": 0.65,
+    "confidence": 0.45,
     "scores": {
-      "BULL": 0.0,
+      "BULL": 0.2,
       "BEAR": 0.35,
       "VOLATILE": 0.0,
-      "SIDEWAYS": 0.65
+      "SIDEWAYS": 0.45
     },
     "metrics": {
-      "price": 757.67,
-      "ma50": 744.59,
+      "price": 771.33,
+      "ma50": 745.2,
       "ma200": NaN,
-      "vol_20d_ann": 13.3,
+      "vol_20d_ann": 14.5,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
-      "ret_30d_pct": 1.46,
+      "ret_30d_pct": 3.62,
       "above_ma200": false,
       "golden_cross": false
     },
@@ -35,13 +35,13 @@
       "SIDEWAYS": 0.45
     },
     "metrics": {
-      "price": 99105.0,
-      "ma50": 123923.29,
+      "price": 100330.0,
+      "ma50": 123473.72,
       "ma200": NaN,
-      "vol_20d_ann": 123.3,
+      "vol_20d_ann": 123.6,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
-      "ret_30d_pct": -32.4,
+      "ret_30d_pct": -32.23,
       "above_ma200": false,
       "golden_cross": false
     },
