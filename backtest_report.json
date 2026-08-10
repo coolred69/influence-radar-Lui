@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-08-09T01:02:20.618903",
+  "timestamp": "2026-08-10T01:03:53.127421",
   "period": "2022-08-24 to 2026-07-30",
   "results": {
     "total_signals": 178,
     "correct_predictions": 60,
     "accuracy": 33.71,
-    "avg_return": 1.27,
+    "avg_return": 1.38,
     "by_person": {
       "이재용": {
         "total": 14,
@@ -59,7 +59,7 @@
         "total": 17,
         "hits": 6,
         "accuracy_pct": 35.3,
-        "avg_return": 1.46
+        "avg_return": 1.63
       },
       "Jerome Powell": {
         "total": 13,
@@ -89,19 +89,19 @@
         "total": 17,
         "hits": 7,
         "accuracy_pct": 41.2,
-        "avg_return": 2.73
+        "avg_return": 2.8
       },
       "Satya Nadella": {
         "total": 16,
         "hits": 6,
         "accuracy_pct": 37.5,
-        "avg_return": 0.97
+        "avg_return": 1.54
       },
       "Mark Zuckerberg": {
         "total": 17,
         "hits": 9,
         "accuracy_pct": 52.9,
-        "avg_return": 4.15
+        "avg_return": 4.51
       }
     },
     "by_sector": {
@@ -139,7 +139,7 @@
         "total": 17,
         "hits": 6,
         "accuracy_pct": 35.3,
-        "avg_return": 1.46
+        "avg_return": 1.63
       },
       "Macro/Rates": {
         "total": 13,
@@ -151,7 +151,7 @@
         "total": 22,
         "hits": 8,
         "accuracy_pct": 36.4,
-        "avg_return": 1.16
+        "avg_return": 1.57
       },
       "Finance": {
         "total": 4,
@@ -175,17 +175,17 @@
         "total": 17,
         "hits": 7,
         "accuracy_pct": 41.2,
-        "avg_return": 2.73
+        "avg_return": 2.8
       },
       "Social/AI": {
         "total": 17,
         "hits": 9,
         "accuracy_pct": 52.9,
-        "avg_return": 4.15
+        "avg_return": 4.51
       }
     },
     "max_return": 39.37,
     "min_return": -21.84,
-    "positive_return_rate": 50.56
+    "positive_return_rate": 51.12
   }
 }
