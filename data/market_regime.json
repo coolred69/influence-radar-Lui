@@ -1,5 +1,5 @@
 {
-  "detected_at": "2026-08-14T22:12:20.161112",
+  "detected_at": "2026-08-15T22:10:20.400640",
   "us": {
     "regime": "SIDEWAYS",
     "confidence": 0.45,
@@ -25,39 +25,15 @@
       "watch": 0.55
     }
   },
-  "kr": {
-    "regime": "BEAR",
-    "confidence": 0.55,
-    "scores": {
-      "BULL": 0.0,
-      "BEAR": 0.55,
-      "VOLATILE": 0.0,
-      "SIDEWAYS": 0.45
-    },
-    "metrics": {
-      "price": 110060.0,
-      "ma50": 118561.11,
-      "ma200": NaN,
-      "vol_20d_ann": 115.7,
-      "vol_1y_ann": NaN,
-      "vol_ratio": NaN,
-      "ret_30d_pct": -10.72,
-      "above_ma200": false,
-      "golden_cross": false
-    },
-    "thresholds": {
-      "buy": 0.8,
-      "watch": 0.65
-    }
-  },
+  "kr": null,
   "combined": {
-    "regime": "BEAR",
-    "confidence": 0.55,
+    "regime": "SIDEWAYS",
+    "confidence": 0.45,
     "thresholds": {
-      "buy": 0.8,
-      "watch": 0.65
+      "buy": 0.7,
+      "watch": 0.55
     },
-    "score_multiplier": 0.75,
-    "note": "🔴 비관적 국면 — BUY 기준 강화됨"
+    "score_multiplier": 0.93,
+    "note": "🟡 횡보 — BUY 조건 약간 강화"
   }
 }
