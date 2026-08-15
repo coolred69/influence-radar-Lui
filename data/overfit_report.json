@@ -1,5 +1,5 @@
 {
-  "validated_at": "2026-08-08T19:19:53.620521",
+  "validated_at": "2026-08-15T19:12:05.250379",
   "event_count": 178,
   "weight_count": 11,
   "status": "OVERFIT",
@@ -42,10 +42,10 @@
   },
   "monte_carlo": {
     "real_auc": 0.3136,
-    "perm_mean": 0.5074,
-    "perm_std": 0.0492,
+    "perm_mean": 0.5031,
+    "perm_std": 0.0413,
     "p_value": 1.0,
-    "z_score": -3.94,
+    "z_score": -4.59,
     "significant": false
   },
   "verdict": "과적합 경보: 통계적 유의성 없음 (p=1.000) — 지표가 노이즈일 수 있음; 검증 AUC 낮음 (0.3122) — 일반화 성능 부족",
