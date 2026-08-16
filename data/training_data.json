@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-09T02:56:12.916767",
+  "generated_at": "2026-08-16T02:14:31.768170",
   "version": "v2",
   "total_signals": 178,
   "positive_rate": 0.337,
@@ -33,8 +33,8 @@
       "sentiment": "positive",
       "statement": "AI반도체 로드맵",
       "outcome": 0,
-      "signal_price": 66811.6641,
-      "result_price": 68129.1016,
+      "signal_price": 66811.7031,
+      "result_price": 68129.0938,
       "actual_return": 1.97,
       "indicators": {
         "rsi_filter": 1.0,
@@ -111,8 +111,8 @@
       "sentiment": "positive",
       "statement": "3Q실적서프라이즈",
       "outcome": 1,
-      "signal_price": 63408.4062,
-      "result_price": 66830.7344,
+      "signal_price": 63408.4023,
+      "result_price": 66830.7422,
       "actual_return": 5.4,
       "indicators": {
         "rsi_filter": 1.0,
@@ -151,7 +151,7 @@
       "statement": "실적발표예고",
       "outcome": 0,
       "signal_price": 70585.7422,
-      "result_price": 71063.3203,
+      "result_price": 71063.3125,
       "actual_return": 0.68,
       "indicators": {
         "rsi_filter": 1.0,
@@ -189,7 +189,7 @@
       "sentiment": "positive",
       "statement": "AI칩 투자발표",
       "outcome": 1,
-      "signal_price": 73451.1953,
+      "signal_price": 73451.2031,
       "result_price": 80693.3438,
       "actual_return": 9.86,
       "indicators": {
@@ -228,7 +228,7 @@
       "sentiment": "positive",
       "statement": "글로벌파트너십",
       "outcome": 0,
-      "signal_price": 75991.8203,
+      "signal_price": 75991.8281,
       "result_price": 74072.8281,
       "actual_return": -2.53,
       "indicators": {
@@ -267,8 +267,8 @@
       "sentiment": "positive",
       "statement": "HBM 공급확대",
       "outcome": 0,
-      "signal_price": 230235.6562,
-      "result_price": 202134.0938,
+      "signal_price": 230235.6875,
+      "result_price": 202134.125,
       "actual_return": -12.21,
       "indicators": {
         "rsi_filter": 1.0,
@@ -307,7 +307,7 @@
       "statement": "실적부진 우려",
       "outcome": 0,
       "signal_price": 63898.0977,
-      "result_price": 59604.5625,
+      "result_price": 59604.5586,
       "actual_return": -6.72,
       "indicators": {
         "rsi_filter": 0.0,
@@ -345,7 +345,7 @@
       "sentiment": "positive",
       "statement": "파운드리 전략",
       "outcome": 0,
-      "signal_price": 55824.7617,
+      "signal_price": 55824.7539,
       "result_price": 54564.8281,
       "actual_return": -2.26,
       "indicators": {
@@ -384,8 +384,8 @@
       "sentiment": "positive",
       "statement": "AI메모리 수요증가",
       "outcome": 0,
-      "signal_price": 52107.0977,
-      "result_price": 52399.832,
+      "signal_price": 52107.0938,
+      "result_price": 52399.8281,
       "actual_return": 0.56,
       "indicators": {
         "rsi_filter": 1.0,
@@ -423,7 +423,7 @@
       "sentiment": "positive",
       "statement": "HBM4 개발완료",
       "outcome": 0,
-      "signal_price": 204772.9219,
+      "signal_price": 204772.9375,
       "result_price": 189564.0625,
       "actual_return": -7.43,
       "indicators": {
@@ -463,7 +463,7 @@
       "statement": "2분기 실적가이던스",
       "outcome": 0,
       "signal_price": 53594.5781,
-      "result_price": 53692.7383,
+      "result_price": 53692.7344,
       "actual_return": 0.18,
       "indicators": {
         "rsi_filter": 1.0,
@@ -501,7 +501,7 @@
       "sentiment": "negative",
       "statement": "2Q25 실적부진(영업이익 -56%YoY)",
       "outcome": 0,
-      "signal_price": 70515.1016,
+      "signal_price": 70515.1094,
       "result_price": 70712.625,
       "actual_return": 0.28,
       "indicators": {
@@ -540,8 +540,8 @@
       "sentiment": "positive",
       "statement": "3Q25 실적급증(영업이익 +159%QoQ)",
       "outcome": 0,
-      "signal_price": 103268.5312,
-      "result_price": 101978.9219,
+      "signal_price": 103268.5391,
+      "result_price": 101978.9141,
       "actual_return": -1.25,
       "indicators": {
         "rsi_filter": 0.0,
@@ -579,7 +579,7 @@
       "sentiment": "positive",
       "statement": "E-GMP 플랫폼 확대",
       "outcome": 0,
-      "signal_price": 175816.9844,
+      "signal_price": 175817.0,
       "result_price": 169510.0625,
       "actual_return": -3.59,
       "indicators": {
@@ -601,7 +601,7 @@
         "momentum_20d": 0.562,
         "volume_trend": 0.298,
         "support_proximity": 0.848,
-        "volatility_20d": 0.729,
+        "volatility_20d": 0.728,
         "hit_rate": 0.25,
         "sentiment": 1.0,
         "cross_val": 0.5,
@@ -618,8 +618,8 @@
       "sentiment": "positive",
       "statement": "2Q 실적호조",
       "outcome": 0,
-      "signal_price": 172929.1562,
-      "result_price": 164835.3438,
+      "signal_price": 172929.1719,
+      "result_price": 164835.3281,
       "actual_return": -4.68,
       "indicators": {
         "rsi_filter": 1.0,
@@ -696,7 +696,7 @@
       "sentiment": "positive",
       "statement": "전기차 판매목표",
       "outcome": 1,
-      "signal_price": 215333.7812,
+      "signal_price": 215333.75,
       "result_price": 225467.6094,
       "actual_return": 4.71,
       "indicators": {
@@ -774,8 +774,8 @@
       "sentiment": "positive",
       "statement": "배터리내재화",
       "outcome": 0,
-      "signal_price": 259413.9531,
-      "result_price": 251526.6875,
+      "signal_price": 259413.9844,
+      "result_price": 251526.7188,
       "actual_return": -3.04,
       "indicators": {
         "rsi_filter": 0.0,
@@ -853,7 +853,7 @@
       "statement": "로보틱스투자",
       "outcome": 0,
       "signal_price": 231158.9219,
-      "result_price": 210694.1406,
+      "result_price": 210694.1562,
       "actual_return": -8.85,
       "indicators": {
         "rsi_filter": 1.0,
@@ -891,7 +891,7 @@
       "sentiment": "positive",
       "statement": "하이브리드전략",
       "outcome": 0,
-      "signal_price": 84659.8203,
+      "signal_price": 84659.8125,
       "result_price": 84928.2891,
       "actual_return": 0.32,
       "indicators": {
@@ -930,8 +930,8 @@
       "sentiment": "positive",
       "statement": "1Q 실적발표",
       "outcome": 1,
-      "signal_price": 174116.5,
-      "result_price": 181495.125,
+      "signal_price": 174116.5156,
+      "result_price": 181495.1406,
       "actual_return": 4.24,
       "indicators": {
         "rsi_filter": 1.0,
@@ -1008,8 +1008,8 @@
       "sentiment": "negative",
       "statement": "3Q25 관세영향 본격화(영업이익 -29.2%)",
       "outcome": 1,
-      "signal_price": 260360.0938,
-      "result_price": 273623.7188,
+      "signal_price": 260360.0625,
+      "result_price": 273623.6875,
       "actual_return": 5.09,
       "indicators": {
         "rsi_filter": 0.0,
@@ -1047,7 +1047,7 @@
       "sentiment": "positive",
       "statement": "HBM3 양산 시작",
       "outcome": 1,
-      "signal_price": 110574.1797,
+      "signal_price": 110574.1875,
       "result_price": 115956.1094,
       "actual_return": 4.87,
       "indicators": {
@@ -1086,8 +1086,8 @@
       "sentiment": "positive",
       "statement": "엔비디아 HBM 독점",
       "outcome": 0,
-      "signal_price": 125181.75,
-      "result_price": 128811.6172,
+      "signal_price": 125181.7422,
+      "result_price": 128811.6094,
       "actual_return": 2.9,
       "indicators": {
         "rsi_filter": 1.0,
@@ -1125,7 +1125,7 @@
       "sentiment": "positive",
       "statement": "AI반도체 수혜",
       "outcome": 1,
-      "signal_price": 162120.0312,
+      "signal_price": 162120.0156,
       "result_price": 167134.0469,
       "actual_return": 3.09,
       "indicators": {
@@ -1204,7 +1204,7 @@
       "statement": "HBM 점유율확대",
       "outcome": 1,
       "signal_price": 159735.2344,
-      "result_price": 184395.7344,
+      "result_price": 184395.7188,
       "actual_return": 15.44,
       "indicators": {
         "rsi_filter": 1.0,
@@ -1242,7 +1242,7 @@
       "sentiment": "positive",
       "statement": "엔비디아 공급망",
       "outcome": 1,
-      "signal_price": 192297.0156,
+      "signal_price": 192297.0,
       "result_price": 222716.8594,
       "actual_return": 15.82,
       "indicators": {
@@ -1282,7 +1282,7 @@
       "statement": "1Q 사상최대 실적",
       "outcome": 1,
       "signal_price": 177237.9219,
-      "result_price": 197317.6094,
+      "result_price": 197317.5938,
       "actual_return": 11.33,
       "indicators": {
         "rsi_filter": 1.0,
@@ -1320,7 +1320,7 @@
       "sentiment": "positive",
       "statement": "2Q25 실적호조(영업이익 9.2조)",
       "outcome": 0,
-      "signal_price": 268378.5,
+      "signal_price": 268378.5312,
       "result_price": 260909.7344,
       "actual_return": -2.78,
       "indicators": {
@@ -1359,8 +1359,8 @@
       "sentiment": "positive",
       "statement": "3Q25 사상최대실적(영업이익 11.4조)",
       "outcome": 1,
-      "signal_price": 556480.625,
-      "result_price": 615319.875,
+      "signal_price": 556480.5625,
+      "result_price": 615319.9375,
       "actual_return": 10.57,
       "indicators": {
         "rsi_filter": 0.0,
@@ -1476,8 +1476,8 @@
       "sentiment": "positive",
       "statement": "전기차 보조금확대",
       "outcome": 0,
-      "signal_price": 247834.5625,
-      "result_price": 235835.1406,
+      "signal_price": 247834.5938,
+      "result_price": 235835.125,
       "actual_return": -4.84,
       "indicators": {
         "rsi_filter": 1.0,
@@ -1516,7 +1516,7 @@
       "statement": "반도체 국가지원",
       "outcome": 0,
       "signal_price": 193580.9531,
-      "result_price": 190222.8906,
+      "result_price": 190222.9062,
       "actual_return": -1.73,
       "indicators": {
         "rsi_filter": 1.0,
@@ -1594,7 +1594,7 @@
       "statement": "반도체 세제지원",
       "outcome": 0,
       "signal_price": 56539.3359,
-      "result_price": 53692.7422,
+      "result_price": 53692.7344,
       "actual_return": -5.03,
       "indicators": {
         "rsi_filter": 0.0,
@@ -1609,7 +1609,7 @@
         "atr_stability": 0.835,
         "trend_dir_20": 0.0,
         "pre_run_inv": 0.386,
-        "rsi_7": 0.688,
+        "rsi_7": 0.687,
         "rsi_21": 0.636,
         "momentum_10d": 0.671,
         "momentum_20d": 0.934,
@@ -1866,7 +1866,7 @@
       "sentiment": "positive",
       "statement": "AI 서비스 출시",
       "outcome": 0,
-      "signal_price": 53685.707,
+      "signal_price": 53685.7031,
       "result_price": 48805.1836,
       "actual_return": -9.09,
       "indicators": {
@@ -1945,7 +1945,7 @@
       "statement": "구조조정 발표",
       "outcome": 0,
       "signal_price": 60558.2734,
-      "result_price": 55777.3594,
+      "result_price": 55777.3555,
       "actual_return": -7.89,
       "indicators": {
         "rsi_filter": 0.0,
@@ -2139,7 +2139,7 @@
       "sentiment": "positive",
       "statement": "AI 검색 강화",
       "outcome": 1,
-      "signal_price": 203355.9062,
+      "signal_price": 203355.8906,
       "result_price": 215173.1875,
       "actual_return": 5.81,
       "indicators": {
@@ -2607,7 +2607,7 @@
       "sentiment": "positive",
       "statement": "FQ1FY26 실적발표",
       "outcome": 1,
-      "signal_price": 134.6213,
+      "signal_price": 134.6214,
       "result_price": 142.64,
       "actual_return": 5.96,
       "indicators": {
@@ -3309,7 +3309,7 @@
       "sentiment": "positive",
       "statement": "금리동결 비둘기",
       "outcome": 1,
-      "signal_price": 408.6264,
+      "signal_price": 408.6263,
       "result_price": 434.7492,
       "actual_return": 6.39,
       "indicators": {
@@ -3348,7 +3348,7 @@
       "sentiment": "negative",
       "statement": "금리동결 매파",
       "outcome": 1,
-      "signal_price": 468.7397,
+      "signal_price": 468.7396,
       "result_price": 483.9702,
       "actual_return": 3.25,
       "indicators": {
@@ -3388,7 +3388,7 @@
       "statement": "금리인하 시사",
       "outcome": 0,
       "signal_price": 438.4674,
-      "result_price": 430.1382,
+      "result_price": 430.1381,
       "actual_return": -1.9,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3426,7 +3426,7 @@
       "sentiment": "positive",
       "statement": "9월 인하 시사",
       "outcome": 0,
-      "signal_price": 538.072,
+      "signal_price": 538.0719,
       "result_price": 531.1753,
       "actual_return": -1.28,
       "indicators": {
@@ -3465,7 +3465,7 @@
       "sentiment": "positive",
       "statement": "빅컷 0.5% 인하",
       "outcome": 0,
-      "signal_price": 548.4171,
+      "signal_price": 548.4172,
       "result_price": 557.4091,
       "actual_return": 1.64,
       "indicators": {
@@ -3504,7 +3504,7 @@
       "sentiment": "negative",
       "statement": "인하속도 조절",
       "outcome": 0,
-      "signal_price": 574.4784,
+      "signal_price": 574.4785,
       "result_price": 581.9865,
       "actual_return": 1.31,
       "indicators": {
@@ -3544,7 +3544,7 @@
       "statement": "금리동결 유지",
       "outcome": 0,
       "signal_price": 516.9812,
-      "result_price": 524.396,
+      "result_price": 524.3959,
       "actual_return": 1.43,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3582,8 +3582,8 @@
       "sentiment": "negative",
       "statement": "스태그플레이션 경고",
       "outcome": 0,
-      "signal_price": 557.5843,
-      "result_price": 556.6878,
+      "signal_price": 557.5842,
+      "result_price": 556.6877,
       "actual_return": -0.16,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3621,7 +3621,7 @@
       "sentiment": "neutral",
       "statement": "9월 0.25%p 인하(리스크관리 컷)",
       "outcome": 0,
-      "signal_price": 651.9562,
+      "signal_price": 651.9561,
       "result_price": 662.9575,
       "actual_return": 1.69,
       "indicators": {
@@ -3700,7 +3700,7 @@
       "statement": "GPT-4 발표",
       "outcome": 1,
       "signal_price": 254.2063,
-      "result_price": 268.2817,
+      "result_price": 268.2818,
       "actual_return": 5.54,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3738,7 +3738,7 @@
       "sentiment": "positive",
       "statement": "OpenAI 해임 후 복귀",
       "outcome": 0,
-      "signal_price": 362.8009,
+      "signal_price": 362.801,
       "result_price": 362.1045,
       "actual_return": -0.19,
       "indicators": {
@@ -3817,7 +3817,7 @@
       "statement": "GPT-4o 발표",
       "outcome": 1,
       "signal_price": 406.5853,
-      "result_price": 423.6619,
+      "result_price": 423.6618,
       "actual_return": 4.2,
       "indicators": {
         "rsi_filter": 1.0,
@@ -3895,7 +3895,7 @@
       "statement": "Stargate 500B",
       "outcome": 0,
       "signal_price": 423.4763,
-      "result_price": 407.5354,
+      "result_price": 407.5355,
       "actual_return": -3.76,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4050,8 +4050,8 @@
       "sentiment": "positive",
       "statement": "애플 추가매입",
       "outcome": 0,
-      "signal_price": 185.342,
-      "result_price": 187.2504,
+      "signal_price": 185.1823,
+      "result_price": 187.0891,
       "actual_return": 1.03,
       "indicators": {
         "rsi_filter": 0.0,
@@ -4128,8 +4128,8 @@
       "sentiment": "negative",
       "statement": "애플매도 발표",
       "outcome": 1,
-      "signal_price": 179.9055,
-      "result_price": 189.3993,
+      "signal_price": 179.7504,
+      "result_price": 189.2361,
       "actual_return": 5.28,
       "indicators": {
         "rsi_filter": 0.0,
@@ -4167,8 +4167,8 @@
       "sentiment": "negative",
       "statement": "애플 추가매도",
       "outcome": 0,
-      "signal_price": 220.0703,
-      "result_price": 224.8048,
+      "signal_price": 219.8807,
+      "result_price": 224.6111,
       "actual_return": 2.15,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4401,8 +4401,8 @@
       "sentiment": "positive",
       "statement": "대선 승리",
       "outcome": 0,
-      "signal_price": 579.1426,
-      "result_price": 578.6133,
+      "signal_price": 579.1427,
+      "result_price": 578.6134,
       "actual_return": -0.09,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4440,8 +4440,8 @@
       "sentiment": "positive",
       "statement": "취임 + 행정명령",
       "outcome": 0,
-      "signal_price": 592.8996,
-      "result_price": 591.651,
+      "signal_price": 592.8997,
+      "result_price": 591.6511,
       "actual_return": -0.21,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4518,7 +4518,7 @@
       "sentiment": "negative",
       "statement": "상호관세 발표",
       "outcome": 0,
-      "signal_price": 556.6878,
+      "signal_price": 556.6877,
       "result_price": 518.3669,
       "actual_return": -6.88,
       "indicators": {
@@ -4596,8 +4596,8 @@
       "sentiment": "positive",
       "statement": "FQ2 실적발표 견조",
       "outcome": 1,
-      "signal_price": 163.272,
-      "result_price": 172.6299,
+      "signal_price": 163.1313,
+      "result_price": 172.4811,
       "actual_return": 5.73,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4635,8 +4635,8 @@
       "sentiment": "positive",
       "statement": "FQ3 실적 iPhone 견조",
       "outcome": 0,
-      "signal_price": 188.527,
-      "result_price": 171.8261,
+      "signal_price": 188.3646,
+      "result_price": 171.678,
       "actual_return": -8.86,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4674,8 +4674,8 @@
       "sentiment": "positive",
       "statement": "FQ4 실적발표",
       "outcome": 1,
-      "signal_price": 175.3515,
-      "result_price": 187.5866,
+      "signal_price": 175.2004,
+      "result_price": 187.425,
       "actual_return": 6.98,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4713,8 +4713,8 @@
       "sentiment": "negative",
       "statement": "FQ1 실적 중국 부진",
       "outcome": 0,
-      "signal_price": 184.7685,
-      "result_price": 182.0341,
+      "signal_price": 184.6093,
+      "result_price": 181.8772,
       "actual_return": -1.48,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4752,8 +4752,8 @@
       "sentiment": "positive",
       "statement": "FQ2 250B 자사주매입",
       "outcome": 1,
-      "signal_price": 171.3117,
-      "result_price": 188.2096,
+      "signal_price": 171.164,
+      "result_price": 188.0475,
       "actual_return": 9.86,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4791,8 +4791,8 @@
       "sentiment": "positive",
       "statement": "WWDC AI 발표",
       "outcome": 1,
-      "signal_price": 191.4615,
-      "result_price": 207.2745,
+      "signal_price": 191.2965,
+      "result_price": 207.0959,
       "actual_return": 8.26,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4830,8 +4830,8 @@
       "sentiment": "positive",
       "statement": "FQ3 서프라이즈",
       "outcome": 1,
-      "signal_price": 216.4847,
-      "result_price": 223.048,
+      "signal_price": 216.2982,
+      "result_price": 222.8558,
       "actual_return": 3.03,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4869,8 +4869,8 @@
       "sentiment": "positive",
       "statement": "FQ1 실적발표",
       "outcome": 0,
-      "signal_price": 236.0817,
-      "result_price": 240.2605,
+      "signal_price": 235.8782,
+      "result_price": 240.0535,
       "actual_return": 1.77,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4908,8 +4908,8 @@
       "sentiment": "positive",
       "statement": "FQ2 실적발표",
       "outcome": 0,
-      "signal_price": 212.1988,
-      "result_price": 210.6144,
+      "signal_price": 212.016,
+      "result_price": 210.433,
       "actual_return": -0.75,
       "indicators": {
         "rsi_filter": 0.0,
@@ -4947,8 +4947,8 @@
       "sentiment": "positive",
       "statement": "FQ3 실적서프라이즈(아이폰 강세)",
       "outcome": 1,
-      "signal_price": 206.7498,
-      "result_price": 232.1233,
+      "signal_price": 206.5716,
+      "result_price": 231.9233,
       "actual_return": 12.27,
       "indicators": {
         "rsi_filter": 1.0,
@@ -4986,8 +4986,8 @@
       "sentiment": "positive",
       "statement": "FQ4 실적서프라이즈+가이던스 상회",
       "outcome": 0,
-      "signal_price": 270.6343,
-      "result_price": 272.4438,
+      "signal_price": 270.4011,
+      "result_price": 272.2091,
       "actual_return": 0.67,
       "indicators": {
         "rsi_filter": 0.0,
@@ -5142,7 +5142,7 @@
       "sentiment": "positive",
       "statement": "FQ3 Azure AI 폭발",
       "outcome": 1,
-      "signal_price": 392.1585,
+      "signal_price": 392.1584,
       "result_price": 405.2094,
       "actual_return": 3.33,
       "indicators": {
@@ -5220,7 +5220,7 @@
       "sentiment": "positive",
       "statement": "FQ2FY25 클라우드↑",
       "outcome": 0,
-      "signal_price": 437.1441,
+      "signal_price": 437.1442,
       "result_price": 404.2445,
       "actual_return": -7.53,
       "indicators": {
@@ -5416,7 +5416,7 @@
       "statement": "Q4 배당 첫 발표",
       "outcome": 1,
       "signal_price": 386.7438,
-      "result_price": 469.1601,
+      "result_price": 469.16,
       "actual_return": 21.31,
       "indicators": {
         "rsi_filter": 0.0,
@@ -5533,7 +5533,7 @@
       "statement": "AI 에이전트 공개",
       "outcome": 1,
       "signal_price": 673.1628,
-      "result_price": 721.8122,
+      "result_price": 721.8123,
       "actual_return": 7.23,
       "indicators": {
         "rsi_filter": 0.0,
@@ -6000,9 +6000,9 @@
       "sentiment": "positive",
       "statement": "실적발표 EPS서프라이즈 +6.7%(자동수집)",
       "outcome": 0,
-      "signal_price": 333.43,
-      "result_price": 313.33,
-      "actual_return": -6.03,
+      "signal_price": 333.1427,
+      "result_price": 305.26,
+      "actual_return": -8.37,
       "indicators": {
         "rsi_filter": 1.0,
         "rsi_raw": 64.4,
@@ -6039,8 +6039,8 @@
       "sentiment": "positive",
       "statement": "실적발표 EPS서프라이즈 +3.5%(자동수집)",
       "outcome": 1,
-      "signal_price": 271.1003,
-      "result_price": 298.21,
+      "signal_price": 270.8666,
+      "result_price": 297.953,
       "actual_return": 10.0,
       "indicators": {
         "rsi_filter": 1.0,
@@ -6078,8 +6078,8 @@
       "sentiment": "positive",
       "statement": "실적발표 EPS서프라이즈 +6.3%(자동수집)",
       "outcome": 0,
-      "signal_price": 257.801,
-      "result_price": 261.4891,
+      "signal_price": 257.5789,
+      "result_price": 261.2638,
       "actual_return": 1.43,
       "indicators": {
         "rsi_filter": 1.0,
@@ -6117,8 +6117,8 @@
       "sentiment": "neutral",
       "statement": "실적발표 EPS서프라이즈 +2.5%(자동수집)",
       "outcome": 0,
-      "signal_price": 224.2291,
-      "result_price": 226.7711,
+      "signal_price": 224.0359,
+      "result_price": 226.5757,
       "actual_return": 1.13,
       "indicators": {
         "rsi_filter": 1.0,
@@ -6156,8 +6156,8 @@
       "sentiment": "negative",
       "statement": "실적발표 EPS서프라이즈 -3.8%(자동수집)",
       "outcome": 0,
-      "signal_price": 148.303,
-      "result_price": 151.3755,
+      "signal_price": 148.1752,
+      "result_price": 151.2451,
       "actual_return": 2.07,
       "indicators": {
         "rsi_filter": 0.0,
@@ -6195,8 +6195,8 @@
       "sentiment": "neutral",
       "statement": "실적발표 EPS서프라이즈 +1.4%(자동수집)",
       "outcome": 0,
-      "signal_price": 142.1476,
-      "result_price": 144.4189,
+      "signal_price": 142.0252,
+      "result_price": 144.2944,
       "actual_return": 1.6,
       "indicators": {
         "rsi_filter": 1.0,
@@ -6210,7 +6210,7 @@
         "price_vs_52w": 0.83,
         "atr_stability": 0.686,
         "trend_dir_20": 1.0,
-        "pre_run_inv": 0.471,
+        "pre_run_inv": 0.47,
         "rsi_7": 0.531,
         "rsi_21": 0.458,
         "momentum_10d": 0.563,
@@ -6235,8 +6235,8 @@
       "statement": "실적발표 EPS서프라이즈 +11.8%(자동수집)",
       "outcome": 1,
       "signal_price": 390.54,
-      "result_price": 499.99,
-      "actual_return": 28.03,
+      "result_price": 492.43,
+      "actual_return": 26.09,
       "indicators": {
         "rsi_filter": 1.0,
         "rsi_raw": 53.9,
@@ -6351,7 +6351,7 @@
       "sentiment": "positive",
       "statement": "실적발표 EPS서프라이즈 +8.1%(자동수집)",
       "outcome": 0,
-      "signal_price": 509.173,
+      "signal_price": 509.1729,
       "result_price": 516.4548,
       "actual_return": 1.43,
       "indicators": {
@@ -6468,7 +6468,7 @@
       "sentiment": "positive",
       "statement": "실적발표 EPS서프라이즈 +12.8%(자동수집)",
       "outcome": 1,
-      "signal_price": 323.5736,
+      "signal_price": 323.5737,
       "result_price": 352.9422,
       "actual_return": 9.08,
       "indicators": {
@@ -6507,8 +6507,8 @@
       "sentiment": "neutral",
       "statement": "실적발표 EPS서프라이즈 +0.2%(자동수집)",
       "outcome": 1,
-      "signal_price": 235.3401,
-      "result_price": 260.1537,
+      "signal_price": 235.3402,
+      "result_price": 260.1538,
       "actual_return": 10.54,
       "indicators": {
         "rsi_filter": 1.0,
@@ -6546,7 +6546,7 @@
       "sentiment": "neutral",
       "statement": "실적발표 EPS서프라이즈 +1.9%(자동수집)",
       "outcome": 0,
-      "signal_price": 243.0367,
+      "signal_price": 243.0366,
       "result_price": 221.9093,
       "actual_return": -8.69,
       "indicators": {
@@ -6586,8 +6586,8 @@
       "statement": "실적발표 EPS서프라이즈 -14.4%(자동수집)",
       "outcome": 0,
       "signal_price": 585.61,
-      "result_price": 592.1,
-      "actual_return": 1.11,
+      "result_price": 578.85,
+      "actual_return": -1.15,
       "indicators": {
         "rsi_filter": 1.0,
         "rsi_raw": 36.5,
@@ -6781,7 +6781,7 @@
       "statement": "실적발표 EPS서프라이즈 +23.1%(자동수집)",
       "outcome": 1,
       "signal_price": 546.7858,
-      "result_price": 656.7007,
+      "result_price": 656.7006,
       "actual_return": 20.1,
       "indicators": {
         "rsi_filter": 1.0,
@@ -6819,7 +6819,7 @@
       "sentiment": "positive",
       "statement": "실적발표 EPS서프라이즈 +8.4%(자동수집)",
       "outcome": 1,
-      "signal_price": 471.6637,
+      "signal_price": 471.6638,
       "result_price": 523.2476,
       "actual_return": 10.94,
       "indicators": {
@@ -6897,7 +6897,7 @@
       "sentiment": "positive",
       "statement": "실적발표 EPS서프라이즈 +20.9%(자동수집)",
       "outcome": 1,
-      "signal_price": 296.9226,
+      "signal_price": 296.9225,
       "result_price": 316.9963,
       "actual_return": 6.76,
       "indicators": {
