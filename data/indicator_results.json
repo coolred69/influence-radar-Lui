@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-16T02:18:32.564641",
+  "generated_at": "2026-08-23T02:21:15.070176",
   "version": "v2",
-  "generation": 55,
-  "coordinate_sig": "IR-COORD-G55-2A731D08-AUC71-S3",
+  "generation": 60,
+  "coordinate_sig": "IR-COORD-G60-2A731D08-AUC71-S3",
   "active_indicators": [
     "cross_val",
     "hit_rate",
@@ -14,24 +14,24 @@
     "volume_trend"
   ],
   "indicator_labels": {
-    "hit_rate": "인물 과거 적중률",
-    "rsi_7": "RSI(7일)",
-    "cross_val": "다중 검증 점수",
-    "support_proximity": "지지선 근접도",
-    "pre_run_inv": "사전 모멘텀(역)",
     "volume_trend": "거래량 추세(단기/장기)",
     "momentum_10d": "10일 모멘텀",
-    "sentiment": "감정 분석"
+    "hit_rate": "인물 과거 적중률",
+    "cross_val": "다중 검증 점수",
+    "rsi_7": "RSI(7일)",
+    "sentiment": "감정 분석",
+    "support_proximity": "지지선 근접도",
+    "pre_run_inv": "사전 모멘텀(역)"
   },
   "univariate_auc": {
-    "hit_rate": 0.6823,
-    "rsi_7": 0.485,
-    "cross_val": 0.572,
-    "support_proximity": 0.4822,
-    "pre_run_inv": 0.4825,
     "volume_trend": 0.5047,
     "momentum_10d": 0.5356,
-    "sentiment": 0.5356
+    "hit_rate": 0.6823,
+    "cross_val": 0.572,
+    "rsi_7": 0.485,
+    "sentiment": 0.5356,
+    "support_proximity": 0.4822,
+    "pre_run_inv": 0.4825
   },
   "optimal_weights": {
     "cross_val": 0.0795,
@@ -1326,6 +1326,76 @@
       "accuracy": 55.13,
       "sharpe": 0.5052,
       "coordinate_sig": "IR-COORD-G55-2A731D08-AUC71-S3"
+    },
+    {
+      "generation": 56,
+      "timestamp": "2026-08-23T02:18:21.479932",
+      "active_count": 8,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7476,
+      "test_auc": 0.6161,
+      "overfit_gap": 0.1315,
+      "accuracy": 55.13,
+      "sharpe": 0.5052,
+      "coordinate_sig": "IR-COORD-G56-2A731D08-AUC71-S3"
+    },
+    {
+      "generation": 57,
+      "timestamp": "2026-08-23T02:19:04.202312",
+      "active_count": 8,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7476,
+      "test_auc": 0.6161,
+      "overfit_gap": 0.1315,
+      "accuracy": 55.13,
+      "sharpe": 0.5052,
+      "coordinate_sig": "IR-COORD-G57-2A731D08-AUC71-S3"
+    },
+    {
+      "generation": 58,
+      "timestamp": "2026-08-23T02:19:47.429054",
+      "active_count": 8,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7476,
+      "test_auc": 0.6161,
+      "overfit_gap": 0.1315,
+      "accuracy": 55.13,
+      "sharpe": 0.5052,
+      "coordinate_sig": "IR-COORD-G58-2A731D08-AUC71-S3"
+    },
+    {
+      "generation": 59,
+      "timestamp": "2026-08-23T02:20:29.964840",
+      "active_count": 8,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7476,
+      "test_auc": 0.6161,
+      "overfit_gap": 0.1315,
+      "accuracy": 55.13,
+      "sharpe": 0.5052,
+      "coordinate_sig": "IR-COORD-G59-2A731D08-AUC71-S3"
+    },
+    {
+      "generation": 60,
+      "timestamp": "2026-08-23T02:21:15.070166",
+      "active_count": 8,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7476,
+      "test_auc": 0.6161,
+      "overfit_gap": 0.1315,
+      "accuracy": 55.13,
+      "sharpe": 0.5052,
+      "coordinate_sig": "IR-COORD-G60-2A731D08-AUC71-S3"
     }
   ],
   "data_stats": {
