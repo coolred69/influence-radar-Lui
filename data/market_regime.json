@@ -1,5 +1,5 @@
 {
-  "detected_at": "2026-08-31T00:01:11.313821",
+  "detected_at": "2026-09-01T00:53:53.785567",
   "us": {
     "regime": "SIDEWAYS",
     "confidence": 0.45,
@@ -10,13 +10,13 @@
       "SIDEWAYS": 0.45
     },
     "metrics": {
-      "price": 769.35,
-      "ma50": 753.96,
+      "price": 767.05,
+      "ma50": 754.36,
       "ma200": NaN,
-      "vol_20d_ann": 10.4,
+      "vol_20d_ann": 9.4,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
-      "ret_30d_pct": 3.51,
+      "ret_30d_pct": 3.36,
       "above_ma200": false,
       "golden_cross": false
     },
@@ -26,38 +26,38 @@
     }
   },
   "kr": {
-    "regime": "BEAR",
-    "confidence": 0.55,
+    "regime": "SIDEWAYS",
+    "confidence": 0.65,
     "scores": {
       "BULL": 0.0,
-      "BEAR": 0.55,
+      "BEAR": 0.35,
       "VOLATILE": 0.0,
-      "SIDEWAYS": 0.45
+      "SIDEWAYS": 0.65
     },
     "metrics": {
-      "price": 107180.0,
-      "ma50": 114404.43,
+      "price": 106925.0,
+      "ma50": 112830.13,
       "ma200": NaN,
-      "vol_20d_ann": 104.4,
+      "vol_20d_ann": 49.4,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
-      "ret_30d_pct": -8.0,
+      "ret_30d_pct": 2.93,
       "above_ma200": false,
       "golden_cross": false
     },
     "thresholds": {
-      "buy": 0.8,
-      "watch": 0.65
+      "buy": 0.7,
+      "watch": 0.55
     }
   },
   "combined": {
-    "regime": "BEAR",
-    "confidence": 0.55,
+    "regime": "SIDEWAYS",
+    "confidence": 0.45,
     "thresholds": {
-      "buy": 0.8,
-      "watch": 0.65
+      "buy": 0.7,
+      "watch": 0.55
     },
-    "score_multiplier": 0.75,
-    "note": "🔴 비관적 국면 — BUY 기준 강화됨"
+    "score_multiplier": 0.93,
+    "note": "🟡 횡보 — BUY 조건 약간 강화"
   }
 }
