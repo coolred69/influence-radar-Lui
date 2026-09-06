@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-30T06:05:00.153548",
+  "generated_at": "2026-09-06T05:18:19.427285",
   "version": "v2",
-  "generation": 65,
-  "coordinate_sig": "IR-COORD-G65-735C6086-AUC71-S5",
+  "generation": 70,
+  "coordinate_sig": "IR-COORD-G70-735C6086-AUC71-S5",
   "active_indicators": [
     "cross_val",
     "hit_rate",
@@ -13,22 +13,22 @@
     "support_proximity"
   ],
   "indicator_labels": {
-    "hit_rate": "인물 과거 적중률",
-    "cross_val": "다중 검증 점수",
-    "support_proximity": "지지선 근접도",
-    "rsi_7": "RSI(7일)",
     "sentiment": "감정 분석",
+    "support_proximity": "지지선 근접도",
+    "momentum_10d": "10일 모멘텀",
     "pre_run_inv": "사전 모멘텀(역)",
-    "momentum_10d": "10일 모멘텀"
+    "hit_rate": "인물 과거 적중률",
+    "rsi_7": "RSI(7일)",
+    "cross_val": "다중 검증 점수"
   },
   "univariate_auc": {
-    "hit_rate": 0.6826,
-    "cross_val": 0.5694,
-    "support_proximity": 0.4833,
-    "rsi_7": 0.4751,
     "sentiment": 0.5289,
+    "support_proximity": 0.4833,
+    "momentum_10d": 0.5254,
     "pre_run_inv": 0.4924,
-    "momentum_10d": 0.5254
+    "hit_rate": 0.6826,
+    "rsi_7": 0.4751,
+    "cross_val": 0.5694
   },
   "optimal_weights": {
     "cross_val": 0.0006,
@@ -1424,6 +1424,76 @@
       "accuracy": 66.04,
       "sharpe": 0.761,
       "coordinate_sig": "IR-COORD-G65-735C6086-AUC71-S5"
+    },
+    {
+      "generation": 66,
+      "timestamp": "2026-09-06T05:16:02.931781",
+      "active_count": 7,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7425,
+      "test_auc": 0.6173,
+      "overfit_gap": 0.1252,
+      "accuracy": 66.04,
+      "sharpe": 0.761,
+      "coordinate_sig": "IR-COORD-G66-735C6086-AUC71-S5"
+    },
+    {
+      "generation": 67,
+      "timestamp": "2026-09-06T05:16:37.131055",
+      "active_count": 7,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7425,
+      "test_auc": 0.6173,
+      "overfit_gap": 0.1252,
+      "accuracy": 66.04,
+      "sharpe": 0.761,
+      "coordinate_sig": "IR-COORD-G67-735C6086-AUC71-S5"
+    },
+    {
+      "generation": 68,
+      "timestamp": "2026-09-06T05:17:11.381591",
+      "active_count": 7,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7425,
+      "test_auc": 0.6173,
+      "overfit_gap": 0.1252,
+      "accuracy": 66.04,
+      "sharpe": 0.761,
+      "coordinate_sig": "IR-COORD-G68-735C6086-AUC71-S5"
+    },
+    {
+      "generation": 69,
+      "timestamp": "2026-09-06T05:17:45.157400",
+      "active_count": 7,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7425,
+      "test_auc": 0.6173,
+      "overfit_gap": 0.1252,
+      "accuracy": 66.04,
+      "sharpe": 0.761,
+      "coordinate_sig": "IR-COORD-G69-735C6086-AUC71-S5"
+    },
+    {
+      "generation": 70,
+      "timestamp": "2026-09-06T05:18:19.427276",
+      "active_count": 7,
+      "dropped": [],
+      "removed_by_contribution": [],
+      "added": [],
+      "train_auc": 0.7425,
+      "test_auc": 0.6173,
+      "overfit_gap": 0.1252,
+      "accuracy": 66.04,
+      "sharpe": 0.761,
+      "coordinate_sig": "IR-COORD-G70-735C6086-AUC71-S5"
     }
   ],
   "data_stats": {
