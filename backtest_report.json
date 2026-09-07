@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-09-06T02:04:47.329605",
+  "timestamp": "2026-09-07T02:02:07.779669",
   "period": "2022-10-19 to 2026-08-26",
   "results": {
     "total_signals": 178,
     "correct_predictions": 61,
     "accuracy": 34.27,
-    "avg_return": 1.47,
+    "avg_return": 1.5,
     "by_person": {
       "이재용": {
         "total": 14,
@@ -53,7 +53,7 @@
         "total": 20,
         "hits": 8,
         "accuracy_pct": 40.0,
-        "avg_return": 4.23
+        "avg_return": 4.53
       },
       "Elon Musk": {
         "total": 17,
@@ -133,7 +133,7 @@
         "total": 22,
         "hits": 9,
         "accuracy_pct": 40.9,
-        "avg_return": 3.79
+        "avg_return": 4.07
       },
       "EV/Auto": {
         "total": 17,
