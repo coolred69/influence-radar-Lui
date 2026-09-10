@@ -1,22 +1,22 @@
 {
-  "detected_at": "2026-09-09T23:39:59.680777",
+  "detected_at": "2026-09-10T23:33:06.067612",
   "us": {
     "regime": "SIDEWAYS",
-    "confidence": 0.65,
+    "confidence": 0.45,
     "scores": {
-      "BULL": 0.0,
+      "BULL": 0.2,
       "BEAR": 0.35,
       "VOLATILE": 0.0,
-      "SIDEWAYS": 0.65
+      "SIDEWAYS": 0.45
     },
     "metrics": {
-      "price": 762.4,
-      "ma50": 758.02,
+      "price": 757.83,
+      "ma50": 758.25,
       "ma200": NaN,
-      "vol_20d_ann": 8.4,
+      "vol_20d_ann": 8.5,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
-      "ret_30d_pct": 2.91,
+      "ret_30d_pct": 3.89,
       "above_ma200": false,
       "golden_cross": false
     },
@@ -35,13 +35,13 @@
       "SIDEWAYS": 0.45
     },
     "metrics": {
-      "price": 112100.0,
-      "ma50": 109026.4,
+      "price": 111865.0,
+      "ma50": 108497.76,
       "ma200": NaN,
-      "vol_20d_ann": 48.8,
+      "vol_20d_ann": 47.2,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
-      "ret_30d_pct": 17.41,
+      "ret_30d_pct": 25.1,
       "above_ma200": false,
       "golden_cross": false
     },
@@ -52,7 +52,7 @@
   },
   "combined": {
     "regime": "SIDEWAYS",
-    "confidence": 0.65,
+    "confidence": 0.45,
     "thresholds": {
       "buy": 0.7,
       "watch": 0.55
