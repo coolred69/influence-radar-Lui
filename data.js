@@ -93,7 +93,7 @@ const SM = {
     i:[{t:"ALB",n:"Albemarle",f:65,mc:"10B",note:"리튬원자재"},{t:"ON",n:"ON Semi",f:74,mc:"30B",note:"EV전력반도체"},{t:"APTV",n:"Aptiv",f:68,mc:"12B",note:"자율주행부품"}]},
   CRYPTO:{label:"크립토",color:"#f59e0b",temp:61,
     d:[{t:"COIN",n:"Coinbase",f:92,mc:"55B",note:"미국최대거래소"},{t:"MSTR",n:"MicroStrategy",f:85,mc:"80B",note:"BTC레버리지"},{t:"IBIT",n:"iShares BTC ETF",f:70,mc:"—",note:"BTC직접노출"}],
-    i:[{t:"RIOT",n:"Riot Platforms",f:51,mc:"4B",note:"BTC채굴"},{t:"SQ",n:"Block",f:67,mc:"40B",note:"크립토결제"},{t:"CLSK",n:"CleanSpark",f:53,mc:"3B",note:"BTC채굴"}]},
+    i:[{t:"RIOT",n:"Riot Platforms",f:51,mc:"4B",note:"BTC채굴"},{t:"XYZ",n:"Block",f:67,mc:"40B",note:"크립토결제"},{t:"CLSK",n:"CleanSpark",f:53,mc:"3B",note:"BTC채굴"}]},
   ENERGY:{label:"에너지",color:"#ef4444",temp:79,
     d:[{t:"XOM",n:"ExxonMobil",f:74,mc:"490B",note:"원유메이저"},{t:"CVX",n:"Chevron",f:72,mc:"270B",note:"원유메이저"},{t:"OXY",n:"Occidental",f:68,mc:"48B",note:"Buffett보유"}],
     i:[{t:"HAL",n:"Halliburton",f:66,mc:"28B",note:"유전서비스"},{t:"SLB",n:"SLB",f:70,mc:"60B",note:"오일필드1위"},{t:"FSLR",n:"First Solar",f:72,mc:"20B",note:"태양광"}]},

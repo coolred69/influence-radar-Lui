@@ -411,19 +411,20 @@ const oppLabel = s => s>=70?'🔴 즉시포착':s>=45?'🟠 유망':s>=25?'🟡 
 const oppClass = s => s>=70?'opp-red':s>=45?'opp-orange':s>=25?'opp-yellow':'opp-grey';
 const oppBorder = s => s>=70?'#ff4444':s>=45?'#ff8c00':s>=25?'#fbbf24':'#2a2a4a';
 
-// 종목 현재가 (2026.03 기준 추정 — 실제 확인 필요)
+// 종목 현재가 fallback (실시간 로드 실패시 사용)
+// 2026-09-11 종가 기준, FMP 실데이터로 전면 갱신 (기존 2025-05 값은 1년+ 방치되어 NVDA 등 -75% 오판정 버그 유발했음)
 const PRICES = {
-  // 2025년 5월 기준 근사값 (실시간 로드 실패시 fallback용)
-  NVDA:880, MSFT:415, GOOGL:175, SMCI:55,  ANET:380, ARM:135,
-  AMD:165,  INTC:22,  ASML:720,  AMAT:190, TSM:185,
-  TSLA:250, RIVN:12,  LI:28,     ALB:75,   ON:55,    APTV:55,
-  COIN:225, MSTR:390, IBIT:38,   RIOT:9,   SQ:72,    CLSK:11,
-  XOM:118,  CVX:155,  OXY:52,    HAL:32,   SLB:44,   FSLR:165,
-  JPM:250,  BAC:44,   GS:570,    V:290,    'BRK.B':475, SCHW:80,
-  BABA:105, BIDU:88,  PDD:130,   FXI:28,   KWEB:32,  JD:38,
-  ISRG:490, ABB:48,   TER:95,    RKLB:22,
-  LMT:480,  RTX:128,  NOC:510,   PLTR:95,  HII:220,
+  NVDA:218.29, MSFT:495.63, GOOGL:338.50, SMCI:40.10, ANET:199.59, ARM:264.79,
+  AMD:516.13,  INTC:102.94, ASML:1698.30, AMAT:456.49, TSM:433.24,
+  TSLA:365.44, RIVN:16.03,  LI:11.81,     ALB:117.52,  ON:76.14,    APTV:45.54,
+  COIN:175.26, MSTR:130.97, IBIT:43.77,   RIOT:21.47,  XYZ:79.21,   CLSK:13.67,
+  XOM:165.99,  CVX:214.01,  OXY:61.46,    HAL:35.84,   SLB:56.06,   FSLR:209.03,
+  JPM:356.23,  BAC:62.69,   GS:1029.18,   V:370.45,    'BRK.B':510.37, SCHW:107.25,
+  BABA:109.30, BIDU:91.40,  PDD:77.81,    FXI:34.49,   KWEB:24.60,  JD:27.06,
+  ISRG:369.15, ABB:37.13,   TER:379.72,   RKLB:62.95,
+  LMT:524.19,  RTX:197.68,  NOC:518.97,   PLTR:167.23, HII:279.69,
 };
+// SQ(Square) ticker is delisted since Block Inc rebrand (2025) -- replaced with XYZ below
 
 // 종목별 변동성 기반 최소 손절% 테이블 (일평균 변동성 × 2)
 const STOCK_VOL = {
@@ -440,7 +441,7 @@ const STOCK_VOL = {
 const DEFENSE_TICKERS = new Set(['LMT','RTX','NOC','HII','PLTR','RKLB']);
 const ENERGY_TICKERS  = new Set(['XOM','CVX','OXY','HAL','SLB','FSLR']);
 const AI_TICKERS      = new Set(['NVDA','AMD','MSFT','GOOGL','ARM','ASML','AMAT','TSM','INTC']);
-const CRYPTO_TICKERS     = new Set(['COIN','IBIT','MSTR','RIOT','CLSK','SQ']);
+const CRYPTO_TICKERS     = new Set(['COIN','IBIT','MSTR','RIOT','CLSK','XYZ']);
 const HEALTHCARE_TICKERS = new Set(['JNJ','UNH','LLY','PFE','MRNA','ABBV','TMO','ABT','MDT','ISRG']);
 const RETAIL_TICKERS     = new Set(['AMZN','WMT','TGT','COST','HD','MCD','SBUX','NKE','LOW']);
 const REALESTATE_TICKERS = new Set(['AMT','PLD','EQIX','SPG','O','VNQ','IYR','WELL','DLR']);
