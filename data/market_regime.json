@@ -1,22 +1,22 @@
 {
-  "detected_at": "2026-09-13T23:46:27.246733",
+  "detected_at": "2026-09-15T00:05:20.640694",
   "us": {
     "regime": "SIDEWAYS",
-    "confidence": 0.45,
+    "confidence": 0.65,
     "scores": {
-      "BULL": 0.2,
+      "BULL": 0.0,
       "BEAR": 0.35,
       "VOLATILE": 0.0,
-      "SIDEWAYS": 0.45
+      "SIDEWAYS": 0.65
     },
     "metrics": {
-      "price": 764.29,
-      "ma50": 758.62,
+      "price": NaN,
+      "ma50": NaN,
       "ma200": NaN,
       "vol_20d_ann": 8.7,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
-      "ret_30d_pct": 3.05,
+      "ret_30d_pct": NaN,
       "above_ma200": false,
       "golden_cross": false
     },
@@ -27,21 +27,21 @@
   },
   "kr": {
     "regime": "SIDEWAYS",
-    "confidence": 0.45,
+    "confidence": 0.65,
     "scores": {
-      "BULL": 0.2,
+      "BULL": 0.0,
       "BEAR": 0.35,
       "VOLATILE": 0.0,
-      "SIDEWAYS": 0.45
+      "SIDEWAYS": 0.65
     },
     "metrics": {
-      "price": 109500.0,
-      "ma50": 108002.75,
+      "price": 105410.0,
+      "ma50": 107645.4,
       "ma200": NaN,
-      "vol_20d_ann": 46.2,
+      "vol_20d_ann": 47.2,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
-      "ret_30d_pct": 24.95,
+      "ret_30d_pct": -3.13,
       "above_ma200": false,
       "golden_cross": false
     },
@@ -52,7 +52,7 @@
   },
   "combined": {
     "regime": "SIDEWAYS",
-    "confidence": 0.45,
+    "confidence": 0.65,
     "thresholds": {
       "buy": 0.7,
       "watch": 0.55
