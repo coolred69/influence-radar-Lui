@@ -348,6 +348,9 @@ def score_stock(item, weights, hit_rates):
             return None
 
         df.index = pd.to_datetime(df.index).tz_localize(None)
+        df = df[df['Close'].notna()]   # 당일 미확정 봉(NaN) 제거 — 2026-09-23 발견된 실전 버그 방어
+        if len(df) < 25:
+            return None
         close  = df['Close']
         volume = df['Volume']
 
