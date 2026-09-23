@@ -525,12 +525,33 @@ def main():
 
     new_state = evolve(prev_state, all_signals)
 
-    # ── 역대 최고 AUC Gen 추적
-    current_auc = new_state.get("optimal_metrics", {}).get("auc", 0)
-    prev_best    = (prev_state or {}).get("best_ever", {})
-    prev_best_auc = prev_best.get("metrics", {}).get("auc", 0)
+    # ── 역대 최고 Gen 추적 (2026-09-23 수정)
+    # 기존 버그: best_ever에 저장된 AUC는 "그 세대 당시" 데이터 기준으로 고정된 값이라
+    # 데이터가 커진 지금(178건)과 비교하는 게 apples-to-oranges였음. 게다가 raw AUC만
+    # 비교해서, INFLUENCER_DEP_CAP(hit_rate+sentiment 상한) 도입 이전인 Gen1이
+    # 80세대 내내 best_ever를 독점 — 오늘 도입한 인플루언서 의존도 축소가 실전에
+    # 전혀 반영 안 되고 있었음(load_weights()는 best_ever 우선 사용).
+    # 수정: prev_best 가중치를 "현재" all_signals + "현재" objective(페널티 포함)로
+    # 재평가해서 공정하게 비교.
+    available_keys = set(all_signals[0].get("indicators", {}).keys())
+    prev_best = (prev_state or {}).get("best_ever", {})
+    prev_best_score = -9999.0
+    prev_best_auc = 0.0
+    if prev_best.get("weights"):
+        usable = [k for k in prev_best.get("active_indicators", []) if k in available_keys]
+        w_raw = {k: prev_best["weights"].get(k, 0) for k in usable}
+        wsum = sum(w_raw.values())
+        if usable and wsum > 0:
+            w_norm = {k: v / wsum for k, v in w_raw.items()}
+            reval_ext = extract_indicators(all_signals, usable)
+            prev_best_score = objective(w_norm, reval_ext)
+            prev_best_auc = evaluate_weights(reval_ext, w_norm).get("auc", 0)
 
-    if current_auc >= prev_best_auc:
+    current_ext = extract_indicators(all_signals, new_state["active_indicators"])
+    current_score = objective(new_state["optimal_weights"], current_ext)
+    current_auc = new_state.get("optimal_metrics", {}).get("auc", 0)
+
+    if current_score >= prev_best_score:
         new_state["best_ever"] = {
             "generation":      new_state["generation"],
             "coordinate_sig":  new_state["coordinate_sig"],
@@ -539,12 +560,12 @@ def main():
             "active_indicators": new_state["active_indicators"],
             "updated_at":      new_state["generated_at"],
         }
-        print(f"🏆 역대 최고 갱신! AUC {current_auc:.4f} (이전 최고: {prev_best_auc:.4f})")
+        print(f"🏆 역대 최고 갱신! score {current_score:.4f}(AUC {current_auc:.4f}) (이전 최고 재평가: score {prev_best_score:.4f}, AUC {prev_best_auc:.4f})")
     else:
         # 이전 best 유지
         new_state["best_ever"] = prev_best
-        print(f"📊 역대 최고 유지: Gen {prev_best.get('generation','?')} AUC {prev_best_auc:.4f}"
-              f"  (현재 Gen {new_state['generation']}: {current_auc:.4f})")
+        print(f"📊 역대 최고 유지: Gen {prev_best.get('generation','?')} score {prev_best_score:.4f}(AUC {prev_best_auc:.4f}, 현재데이터 재평가)"
+              f"  vs 현재 Gen {new_state['generation']} score {current_score:.4f}(AUC {current_auc:.4f})")
 
     os.makedirs("data", exist_ok=True)
     with open(RESULTS_PATH, "w", encoding="utf-8") as f:
