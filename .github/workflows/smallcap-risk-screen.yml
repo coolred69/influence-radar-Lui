@@ -1,0 +1,44 @@
+name: Track C 소형주 리스크 스크리닝 자동 실행
+
+on:
+  workflow_dispatch:
+  schedule:
+    # KST 08:00 = UTC 23:00 (전날), 평일(한국 기준 월~금)
+    - cron: '0 23 * * 0-4'
+
+permissions:
+  contents: write
+
+jobs:
+  screen-smallcap-risk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install finance-datareader pandas numpy python-dotenv
+
+      - name: Run Track C Screening
+        env:
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: |
+          mkdir -p data
+          python scripts/screen_smallcap_risk.py
+
+      - name: 결과 커밋 & 푸시
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/smallcap_risk_screen.json
+          git diff --cached --quiet || git commit -m "Track C 소형주 리스크 스크리닝 자동 업데이트 $(date +'%Y-%m-%d')"
+          git push
