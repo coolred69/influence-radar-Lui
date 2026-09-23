@@ -533,6 +533,16 @@ def main():
     # 전혀 반영 안 되고 있었음(load_weights()는 best_ever 우선 사용).
     # 수정: prev_best 가중치를 "현재" all_signals + "현재" objective(페널티 포함)로
     # 재평가해서 공정하게 비교.
+    # ── best_ever 비교는 "홀드아웃 테스트셋" 기준으로만 수행 (2026-09-23 2차 수정)
+    # 1차 수정(Gen1 독점 버그)은 고쳤지만 비교 기준 자체가 optimal_metrics(전체
+    # 데이터로 피팅한 AUC)였음 — 과적합에 취약. 실제로 Gen82는 optimal AUC
+    # 0.713으로 Gen1을 이겨 best_ever가 됐지만, 진짜 홀드아웃 test_auc는
+    # 0.5185(역대 최저, 거의 무작위)이고 과적합 갭도 0.2428(역대 최고)이었음 —
+    # 과적합 모델이 "역대 최고"로 실전 배포될 뻔한 상황.
+    # 수정: 이전 best와 현재 gen 모두 동일한 홀드아웃 test_sigs로만 재평가해서
+    # 비교 — 전체 데이터 피팅 성능이 아니라 "본 적 없는 데이터에서 얼마나
+    # 잘 맞추는가"만으로 승부.
+    _, holdout_test_sigs = split_data(all_signals)
     available_keys = set(all_signals[0].get("indicators", {}).keys())
     prev_best = (prev_state or {}).get("best_ever", {})
     prev_best_score = -9999.0
@@ -543,13 +553,13 @@ def main():
         wsum = sum(w_raw.values())
         if usable and wsum > 0:
             w_norm = {k: v / wsum for k, v in w_raw.items()}
-            reval_ext = extract_indicators(all_signals, usable)
+            reval_ext = extract_indicators(holdout_test_sigs, usable)
             prev_best_score = objective(w_norm, reval_ext)
             prev_best_auc = evaluate_weights(reval_ext, w_norm).get("auc", 0)
 
-    current_ext = extract_indicators(all_signals, new_state["active_indicators"])
+    current_ext = extract_indicators(holdout_test_sigs, new_state["active_indicators"])
     current_score = objective(new_state["optimal_weights"], current_ext)
-    current_auc = new_state.get("optimal_metrics", {}).get("auc", 0)
+    current_auc = evaluate_weights(current_ext, new_state["optimal_weights"]).get("auc", 0)
 
     if current_score >= prev_best_score:
         new_state["best_ever"] = {
