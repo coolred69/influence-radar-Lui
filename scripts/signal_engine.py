@@ -255,6 +255,83 @@ def calc_pre_run_inv(close, days=5):
     ret = (close.iloc[-1] - close.iloc[-(days+1)]) / (close.iloc[-(days+1)] + 1e-9)
     return float(np.clip(0.5 - ret * 3, 0, 1))
 
+# ── 신규 지표 (인플루언서 발언 의존도 축소용 자체 개발, 2026-09-23 추가) ──
+# build_training_data.py와 동일 로직 — daily watchlist에도 동일하게 적용.
+
+_BENCHMARK_FULL = {}
+
+def get_benchmark_series(market):
+    """시장 벤치마크 종가 시리즈 캐시(이 실행 동안 1회만 조회). KR=KODEX200, US=SPY."""
+    ticker = "069500.KS" if market == "KR" else "SPY"
+    if ticker in _BENCHMARK_FULL:
+        return _BENCHMARK_FULL[ticker]
+    try:
+        end = datetime.today()
+        start = (end - timedelta(days=120)).strftime("%Y-%m-%d")
+        bdf = yf.Ticker(ticker).history(start=start, auto_adjust=True)
+        if bdf.empty:
+            _BENCHMARK_FULL[ticker] = None
+        else:
+            bdf.index = pd.to_datetime(bdf.index).tz_localize(None)
+            _BENCHMARK_FULL[ticker] = bdf['Close'].dropna()
+    except Exception as e:
+        print(f"  ⚠️ 벤치마크({ticker}) 조회 실패: {e}")
+        _BENCHMARK_FULL[ticker] = None
+    return _BENCHMARK_FULL[ticker]
+
+def calc_market_rel_strength(close, market, days=5):
+    close = close.dropna()
+    bench = get_benchmark_series(market)
+    if bench is None or len(close) < days + 1 or len(bench) < days + 1:
+        return 0.5
+    stock_ret = (close.iloc[-1] - close.iloc[-(days+1)]) / (close.iloc[-(days+1)] + 1e-9)
+    b0 = float(bench.iloc[-(days+1)]); b1 = float(bench.iloc[-1])
+    bench_ret = (b1 - b0) / (b0 + 1e-9)
+    rel = stock_ret - bench_ret
+    return float(np.clip(0.5 + rel * 5, 0, 1))
+
+def calc_vol_price_divergence(close, volume, days=5):
+    close = close.dropna(); volume = volume.dropna()
+    if len(close) < days + 1 or len(volume) < days * 2 + 1:
+        return 0.5
+    price_ret = (close.iloc[-1] - close.iloc[-(days+1)]) / (close.iloc[-(days+1)] + 1e-9)
+    vol_recent = volume.iloc[-days:].mean()
+    vol_prior  = volume.iloc[-(days*2):-days].mean()
+    vol_chg = (vol_recent - vol_prior) / (vol_prior + 1e-9)
+    agree = price_ret * vol_chg
+    return float(np.clip(0.5 + agree * 3, 0, 1))
+
+def calc_squeeze_breakout(close, window=20, lookback=60):
+    close = close.dropna()
+    if len(close) < window + lookback:
+        return 0.5
+    ma  = close.rolling(window).mean()
+    std = close.rolling(window).std()
+    width = std / (ma + 1e-9)
+    hist = width.iloc[-lookback:]
+    threshold = hist.quantile(0.25)
+    prior_w = float(width.iloc[-6])
+    now_w   = float(width.iloc[-1])
+    was_squeezed = prior_w <= threshold
+    expanding = now_w > prior_w
+    if was_squeezed and expanding: return 1.0
+    if expanding:                  return 0.65
+    if was_squeezed:               return 0.45
+    return 0.3
+
+def calc_gap_persistence(df_full):
+    df_full = df_full.dropna(subset=['Open', 'Close'])
+    if len(df_full) < 2:
+        return 0.5
+    prev_close = float(df_full['Close'].iloc[-2])
+    day_open   = float(df_full['Open'].iloc[-1])
+    day_close  = float(df_full['Close'].iloc[-1])
+    gap = day_open - prev_close
+    if abs(gap) < prev_close * 0.001:
+        return 0.5
+    persistence = (day_close - prev_close) / (gap + 1e-9)
+    return float(np.clip(persistence, 0, 1.5) / 1.5)
+
 # ──────────────────────────────────────────────────────────────
 # 종목 스코어링
 # ──────────────────────────────────────────────────────────────
@@ -278,6 +355,8 @@ def score_stock(item, weights, hit_rates):
         price_now  = float(close.iloc[-1])
         price_prev = float(close.iloc[-2]) if len(close) > 1 else price_now
         change_pct = round((price_now - price_prev) / (price_prev + 1e-9) * 100, 2)
+
+        market_code_early = item.get("market", "US")
 
         # ── 12개 지표 계산
         rsi_val    = calc_rsi(close)
@@ -324,6 +403,11 @@ def score_stock(item, weights, hit_rates):
             "signal_strength": sig_str,
             "news_freq":     0.5,
             "cross_val":     0.5,
+            # ── 신규 지표 (인플루언서 의존도 축소, 2026-09-23) ──
+            "market_rel_strength":  round(calc_market_rel_strength(close, market_code_early), 3),
+            "vol_price_divergence": round(calc_vol_price_divergence(close, volume), 3),
+            "squeeze_breakout":     calc_squeeze_breakout(close),
+            "gap_persistence":      round(calc_gap_persistence(df), 3),
         }
 
         # ── IR-COORD 적용

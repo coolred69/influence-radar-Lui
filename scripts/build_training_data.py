@@ -382,6 +382,93 @@ def calc_volatility_20d(close, window=20):
     return float(np.clip(1 - vol * 20, 0, 1))
 
 
+# ── 신규 지표 (인플루언서 발언 의존도 축소용 자체 개발, 2026-09-23 추가) ──
+# 인물별 hit_rate/sentiment 대신 "가격·거래량 구조" 자체에서 뽑아낸
+# 새 지표군. 발언 이벤트가 없어도(=인플루언서 침묵 기간에도) 매일 계산 가능.
+
+_BENCHMARK_FULL = {}
+
+def get_benchmark_series(market):
+    """시장 벤치마크 종가 시리즈 캐시. KR=KODEX200(069500.KS), US=SPY.
+    실패 시 None 반환(호출부에서 중립값 0.5로 폴백)."""
+    ticker = "069500.KS" if market == "KR" else "SPY"
+    if ticker in _BENCHMARK_FULL:
+        return _BENCHMARK_FULL[ticker]
+    try:
+        bdf = yf.Ticker(ticker).history(start="2022-01-01", auto_adjust=True)
+        if bdf.empty:
+            _BENCHMARK_FULL[ticker] = None
+        else:
+            bdf.index = pd.to_datetime(bdf.index).tz_localize(None)
+            _BENCHMARK_FULL[ticker] = bdf['Close'].dropna()
+    except Exception as e:
+        print(f"  ⚠️ 벤치마크({ticker}) 조회 실패: {e}")
+        _BENCHMARK_FULL[ticker] = None
+    return _BENCHMARK_FULL[ticker]
+
+def calc_market_rel_strength(close, market, signal_dt, days=5):
+    """시장 대비 상대강도: 종목 5일수익률 - 벤치마크 5일수익률.
+    인플루언서와 무관하게 '지금 이 종목이 시장보다 강한가'만 측정."""
+    bench = get_benchmark_series(market)
+    if bench is None or len(close) < days + 1:
+        return 0.5
+    stock_ret = (close.iloc[-1] - close.iloc[-(days+1)]) / (close.iloc[-(days+1)] + 1e-9)
+    bench_before = bench[bench.index <= signal_dt]
+    if len(bench_before) < days + 1:
+        return 0.5
+    b0 = float(bench_before.iloc[-(days+1)]); b1 = float(bench_before.iloc[-1])
+    bench_ret = (b1 - b0) / (b0 + 1e-9)
+    rel = stock_ret - bench_ret
+    return float(np.clip(0.5 + rel * 5, 0, 1))
+
+def calc_vol_price_divergence(close, volume, days=5):
+    """가격-거래량 다이버전스: 가격은 오르는데 거래량이 안 받쳐주면(약한 상승) 낮은 점수,
+    가격·거래량이 같은 방향으로 움직이면(신뢰도 높은 움직임) 높은 점수."""
+    if len(close) < days + 1 or len(volume) < days * 2 + 1:
+        return 0.5
+    price_ret = (close.iloc[-1] - close.iloc[-(days+1)]) / (close.iloc[-(days+1)] + 1e-9)
+    vol_recent = volume.iloc[-days:].mean()
+    vol_prior  = volume.iloc[-(days*2):-days].mean()
+    vol_chg = (vol_recent - vol_prior) / (vol_prior + 1e-9)
+    agree = price_ret * vol_chg
+    return float(np.clip(0.5 + agree * 3, 0, 1))
+
+def calc_squeeze_breakout(close, window=20, lookback=60):
+    """변동성 압축 브레이크아웃: 볼린저밴드 폭이 최근 lookback일 중 하위 25%(압축)였다가
+    확장되기 시작하는 시점을 포착. 표준 TA에 없는 자체 설계 지표."""
+    if len(close) < window + lookback:
+        return 0.5
+    ma  = close.rolling(window).mean()
+    std = close.rolling(window).std()
+    width = std / (ma + 1e-9)
+    hist = width.iloc[-lookback:]
+    threshold = hist.quantile(0.25)
+    prior_w = float(width.iloc[-6])
+    now_w   = float(width.iloc[-1])
+    was_squeezed = prior_w <= threshold
+    expanding = now_w > prior_w
+    if was_squeezed and expanding: return 1.0
+    if expanding:                  return 0.65
+    if was_squeezed:               return 0.45
+    return 0.3
+
+def calc_gap_persistence(df_full, signal_pos):
+    """갭 유지력: 이벤트 당일 시가 갭이 종가까지 얼마나 유지(또는 추가 확대)됐는지.
+    갭이 거의 없으면 중립(0.5)."""
+    if signal_pos < 1 or signal_pos >= len(df_full):
+        return 0.5
+    prev_close = float(df_full['Close'].iloc[signal_pos - 1])
+    day_open   = float(df_full['Open'].iloc[signal_pos])
+    day_close  = float(df_full['Close'].iloc[signal_pos])
+    if any(pd.isna(v) for v in (prev_close, day_open, day_close)):
+        return 0.5
+    gap = day_open - prev_close
+    if abs(gap) < prev_close * 0.001:
+        return 0.5
+    persistence = (day_close - prev_close) / (gap + 1e-9)
+    return float(np.clip(persistence, 0, 1.5) / 1.5)
+
+
 # ──────────────────────────────────────────────────────────────
 # 이벤트 → 훈련 데이터 변환
 # ──────────────────────────────────────────────────────────────
@@ -404,6 +491,7 @@ def fetch_event_data(date_str, symbol, hold_days=HOLD_DAYS):
         signal_idx = after.index[0]
         signal_pos = df.index.get_loc(signal_idx)
         signal_price = float(df['Close'].iloc[signal_pos])
+        market = "KR" if symbol.endswith(".KS") else "US"
 
         pre = df.iloc[:signal_pos+1]
         if len(pre) < 25: return None
@@ -446,6 +534,11 @@ def fetch_event_data(date_str, symbol, hold_days=HOLD_DAYS):
                 "volume_trend":    round(calc_volume_trend(volume), 3),
                 "support_proximity": round(calc_support_proximity(close), 3),
                 "volatility_20d":  round(calc_volatility_20d(close), 3),
+                # ── 신규 지표 (인플루언서 의존도 축소, 2026-09-23) ──
+                "market_rel_strength":  round(calc_market_rel_strength(close, market, signal_dt), 3),
+                "vol_price_divergence": round(calc_vol_price_divergence(close, volume), 3),
+                "squeeze_breakout":     calc_squeeze_breakout(close),
+                "gap_persistence":      round(calc_gap_persistence(df, signal_pos), 3),
             }
         }
     except Exception as e:

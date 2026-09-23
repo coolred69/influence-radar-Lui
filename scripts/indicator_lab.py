@@ -71,6 +71,11 @@ CANDIDATE_INDICATORS = [
     "volume_trend",
     "support_proximity",
     "volatility_20d",
+    # 2026-09-23 추가 — 인플루언서 발언(hit_rate/sentiment) 의존도 축소용 자체 개발 지표
+    "market_rel_strength",
+    "vol_price_divergence",
+    "squeeze_breakout",
+    "gap_persistence",
 ]
 
 INDICATOR_LABELS = {
@@ -97,6 +102,10 @@ INDICATOR_LABELS = {
     "volume_trend":  "거래량 추세(단기/장기)",
     "support_proximity": "지지선 근접도",
     "volatility_20d": "20일 변동성",
+    "market_rel_strength": "시장대비 상대강도",
+    "vol_price_divergence": "가격-거래량 다이버전스",
+    "squeeze_breakout": "변동성압축 브레이크아웃",
+    "gap_persistence": "갭 유지력",
 }
 
 
@@ -176,9 +185,17 @@ def evaluate_weights(signals, weights, threshold=0.52):
         "coverage": round(cov * 100, 2),
     }
 
+INFLUENCER_DEP_KEYS = ("hit_rate", "sentiment")
+INFLUENCER_DEP_CAP  = 0.30   # hit_rate+sentiment 합산 가중치 상한 (2026-09-23, 재식님 지시)
+
 def objective(weights, signals):
     m = evaluate_weights(signals, weights)
-    return m["sharpe"] * m["auc"] * (m["coverage"] / 100 + 0.1)
+    base = m["sharpe"] * m["auc"] * (m["coverage"] / 100 + 0.1)
+    dep_sum = sum(weights.get(k, 0) for k in INFLUENCER_DEP_KEYS)
+    if dep_sum > INFLUENCER_DEP_CAP:
+        over = dep_sum - INFLUENCER_DEP_CAP
+        base *= max(0.0, 1 - over * 3)   # 상한 초과분에 비례해 강하게 페널티
+    return base
 
 
 # ──────────────────────────────────────────────────────────────
