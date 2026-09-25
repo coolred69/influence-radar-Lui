@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-09-24T01:01:48Z",
+  "generated_at": "2026-09-25T00:49:44Z",
   "universe_size": 828,
-  "excluded_count": 9,
-  "flagged_count": 46,
-  "clean_count": 773,
+  "excluded_count": 8,
+  "flagged_count": 41,
+  "clean_count": 779,
   "results": [
     {
       "ticker": "261780",
@@ -264,34 +264,10 @@
       ]
     },
     {
-      "ticker": "123860",
-      "name": "아나패스",
-      "market_cap_eok": 1618,
-      "risk_score": -41,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "MEDIUM",
-          "report": "금전대여결정(자율공시)              ",
-          "date": "20260915"
-        },
-        {
-          "tier": "HIGH",
-          "report": "최대주주변경을수반하는주식담보제공계약체결              ",
-          "date": "20260914"
-        },
-        {
-          "tier": "MEDIUM",
-          "report": "금전대여결정              (대여기간 연장)",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
       "ticker": "026150",
       "name": "특수건설",
       "market_cap_eok": 683,
-      "risk_score": -40,
+      "risk_score": -45,
       "excluded": false,
       "flags": [
         {
@@ -308,11 +284,25 @@
           "tier": "POSITIVE",
           "report": "단일판매ㆍ공급계약체결              ",
           "date": "20260918"
+        }
+      ]
+    },
+    {
+      "ticker": "123860",
+      "name": "아나패스",
+      "market_cap_eok": 1618,
+      "risk_score": -33,
+      "excluded": false,
+      "flags": [
+        {
+          "tier": "MEDIUM",
+          "report": "금전대여결정(자율공시)              ",
+          "date": "20260915"
         },
         {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결              ",
-          "date": "20260910"
+          "tier": "HIGH",
+          "report": "최대주주변경을수반하는주식담보제공계약체결              ",
+          "date": "20260914"
         }
       ]
     },
@@ -331,20 +321,6 @@
       ]
     },
     {
-      "ticker": "307180",
-      "name": "아이엘",
-      "market_cap_eok": 2134,
-      "risk_score": -25,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "HIGH",
-          "report": "주요사항보고서(전환사채권발행결정)",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
       "ticker": "051160",
       "name": "지어소프트",
       "market_cap_eok": 1863,
@@ -359,20 +335,6 @@
       ]
     },
     {
-      "ticker": "489460",
-      "name": "바이오비쥬",
-      "market_cap_eok": 1764,
-      "risk_score": -25,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "HIGH",
-          "report": "주요사항보고서(전환사채권발행결정)",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
       "ticker": "119830",
       "name": "아이텍",
       "market_cap_eok": 1653,
@@ -383,20 +345,6 @@
           "tier": "HIGH",
           "report": "주요사항보고서(유상증자결정)",
           "date": "20260911"
-        }
-      ]
-    },
-    {
-      "ticker": "205500",
-      "name": "넥써쓰",
-      "market_cap_eok": 1482,
-      "risk_score": -25,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "HIGH",
-          "report": "주요사항보고서(유상증자결정)",
-          "date": "20260910"
         }
       ]
     },
@@ -569,39 +517,6 @@
       ]
     },
     {
-      "ticker": "070300",
-      "name": "퀀텀레일",
-      "market_cap_eok": 515,
-      "risk_score": -16,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "MEDIUM",
-          "report": "금전대여결정              (대여기간 연장)",
-          "date": "20260911"
-        },
-        {
-          "tier": "MEDIUM",
-          "report": "금전대여결정              ",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
-      "ticker": "036890",
-      "name": "진성티이씨",
-      "market_cap_eok": 2637,
-      "risk_score": -8,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "MEDIUM",
-          "report": "타인에대한채무보증결정              ",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
       "ticker": "036710",
       "name": "심텍홀딩스",
       "market_cap_eok": 2369,
@@ -714,20 +629,6 @@
       ]
     },
     {
-      "ticker": "019540",
-      "name": "일지테크",
-      "market_cap_eok": 677,
-      "risk_score": -8,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "MEDIUM",
-          "report": "타인에대한채무보증결정              ",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
       "ticker": "122350",
       "name": "삼기",
       "market_cap_eok": 628,
@@ -765,6 +666,20 @@
         {
           "tier": "MEDIUM",
           "report": "소송등의판결ㆍ결정              ",
+          "date": "20260911"
+        }
+      ]
+    },
+    {
+      "ticker": "070300",
+      "name": "퀀텀레일",
+      "market_cap_eok": 515,
+      "risk_score": -8,
+      "excluded": false,
+      "flags": [
+        {
+          "tier": "MEDIUM",
+          "report": "금전대여결정              (대여기간 연장)",
           "date": "20260911"
         }
       ]
@@ -1026,6 +941,14 @@
       "flags": []
     },
     {
+      "ticker": "036890",
+      "name": "진성티이씨",
+      "market_cap_eok": 2637,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
       "ticker": "287840",
       "name": "인투셀",
       "market_cap_eok": 2626,
@@ -1186,6 +1109,14 @@
       "flags": []
     },
     {
+      "ticker": "023410",
+      "name": "유진기업",
+      "market_cap_eok": 2486,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
       "ticker": "461300",
       "name": "아이스크림미디어",
       "market_cap_eok": 2477,
@@ -1285,6 +1216,14 @@
       "ticker": "064820",
       "name": "케이프",
       "market_cap_eok": 2345,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
+      "ticker": "032580",
+      "name": "피델릭스",
+      "market_cap_eok": 2326,
       "risk_score": 0,
       "excluded": false,
       "flags": []
@@ -1453,6 +1392,14 @@
       "ticker": "0001A0",
       "name": "덕양에너젠",
       "market_cap_eok": 2144,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
+      "ticker": "307180",
+      "name": "아이엘",
+      "market_cap_eok": 2134,
       "risk_score": 0,
       "excluded": false,
       "flags": []
@@ -1941,6 +1888,14 @@
       "ticker": "083930",
       "name": "아바코",
       "market_cap_eok": 1777,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
+      "ticker": "489460",
+      "name": "바이오비쥬",
+      "market_cap_eok": 1764,
       "risk_score": 0,
       "excluded": false,
       "flags": []
@@ -2546,6 +2501,14 @@
       "flags": []
     },
     {
+      "ticker": "205500",
+      "name": "넥써쓰",
+      "market_cap_eok": 1482,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
       "ticker": "046440",
       "name": "KG파이낸셜",
       "market_cap_eok": 1472,
@@ -2940,6 +2903,14 @@
     {
       "ticker": "264660",
       "name": "씨앤지하이테크",
+      "market_cap_eok": 1311,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
+      "ticker": "038290",
+      "name": "마크로젠",
       "market_cap_eok": 1311,
       "risk_score": 0,
       "excluded": false,
@@ -5058,6 +5029,14 @@
       "flags": []
     },
     {
+      "ticker": "083790",
+      "name": "CG인바이츠",
+      "market_cap_eok": 742,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
       "ticker": "011370",
       "name": "서한",
       "market_cap_eok": 742,
@@ -5498,6 +5477,14 @@
       "flags": []
     },
     {
+      "ticker": "277880",
+      "name": "티에스아이",
+      "market_cap_eok": 687,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
       "ticker": "061040",
       "name": "알에프텍",
       "market_cap_eok": 685,
@@ -5549,6 +5536,14 @@
       "ticker": "067570",
       "name": "엔브이에이치코리아",
       "market_cap_eok": 680,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
+      "ticker": "019540",
+      "name": "일지테크",
+      "market_cap_eok": 677,
       "risk_score": 0,
       "excluded": false,
       "flags": []
@@ -6210,6 +6205,14 @@
       "flags": []
     },
     {
+      "ticker": "039020",
+      "name": "이건홀딩스",
+      "market_cap_eok": 577,
+      "risk_score": 0,
+      "excluded": false,
+      "flags": []
+    },
+    {
       "ticker": "175140",
       "name": "아고스",
       "market_cap_eok": 576,
@@ -6764,20 +6767,6 @@
       ]
     },
     {
-      "ticker": "032580",
-      "name": "피델릭스",
-      "market_cap_eok": 2326,
-      "risk_score": 5,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결              ",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
       "ticker": "114190",
       "name": "강원에너지",
       "market_cap_eok": 2173,
@@ -6834,6 +6823,20 @@
       ]
     },
     {
+      "ticker": "432720",
+      "name": "퀄리타스반도체",
+      "market_cap_eok": 1517,
+      "risk_score": 5,
+      "excluded": false,
+      "flags": [
+        {
+          "tier": "POSITIVE",
+          "report": "단일판매ㆍ공급계약체결              ",
+          "date": "20260915"
+        }
+      ]
+    },
+    {
       "ticker": "101360",
       "name": "에코앤드림",
       "market_cap_eok": 1368,
@@ -6844,20 +6847,6 @@
           "tier": "POSITIVE",
           "report": "단일판매ㆍ공급계약체결              ",
           "date": "20260923"
-        }
-      ]
-    },
-    {
-      "ticker": "038290",
-      "name": "마크로젠",
-      "market_cap_eok": 1311,
-      "risk_score": 5,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결              ",
-          "date": "20260910"
         }
       ]
     },
@@ -6918,6 +6907,20 @@
       ]
     },
     {
+      "ticker": "065450",
+      "name": "빅텍",
+      "market_cap_eok": 858,
+      "risk_score": 5,
+      "excluded": false,
+      "flags": [
+        {
+          "tier": "POSITIVE",
+          "report": "단일판매ㆍ공급계약체결              ",
+          "date": "20260916"
+        }
+      ]
+    },
+    {
       "ticker": "066980",
       "name": "한성크린텍",
       "market_cap_eok": 787,
@@ -6928,20 +6931,6 @@
           "tier": "POSITIVE",
           "report": "단일판매ㆍ공급계약체결              ",
           "date": "20260922"
-        }
-      ]
-    },
-    {
-      "ticker": "083790",
-      "name": "CG인바이츠",
-      "market_cap_eok": 742,
-      "risk_score": 5,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결              ",
-          "date": "20260910"
         }
       ]
     },
@@ -7002,20 +6991,6 @@
       ]
     },
     {
-      "ticker": "277880",
-      "name": "티에스아이",
-      "market_cap_eok": 687,
-      "risk_score": 5,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결              ",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
       "ticker": "137080",
       "name": "나래나노텍",
       "market_cap_eok": 670,
@@ -7072,20 +7047,6 @@
       ]
     },
     {
-      "ticker": "039020",
-      "name": "이건홀딩스",
-      "market_cap_eok": 577,
-      "risk_score": 5,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결(자회사의 주요경영사항)              ",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
       "ticker": "391710",
       "name": "코닉오토메이션",
       "market_cap_eok": 527,
@@ -7129,44 +7090,6 @@
           "tier": "POSITIVE",
           "report": "단일판매ㆍ공급계약체결              ",
           "date": "20260914"
-        }
-      ]
-    },
-    {
-      "ticker": "432720",
-      "name": "퀄리타스반도체",
-      "market_cap_eok": 1517,
-      "risk_score": 10,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결              ",
-          "date": "20260915"
-        },
-        {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결              ",
-          "date": "20260910"
-        }
-      ]
-    },
-    {
-      "ticker": "065450",
-      "name": "빅텍",
-      "market_cap_eok": 858,
-      "risk_score": 10,
-      "excluded": false,
-      "flags": [
-        {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결              ",
-          "date": "20260916"
-        },
-        {
-          "tier": "POSITIVE",
-          "report": "단일판매ㆍ공급계약체결              ",
-          "date": "20260910"
         }
       ]
     },
@@ -7258,20 +7181,6 @@
           "tier": "CRITICAL",
           "report": "불성실공시법인지정예고              (공시번복 3건)",
           "date": "20260923"
-        }
-      ]
-    },
-    {
-      "ticker": "023410",
-      "name": "유진기업",
-      "market_cap_eok": 2486,
-      "risk_score": -100,
-      "excluded": true,
-      "flags": [
-        {
-          "tier": "CRITICAL",
-          "report": "해산사유발생(종속회사의주요경영사항)              ",
-          "date": "20260910"
         }
       ]
     },
