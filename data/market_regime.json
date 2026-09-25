@@ -1,5 +1,5 @@
 {
-  "detected_at": "2026-09-24T00:06:17.726185",
+  "detected_at": "2026-09-25T00:08:25.207336",
   "us": {
     "regime": "SIDEWAYS",
     "confidence": 0.65,
@@ -13,7 +13,7 @@
       "price": NaN,
       "ma50": NaN,
       "ma200": NaN,
-      "vol_20d_ann": 10.5,
+      "vol_20d_ann": 10.9,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
       "ret_30d_pct": NaN,
