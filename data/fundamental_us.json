@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-23T08:00:31Z",
+  "generated_at": "2026-09-27T00:46:48Z",
   "methodology": "fundamental_score = 0.4*(Piotroski/9*100) + 0.3*(clip(AltmanZ,0,10)/10*100) + 0.3*(clip(upside%,-20,50) 정규화)",
   "results": [
     {
@@ -17,10 +17,10 @@
         "gross_margin_improved": false,
         "asset_turnover_improved": false
       },
-      "altman_z": 72.02,
-      "upside_pct": 50.8,
+      "altman_z": 70.91,
+      "upside_pct": 53.4,
       "roa_pct": 58.06,
-      "market_cap_usd": 5543460270000,
+      "market_cap_usd": 5451420470000,
       "fundamental_score": 77.8
     },
     {
@@ -38,11 +38,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 16.7,
-      "upside_pct": 22.9,
+      "altman_z": 16.4,
+      "upside_pct": 25.5,
       "roa_pct": 22.2,
-      "market_cap_usd": 4249777399192,
-      "fundamental_score": 75.1
+      "market_cap_usd": 4162158113480.9995,
+      "fundamental_score": 76.2
     },
     {
       "ticker": "AAPL",
@@ -59,11 +59,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": true
       },
-      "altman_z": 12.75,
-      "upside_pct": 0.7,
+      "altman_z": 12.79,
+      "upside_pct": 0.3,
       "roa_pct": 31.18,
-      "market_cap_usd": 4990029201000,
-      "fundamental_score": 74.4
+      "market_cap_usd": 5009416510920,
+      "fundamental_score": 74.3
     },
     {
       "ticker": "TSLA",
@@ -80,11 +80,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 17.88,
-      "upside_pct": 22.1,
+      "altman_z": 17.59,
+      "upside_pct": 24.4,
       "roa_pct": 2.8,
-      "market_cap_usd": 1496483507587,
-      "fundamental_score": 70.3
+      "market_cap_usd": 1469666080781,
+      "fundamental_score": 71.3
     },
     {
       "ticker": "AMZN",
@@ -101,11 +101,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 5.77,
-      "upside_pct": 28.0,
+      "altman_z": 5.68,
+      "upside_pct": 30.7,
       "roa_pct": 9.49,
-      "market_cap_usd": 2742845358000,
-      "fundamental_score": 69.0
+      "market_cap_usd": 2685725157000,
+      "fundamental_score": 69.9
     },
     {
       "ticker": "AMD",
@@ -122,11 +122,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": true
       },
-      "altman_z": 44.85,
-      "upside_pct": -4.1,
+      "altman_z": 45.33,
+      "upside_pct": -4.4,
       "roa_pct": 5.55,
-      "market_cap_usd": 1017119362000,
-      "fundamental_score": 67.9
+      "market_cap_usd": 1028305278000,
+      "fundamental_score": 67.8
     },
     {
       "ticker": "MSFT",
@@ -143,11 +143,11 @@
         "gross_margin_improved": false,
         "asset_turnover_improved": false
       },
-      "altman_z": 8.86,
-      "upside_pct": 11.7,
+      "altman_z": 9.12,
+      "upside_pct": 7.8,
       "roa_pct": 17.64,
-      "market_cap_usd": 3697923900000,
-      "fundamental_score": 62.4
+      "market_cap_usd": 3832846143500,
+      "fundamental_score": 61.5
     },
     {
       "ticker": "META",
@@ -164,11 +164,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 9.57,
-      "upside_pct": 1.7,
+      "altman_z": 9.73,
+      "upside_pct": 2.0,
       "roa_pct": 16.52,
-      "market_cap_usd": 1876465870029,
-      "fundamental_score": 60.2
+      "market_cap_usd": 1914843755206,
+      "fundamental_score": 60.8
     }
   ]
 }
