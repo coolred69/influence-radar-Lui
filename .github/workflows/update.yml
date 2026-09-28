@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: influence-radar-git-write
   cancel-in-progress: false
 
 permissions:

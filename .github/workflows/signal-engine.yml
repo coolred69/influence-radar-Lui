@@ -11,6 +11,12 @@ on:
 permissions:
   contents: write
 
+# main에 직접 push하는 모든 워크플로우가 공유하는 그룹 — 동시에 두 개 이상 돌지 못하게
+# GitHub가 큐에 세워서 순차 실행시킴 (git push 충돌의 근본 원인 제거, 재시도로 땜빵 안 함)
+concurrency:
+  group: influence-radar-git-write
+  cancel-in-progress: false
+
 jobs:
   generate-signals:
     runs-on: ubuntu-latest

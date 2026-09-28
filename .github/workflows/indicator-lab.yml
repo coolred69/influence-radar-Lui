@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write           # 결과 파일 자동 커밋
 
+concurrency:
+  group: influence-radar-git-write
+  cancel-in-progress: false
+
 jobs:
   run-indicator-lab:
     runs-on: ubuntu-latest
