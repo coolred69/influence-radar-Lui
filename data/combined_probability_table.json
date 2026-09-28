@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-25T18:09:47Z (자동 생성)",
+  "generated_at": "2026-09-28T00:49:31Z (자동 생성)",
   "methodology": {
     "US": "fundamental_score = 0.4*(Piotroski/9*100) + 0.3*(clip(AltmanZ,0,10)/10*100) + 0.3*(clip(목표주가업사이드%,-20,50) 정규화); final_score = 0.5*fundamental + 0.5*기술점수(보정)",
     "KR": "fundamental_score = 0.5*(Piotroski/9*100) + 0.5*(clip(AltmanZ,0,10)/10*100) — 애널리스트 목표주가 불가능(DART 미제공)으로 제외; final_score = 0.5*fundamental + 0.5*기술점수(보정)",
@@ -8,202 +8,202 @@
   },
   "rows": [
     {
-      "market": "KR",
-      "ticker": "000660",
-      "name": "SK하이닉스",
-      "piotroski": 8,
-      "altman_z": 16.69,
-      "upside_pct": null,
-      "fundamental_score": 94.4,
-      "tech_score": 42.1,
-      "final_score": 68.2
-    },
-    {
-      "market": "KR",
-      "ticker": "207940",
-      "name": "삼성바이오로직스",
-      "piotroski": 9,
-      "altman_z": 12.58,
-      "upside_pct": null,
-      "fundamental_score": 100.0,
-      "tech_score": 31.4,
-      "final_score": 65.7
-    },
-    {
       "market": "US",
       "ticker": "GOOGL",
       "name": "Alphabet",
       "piotroski": 6,
-      "altman_z": 16.7,
-      "upside_pct": 22.9,
-      "fundamental_score": 75.1,
-      "tech_score": 52.0,
-      "final_score": 63.5
+      "altman_z": 16.4,
+      "upside_pct": 25.5,
+      "fundamental_score": 76.2,
+      "tech_score": 51.9,
+      "final_score": 64.0
     },
     {
       "market": "US",
       "ticker": "AMZN",
       "name": "Amazon",
       "piotroski": 7,
-      "altman_z": 5.77,
-      "upside_pct": 28.0,
-      "fundamental_score": 69.0,
-      "tech_score": 52.3,
-      "final_score": 60.6
+      "altman_z": 5.68,
+      "upside_pct": 30.7,
+      "fundamental_score": 69.9,
+      "tech_score": 52.2,
+      "final_score": 61.1
     },
     {
       "market": "US",
       "ticker": "NVDA",
       "name": "NVIDIA",
       "piotroski": 4,
-      "altman_z": 72.02,
-      "upside_pct": 50.8,
+      "altman_z": 70.91,
+      "upside_pct": 53.4,
       "fundamental_score": 77.8,
-      "tech_score": 39.9,
-      "final_score": 58.8
+      "tech_score": 40.0,
+      "final_score": 58.9
     },
     {
       "market": "US",
       "ticker": "AAPL",
       "name": "Apple",
       "piotroski": 8,
-      "altman_z": 12.75,
-      "upside_pct": 0.7,
-      "fundamental_score": 74.4,
-      "tech_score": 40.4,
-      "final_score": 57.4
-    },
-    {
-      "market": "KR",
-      "ticker": "005930",
-      "name": "삼성전자",
-      "piotroski": 7,
-      "altman_z": 10.7,
-      "upside_pct": null,
-      "fundamental_score": 88.9,
-      "tech_score": 23.9,
-      "final_score": 56.4
+      "altman_z": 12.79,
+      "upside_pct": 0.3,
+      "fundamental_score": 74.3,
+      "tech_score": 40.2,
+      "final_score": 57.2
     },
     {
       "market": "US",
       "ticker": "TSLA",
       "name": "Tesla",
       "piotroski": 5,
-      "altman_z": 17.88,
-      "upside_pct": 22.1,
-      "fundamental_score": 70.3,
-      "tech_score": 37.2,
-      "final_score": 53.8
+      "altman_z": 17.59,
+      "upside_pct": 24.4,
+      "fundamental_score": 71.3,
+      "tech_score": 37.7,
+      "final_score": 54.5
     },
     {
       "market": "US",
       "ticker": "META",
       "name": "Meta",
       "piotroski": 5,
-      "altman_z": 9.57,
-      "upside_pct": 1.7,
-      "fundamental_score": 60.2,
-      "tech_score": 44.5,
-      "final_score": 52.4
+      "altman_z": 9.73,
+      "upside_pct": 2.0,
+      "fundamental_score": 60.8,
+      "tech_score": 45.8,
+      "final_score": 53.3
+    },
+    {
+      "market": "KR",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "piotroski": 8,
+      "altman_z": 2.5,
+      "upside_pct": null,
+      "fundamental_score": 56.9,
+      "tech_score": 43.9,
+      "final_score": 50.4
     },
     {
       "market": "US",
       "ticker": "AMD",
       "name": "AMD",
       "piotroski": 7,
-      "altman_z": 44.85,
-      "upside_pct": -4.1,
-      "fundamental_score": 67.9,
-      "tech_score": 31.8,
-      "final_score": 49.9
+      "altman_z": 45.33,
+      "upside_pct": -4.4,
+      "fundamental_score": 67.8,
+      "tech_score": 32.1,
+      "final_score": 50.0
     },
     {
       "market": "US",
       "ticker": "MSFT",
       "name": "Microsoft",
       "piotroski": 5,
-      "altman_z": 8.86,
-      "upside_pct": 11.7,
-      "fundamental_score": 62.4,
-      "tech_score": 36.7,
+      "altman_z": 9.12,
+      "upside_pct": 7.8,
+      "fundamental_score": 61.5,
+      "tech_score": 37.5,
       "final_score": 49.5
     },
     {
       "market": "KR",
-      "ticker": "035420",
-      "name": "네이버",
-      "piotroski": 5,
-      "altman_z": 2.94,
+      "ticker": "207940",
+      "name": "삼성바이오로직스",
+      "piotroski": 9,
+      "altman_z": 2.1,
       "upside_pct": null,
-      "fundamental_score": 42.5,
-      "tech_score": 40.4,
-      "final_score": 41.5
+      "fundamental_score": 60.5,
+      "tech_score": 30.5,
+      "final_score": 45.5
     },
     {
       "market": "KR",
       "ticker": "000270",
       "name": "기아",
       "piotroski": 6,
-      "altman_z": 3.13,
+      "altman_z": 2.42,
       "upside_pct": null,
-      "fundamental_score": 49.0,
+      "fundamental_score": 45.4,
       "tech_score": 32.6,
-      "final_score": 40.8
+      "final_score": 39.0
     },
     {
       "market": "KR",
-      "ticker": "373220",
-      "name": "LG에너지솔루션",
+      "ticker": "035420",
+      "name": "네이버",
       "piotroski": 5,
-      "altman_z": 1.75,
+      "altman_z": 1.5,
       "upside_pct": null,
-      "fundamental_score": 36.5,
-      "tech_score": 38.0,
-      "final_score": 37.2
+      "fundamental_score": 35.3,
+      "tech_score": 40.7,
+      "final_score": 38.0
+    },
+    {
+      "market": "KR",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "piotroski": 7,
+      "altman_z": 2.13,
+      "upside_pct": null,
+      "fundamental_score": 49.5,
+      "tech_score": 25.9,
+      "final_score": 37.7
     },
     {
       "market": "KR",
       "ticker": "035720",
       "name": "카카오",
       "piotroski": 8,
-      "altman_z": 1.38,
+      "altman_z": 0.67,
       "upside_pct": null,
-      "fundamental_score": 51.3,
-      "tech_score": 22.5,
-      "final_score": 36.9
-    },
-    {
-      "market": "KR",
-      "ticker": "051910",
-      "name": "LG화학",
-      "piotroski": 4,
-      "altman_z": 1.03,
-      "upside_pct": null,
-      "fundamental_score": 27.4,
-      "tech_score": 43.8,
-      "final_score": 35.6
+      "fundamental_score": 47.8,
+      "tech_score": 22.4,
+      "final_score": 35.1
     },
     {
       "market": "KR",
       "ticker": "096770",
       "name": "SK이노베이션",
       "piotroski": 5,
-      "altman_z": 1.07,
+      "altman_z": 0.85,
       "upside_pct": null,
-      "fundamental_score": 33.1,
-      "tech_score": 34.7,
-      "final_score": 33.9
+      "fundamental_score": 32.0,
+      "tech_score": 34.4,
+      "final_score": 33.2
+    },
+    {
+      "market": "KR",
+      "ticker": "373220",
+      "name": "LG에너지솔루션",
+      "piotroski": 5,
+      "altman_z": 0.45,
+      "upside_pct": null,
+      "fundamental_score": 30.0,
+      "tech_score": 35.0,
+      "final_score": 32.5
+    },
+    {
+      "market": "KR",
+      "ticker": "051910",
+      "name": "LG화학",
+      "piotroski": 4,
+      "altman_z": 0.8,
+      "upside_pct": null,
+      "fundamental_score": 26.2,
+      "tech_score": 37.7,
+      "final_score": 32.0
     },
     {
       "market": "KR",
       "ticker": "005380",
       "name": "현대차",
       "piotroski": 2,
-      "altman_z": 1.33,
+      "altman_z": 1.1,
       "upside_pct": null,
-      "fundamental_score": 17.8,
-      "tech_score": 32.1,
-      "final_score": 25.0
+      "fundamental_score": 16.6,
+      "tech_score": 32.7,
+      "final_score": 24.7
     }
   ]
 }
