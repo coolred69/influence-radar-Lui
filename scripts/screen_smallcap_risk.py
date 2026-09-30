@@ -120,6 +120,16 @@ def main():
     universe = get_smallcap_universe()
     print(f"소형주 유니버스: {len(universe)}종목 (시총 500억~3000억, 코스닥)")
 
+    # 2026-09-30 재식님 건: KRX 데이터 피드가 간헐적으로 Marcap/Close를 전부 NaN으로 반환하며
+    # universe_size=0으로 기존 정상 데이터(약 800종목대)를 덮어쓰는 사고 발생.
+    # 과거 정상 범위(약 800종목) 대비 현저히 적으면 피드 장애로 판단, 기존 데이터 보존 후 실패 처리.
+    if len(universe) < 300:
+        print(
+            f"[WARN] 유니버스 비정상 축소({len(universe)}종목, 정상 800종목 내외) - "
+            "KRX 데이터 피드 장애로 추정. 기존 smallcap_risk_screen.json 보존, 실패로 종료."
+        )
+        raise SystemExit(1)
+
     filings_b = fetch_recent_filings(days=14, pblntf_ty="B")  # 주요사항보고
     filings_i = fetch_recent_filings(days=14, pblntf_ty="I")  # 거래소공시
     all_filings = filings_b + filings_i
