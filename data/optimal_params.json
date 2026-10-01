@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-09-01T20:26:29.890262",
-  "best_auc": 0.5938,
+  "updated_at": "2026-10-01T22:16:14.397884",
+  "best_auc": 0.5956,
   "best_params": {
     "rsi_period": 12,
     "macd_fast": 9,
@@ -11,8 +11,8 @@
     "volume_ma": 10,
     "momentum_days": 6,
     "atr_period": 21,
-    "trend_period": 27,
-    "rsi_low": 33,
+    "trend_period": 28,
+    "rsi_low": 34,
     "rsi_high": 63
   },
   "default_params": {
