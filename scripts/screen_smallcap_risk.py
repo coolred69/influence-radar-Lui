@@ -17,6 +17,8 @@ corp_cls=K(코스닥) 조건으로 한 번에 긁어와서(페이지네이션) �
 import json
 import os
 import datetime
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -114,8 +116,18 @@ def fetch_recent_filings(days=14, pblntf_ty="B"):
             f"&bgn_de={begin}&end_de={end}&pblntf_ty={pblntf_ty}&corp_cls=K"
             f"&page_no={page}&page_count=100"
         )
-        with urllib.request.urlopen(url, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
+        # DART 접속 타임아웃 대비 재시도 (2026-10-02: GitHub runner -> opendart connect timeout 실측)
+        data = None
+        for attempt in range(1, 4):
+            try:
+                with urllib.request.urlopen(url, timeout=45) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                break
+            except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+                print(f"[FILING] type={pblntf_ty} page={page} attempt={attempt} ERR {type(e).__name__}: {str(e)[:100]}")
+                if attempt == 3:
+                    raise
+                time.sleep(10 * attempt)
         if data.get("status") != "000":
             break
         rows = data.get("list", [])
