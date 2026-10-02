@@ -57,13 +57,38 @@ RISK_KEYWORDS = {
 RISK_SCORE = {"CRITICAL": -100, "HIGH": -25, "MEDIUM": -8, "POSITIVE": 5}
 
 
+def _load_listing():
+    """KRX 시세 로드 — 일시적 NaN/빈 응답 대비 재시도 + 대체 소스 폴백.
+    (2026-10-02 추가: 10/1·10/2 Track C 연속 실패 = 유니버스<300 가드 발동 대응)"""
+    import time
+    import FinanceDataReader as fdr
+
+    last_err = None
+    for attempt in range(1, 4):
+        for src in ("KRX", "KOSDAQ"):
+            try:
+                df = fdr.StockListing(src)
+                if "Market" not in df.columns:  # KOSDAQ 단독 소스는 Market 컬럼이 없을 수 있음
+                    df = df.assign(Market="KOSDAQ")
+                n_cap = int(df["Marcap"].notna().sum()) if "Marcap" in df.columns else 0
+                print(f"[LISTING] try={attempt} src={src} rows={len(df)} marcap_notna={n_cap}")
+                if n_cap >= 300:  # 정상 피드 판정 (전부 NaN이면 재시도)
+                    return df
+            except Exception as e:  # noqa: BLE001
+                last_err = e
+                print(f"[LISTING] try={attempt} src={src} ERR {type(e).__name__}: {str(e)[:120]}")
+        time.sleep(20 * attempt)
+    print(f"[LISTING] 3회 재시도 실패 last_err={last_err!r}")
+    return None
+
+
 def get_smallcap_universe():
     """FinanceDataReader로 코스닥 소형주 유니버스 산출.
     pykrx는 최신 버전에서 KRX 로그인을 요구해서(KRX_ID/KRX_PW 미보유) 배제,
     FDR은 로그인 없이 동일 데이터(KRX 실시간 시세) 제공 확인됨."""
-    import FinanceDataReader as fdr
-
-    df = fdr.StockListing("KRX")
+    df = _load_listing()
+    if df is None:
+        return {}
     kosdaq = df[df["Market"] == "KOSDAQ"].copy()
     kosdaq = kosdaq[~kosdaq["Name"].str.contains("스팩|리츠|우$", regex=True, na=False)]
     small = kosdaq[
