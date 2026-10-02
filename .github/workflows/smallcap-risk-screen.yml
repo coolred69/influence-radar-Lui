@@ -3,8 +3,8 @@ name: Track C 소형주 리스크 스크리닝 자동 실행
 on:
   workflow_dispatch:
   schedule:
-    # KST 08:00 = UTC 23:00 (전날), 평일(한국 기준 월~금)
-    - cron: '0 23 * * 0-4'
+    # KST 09:45 = UTC 00:45, 평일(월~금). 08:00(장 전)은 Volume=0/Marcap NaN 위험 -> 장 시작 후로 이동 (2026-10-02)
+    - cron: '45 0 * * 1-5'
 
 permissions:
   contents: write
