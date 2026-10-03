@@ -1,15 +1,15 @@
 {
-  "validated_at": "2026-09-26T21:39:38.536501",
+  "validated_at": "2026-10-03T21:51:56.772549",
   "event_count": 178,
   "weight_count": 9,
   "status": "OVERFIT",
   "warnings": [
     "통계적 유의성 없음 (p=1.000) — 지표가 노이즈일 수 있음",
-    "검증 AUC 낮음 (0.2928) — 일반화 성능 부족"
+    "검증 AUC 낮음 (0.2978) — 일반화 성능 부족"
   ],
   "walk_forward": {
-    "avg_test_auc": 0.2928,
-    "avg_degradation": -0.0287,
+    "avg_test_auc": 0.2978,
+    "avg_degradation": -0.0336,
     "folds": [
       {
         "fold": 1,
@@ -34,20 +34,20 @@
         "train_size": 132,
         "test_size": 44,
         "train_auc": 0.2626,
-        "test_auc": 0.3499,
-        "degradation": -0.0873,
+        "test_auc": 0.3648,
+        "degradation": -0.1022,
         "overfit_flag": false
       }
     ]
   },
   "monte_carlo": {
-    "real_auc": 0.2814,
-    "perm_mean": 0.4995,
-    "perm_std": 0.0453,
+    "real_auc": 0.2851,
+    "perm_mean": 0.5044,
+    "perm_std": 0.0466,
     "p_value": 1.0,
-    "z_score": -4.81,
+    "z_score": -4.7,
     "significant": false
   },
-  "verdict": "과적합 경보: 통계적 유의성 없음 (p=1.000) — 지표가 노이즈일 수 있음; 검증 AUC 낮음 (0.2928) — 일반화 성능 부족",
+  "verdict": "과적합 경보: 통계적 유의성 없음 (p=1.000) — 지표가 노이즈일 수 있음; 검증 AUC 낮음 (0.2978) — 일반화 성능 부족",
   "recommendation": "① 지표 수 축소 (현재 상위 6개만 유지)  ② 정규화 강화  ③ 훈련 데이터 증가 후 재진화 권고"
 }
