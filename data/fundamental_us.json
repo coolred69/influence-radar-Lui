@@ -1,28 +1,7 @@
 {
-  "generated_at": "2026-09-27T00:46:48Z",
+  "generated_at": "2026-10-04T03:56:00Z",
   "methodology": "fundamental_score = 0.4*(Piotroski/9*100) + 0.3*(clip(AltmanZ,0,10)/10*100) + 0.3*(clip(upside%,-20,50) 정규화)",
   "results": [
-    {
-      "ticker": "NVDA",
-      "name": "NVIDIA Corporation",
-      "piotroski": 4,
-      "piotroski_detail": {
-        "roa_positive": true,
-        "cfo_positive": true,
-        "roa_improved": false,
-        "cfo_over_ni": false,
-        "leverage_decreased": true,
-        "liquidity_improved": false,
-        "no_new_shares": true,
-        "gross_margin_improved": false,
-        "asset_turnover_improved": false
-      },
-      "altman_z": 70.91,
-      "upside_pct": 53.4,
-      "roa_pct": 58.06,
-      "market_cap_usd": 5451420470000,
-      "fundamental_score": 77.8
-    },
     {
       "ticker": "GOOGL",
       "name": "Alphabet Inc.",
@@ -38,11 +17,32 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 16.4,
-      "upside_pct": 25.5,
+      "altman_z": 16.39,
+      "upside_pct": 25.6,
       "roa_pct": 22.2,
-      "market_cap_usd": 4162158113480.9995,
+      "market_cap_usd": 4157075226740.9995,
       "fundamental_score": 76.2
+    },
+    {
+      "ticker": "NVDA",
+      "name": "NVIDIA Corporation",
+      "piotroski": 4,
+      "piotroski_detail": {
+        "roa_positive": true,
+        "cfo_positive": true,
+        "roa_improved": false,
+        "cfo_over_ni": false,
+        "leverage_decreased": true,
+        "liquidity_improved": false,
+        "no_new_shares": true,
+        "gross_margin_improved": false,
+        "asset_turnover_improved": false
+      },
+      "altman_z": 73.51,
+      "upside_pct": 44.9,
+      "roa_pct": 58.06,
+      "market_cap_usd": 5666502950000,
+      "fundamental_score": 75.6
     },
     {
       "ticker": "AAPL",
@@ -59,11 +59,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": true
       },
-      "altman_z": 12.79,
-      "upside_pct": 0.3,
+      "altman_z": 12.56,
+      "upside_pct": 2.4,
       "roa_pct": 31.18,
-      "market_cap_usd": 5009416510920,
-      "fundamental_score": 74.3
+      "market_cap_usd": 4901023823640,
+      "fundamental_score": 75.2
     },
     {
       "ticker": "TSLA",
@@ -80,11 +80,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 17.59,
-      "upside_pct": 24.4,
+      "altman_z": 17.52,
+      "upside_pct": 24.9,
       "roa_pct": 2.8,
-      "market_cap_usd": 1469666080781,
-      "fundamental_score": 71.3
+      "market_cap_usd": 1463662768742,
+      "fundamental_score": 71.5
     },
     {
       "ticker": "AMZN",
@@ -101,11 +101,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 5.68,
-      "upside_pct": 30.7,
+      "altman_z": 5.71,
+      "upside_pct": 29.9,
       "roa_pct": 9.49,
-      "market_cap_usd": 2685725157000,
-      "fundamental_score": 69.9
+      "market_cap_usd": 2705625792000,
+      "fundamental_score": 69.6
     },
     {
       "ticker": "AMD",
@@ -122,11 +122,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": true
       },
-      "altman_z": 45.33,
-      "upside_pct": -4.4,
+      "altman_z": 45.56,
+      "upside_pct": -4.9,
       "roa_pct": 5.55,
-      "market_cap_usd": 1028305278000,
-      "fundamental_score": 67.8
+      "market_cap_usd": 1033653646000,
+      "fundamental_score": 67.6
     },
     {
       "ticker": "MSFT",
@@ -143,11 +143,11 @@
         "gross_margin_improved": false,
         "asset_turnover_improved": false
       },
-      "altman_z": 9.12,
-      "upside_pct": 7.8,
+      "altman_z": 9.14,
+      "upside_pct": 8.9,
       "roa_pct": 17.64,
-      "market_cap_usd": 3832846143500,
-      "fundamental_score": 61.5
+      "market_cap_usd": 3842944891500,
+      "fundamental_score": 62.0
     },
     {
       "ticker": "META",
@@ -164,11 +164,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 9.73,
-      "upside_pct": 2.0,
+      "altman_z": 9.49,
+      "upside_pct": 5.8,
       "roa_pct": 16.52,
-      "market_cap_usd": 1914843755206,
-      "fundamental_score": 60.8
+      "market_cap_usd": 1854774021886,
+      "fundamental_score": 61.7
     }
   ]
 }
