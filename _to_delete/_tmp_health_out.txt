@@ -1,0 +1,339 @@
+=== overfit_report ===
+{
+  "validated_at": "2026-10-03T21:51:56.772549",
+  "event_count": 178,
+  "weight_count": 9,
+  "status": "OVERFIT",
+  "warnings": [
+    "통계적 유의성 없음 (p=1.000) — 지표가 노이즈일 수 있음",
+    "검증 AUC 낮음 (0.2978) — 일반화 성능 부족"
+  ],
+  "walk_forward": {
+    "avg_test_auc": 0.2978,
+    "avg_degradation": -0.0336,
+    "folds": [
+      {
+        "fold": 1,
+        "train_size": 44,
+        "test_size": 44,
+        "train_auc": 0.2484,
+        "test_auc": 0.3137,
+        "degradation": -0.0653,
+        "overfit_flag": false
+      },
+      {
+        "fold": 2,
+        "train_size": 88,
+        "test_size": 44,
+        "train_auc": 0.2815,
+        "test_auc": 0.2149,
+        "degradation": 0.0666,
+        "overfit_flag": false
+      },
+      {
+        "fold": 3,
+        "train_size": 132,
+        "test_size": 44,
+        "train_auc": 0.2626,
+        "test_auc": 0.3648,
+        "degradation": -0.1022,
+        "overfit_flag": false
+      }
+    ]
+  },
+  "monte_carlo": {
+    "real_auc": 0.2851,
+    "perm_mean": 0.5044,
+    "perm_std": 0.0466,
+    "p_value": 1.0,
+    "z_score": -4.7,
+    "significant": false
+  },
+  "verdict": "과적합 경보: 통계적 유의성 없음 (p=1.000) — 지표가 노이즈일 수 있음; 검증 AUC 낮음 (0.2978) — 일반화 성능 부족",
+  "recommendation": "① 지표 수 축소 (현재 상위 6개만 유지)  ② 정규화 강화  ③ 훈련 데이터 증가 후 재진화 권고"
+}
+=== combined_probability_table type === <class 'dict'>
+keys: ['generated_at', 'methodology', 'rows']
+{
+  "generated_at": "2026-10-07T19:39:57Z (자동 생성)",
+  "methodology": {
+    "US": "fundamental_score = 0.4*(Piotroski/9*100) + 0.3*(clip(AltmanZ,0,10)/10*100) + 0.3*(clip(목표주가업사이드%,-20,50) 정규화); final_score = 0.5*fundamental + 0.5*기술점수(보정)",
+    "KR": "fundamental_score = 0.5*(Piotroski/9*100) + 0.5*(clip(AltmanZ,0,10)/10*100) — 애널리스트 목표주가 불가능(DART 미제공)으로 제외; final_score = 0.5*fundamental + 0.5*기술점수(보정)",
+    "tech_score_source": "signal_engine.py 매일 자동 실행 결과(보정 점수), data/signals.json",
+    "limitation": "US/KR 펀더멘털 산식이 달라 fundamental_score 직접 비교는 참고용. Altman Z는 미국 제조업 기준 모델이라 한국 대기업 저평가 편향 있음."
+  },
+  "rows": [
+    {
+      "market": "US",
+      "ticker": "GOOGL",
+      "name": "Alphabet",
+      "piotroski": 6,
+      "altman_z": 16.39,
+      "upside_pct": 25.6,
+      "fundamental_score": 76.2,
+      "tech_score": 48.8,
+      "final_score": 62.5
+    },
+    {
+      "market": "US",
+      "ticker": "AMZN",
+      "name": "Amazon",
+      "piotroski": 7,
+      "altman_z": 5.71,
+      "upside_pct": 29.9,
+      "fundamental_score": 69.6,
+      "tech_score": 47.2,
+      "final_score": 58.4
+    },
+    {
+      "market": "US",
+      "ticker": "AAPL",
+      "name": "Apple",
+      "piotroski": 8,
+      "altman_z": 12.56,
+      "upside_pct": 2.4,
+      "fundamental_score": 75.2,
+      "tech_score": 40.4,
+      "final_score": 57.8
+    },
+    {
+      "market": "US",
+      "ticker": "NVDA",
+      "name": "NVIDIA",
+      "piotroski": 4,
+      "altman_z": 73.51,
+      "upside_pct": 44.9,
+      "fundamental_score": 75.6,
+      "tech_score": 37.9,
+      "final_score": 56.8
+    },
+    {
+      "market": "KR",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "piotroski": 8,
+      "altman_z": 2.5,
+      "upside_pct": null,
+      "fundamental_score": 56.9,
+      "tech_score": 56.5,
+      "final_score": 56.7
+    },
+    {
+      "market": "US",
+      "ticker": "META",
+      "name": "Meta",
+      "piotroski": 5,
+      "altman_z": 9.49,
+      "upside_pct": 5.8,
+      "fundamental_score": 61.7,
+      "tech_score": 46.4,
+      "final_score": 54.0
+    },
+    {
+      "market": "US",
+      "ticker": "TSLA",
+      "name": "Tesla",
+      "piotroski": 5,
+      "altman_z": 17.52,
+      "upside_pct": 24.9,
+      "fundamental_score": 71.5,
+      "tech_score": 34.2,
+      "final_score": 52.9
+    },
+    {
+      "market": "US",
+      "ticker": "AMD",
+      "name": "AMD",
+      "piotroski": 7,
+      "altman_z": 45.56,
+      "upside_pct": -4.9,
+      "fundamental_score": 67.6,
+      "tech_score": 36.2,
+      "final_score": 51.9
+    },
+    {
+      "market": "US",
+      "ticker": "MSFT",
+      "name": "Microsoft",
+      "piotroski": 5,
+      "altman_z": 9.14,
+      "upside_pct": 8.9,
+      "fundamental_score": 62.0,
+      "tech_score": 36.5,
+      "final_score": 49.2
+    },
+    {
+      "market": "KR",
+      "ticker": "207940",
+      "name": "삼성바이오로직스",
+      "piotroski": 9,
+      "altman_z": 2.1,
+      "upside_pct": null,
+      "fundamental_score": 60.5,
+      "tech_score": 36.0,
+      "fin
+=== smallcap_risk_screen ===
+keys: ['generated_at', 'universe_size', 'excluded_count', 'flagged_count', 'clean_count', 'results']
+{
+  "generated_at": "2026-10-07T06:29:20Z",
+  "universe_size": 836,
+  "excluded_count": 9,
+  "flagged_count": 42,
+  "clean_count": 785,
+  "results": [
+    {
+      "ticker": "163730",
+      "name": "핑거",
+      "market_cap_eok": 1917,
+      "risk_score": -83,
+      "excluded": false,
+      "flags": [
+        {
+          "tier": "HIGH",
+          "report": "주요사항보고서(전환사채권발행결정)",
+          "date": "20260928"
+        },
+        {
+          "tier": "HIGH",
+          "report": "주요사항보고서(전환사채권발행결정)",
+          "date": "20260928"
+        },
+        {
+          "tier": "HIGH",
+          "report": "유상증자결정(종속회사의주요경영사항)              ",
+          "date": "20261001"
+        },
+        {
+          "tier": "MEDIUM",
+          "report": "금전대여결정              ",
+          "date": "20260930"
+        }
+      ]
+    },
+    {
+      "ticker": "320000",
+      "name": "한울반도체",
+      "market_cap_eok": 705,
+      "risk_score": -75,
+      "excluded": false,
+      "flags": [
+        {
+          "tier": "HIGH",
+          "report": "주요사항보고서(유상증자결정)",
+          "date": "20260930"
+        },
+        {
+          "tier": "HIGH",
+          "report": "주요사항보고서(유상증자결정)",
+          "date": "20260929"
+        },
+        {
+          "tier": "HIGH",
+          "report": "기타주요경영사항              (유상증자결정(주주배정후 실권주 일반공모) 철회)",
+          "date": "20260930"
+        }
+      ]
+    },
+    {
+      "ticker": "059270",
+      "name": "해성에어로보틱스",
+      "market_cap_eok": 597,
+      "risk_score": -75,
+      "excluded": false,
+      "flags": [
+        {
+          "tier": "HIGH",
+          "report": "최대주주변경을수반하는주식담보제공계약체결              ",
+          "date": "20260930"
+        },
+        {
+          "tier": "HIGH",
+          "report": "최대주주변경을수반하는주식담보제공계약해제ㆍ취소등              ",
+          "date": "20260930"
+        },
+        {
+          "tier": "HIGH",
+          "report": "최대주주변경을수반하는주식담보제공계약체결              ",
+          "date": "20260928"
+        }
+      ]
+    },
+    {
+      "ticker": "402030",
+      "name": "코난테크놀로지",
+      "market_cap_eok": 1614,
+      "risk_score": -50,
+      "excluded": false,
+      "flags": [
+        {
+          "tier": "HIGH",
+          "report": "최대주주변경을수반하는주식담보제공계약체결              ",
+          "date": "20260930"
+        },
+        {
+          "tier": "HIGH",
+          "report": "최대주주변경을수반하는주식담보제공계약체결              ",
+          "date": "20260928"
+        }
+      ]
+    },
+    {
+      "ticker": "109670",
+      "name": "씨싸이트",
+      "market_cap_eok": 942,
+      "risk_score": -50,
+      "excluded": false,
+   
+=== fundamental_kr ===
+type: <class 'list'>
+len: 10
+[
+  {
+    "piotroski": 9,
+    "piotroski_detail": {
+      "ROA>0": true,
+      "CFO>0": true,
+      "dROA>0": true,
+      "CFO>NI": true,
+      "레버리지감소": true,
+      "유동비율개선": true,
+      "무증자": true,
+      "영업이익률개선": true,
+      "자산회전율개선": true
+    },
+    "altman_z": 2.1,
+    "roa_pct": 16.13,
+    "debt_ratio_pct": 32.6,
+    "opm_pct": 45.41,
+    "revenue_eok": 45570,
+    "ni_eok": 17844,
+    "market_cap_eok": 0,
+    "ticker": "207940",
+    "name": "삼성바이오로직스",
+    "fs_div": "CFS"
+  },
+  {
+    "piotroski": 8,
+    "piotroski_detail": {
+      "ROA>0": true,
+      "CFO>0": true,
+      "dROA>0": true,
+      "CFO>NI": true,
+      "레버리지감소": true,
+      "유동비율개선": true,
+      "무증자": true,
+      "영업이익률개선": true,
+      "자산회전율개선": false
+    },
+    "altman_z": 2.5,
+    "roa_pct": 24.39,
+    "debt_ratio_pct": 31.5,
+    "opm_pct": 48.59,
+    "revenue_eok": 971467,
+    "ni_eok": 429479,
+    "market_cap_eok": 0,
+    "ticker": "000660",
+    "name": "SK하이닉스",
+    "fs_div": "CFS"
+  }
+]
