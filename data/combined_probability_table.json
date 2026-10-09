@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-08T19:35:50Z (자동 생성)",
+  "generated_at": "2026-10-09T03:00:33Z (자동 생성)",
   "methodology": {
     "US": "fundamental_score = 0.4*(Piotroski/9*100) + 0.3*(clip(AltmanZ,0,10)/10*100) + 0.3*(clip(목표주가업사이드%,-20,50) 정규화); final_score = 0.5*fundamental + 0.5*기술점수(보정)",
     "KR": "fundamental_score = 0.5*(Piotroski/9*100) + 0.5*(clip(AltmanZ,0,10)/10*100) — 애널리스트 목표주가 불가능(DART 미제공)으로 제외; final_score = 0.5*fundamental + 0.5*기술점수(보정)",
@@ -15,8 +15,8 @@
       "altman_z": 16.39,
       "upside_pct": 25.6,
       "fundamental_score": 76.2,
-      "tech_score": 48.2,
-      "final_score": 62.2
+      "tech_score": 48.0,
+      "final_score": 62.1
     },
     {
       "market": "US",
@@ -26,8 +26,8 @@
       "altman_z": 5.71,
       "upside_pct": 29.9,
       "fundamental_score": 69.6,
-      "tech_score": 49.1,
-      "final_score": 59.3
+      "tech_score": 49.5,
+      "final_score": 59.5
     },
     {
       "market": "KR",
@@ -48,8 +48,8 @@
       "altman_z": 73.51,
       "upside_pct": 44.9,
       "fundamental_score": 75.6,
-      "tech_score": 41.4,
-      "final_score": 58.5
+      "tech_score": 41.3,
+      "final_score": 58.4
     },
     {
       "market": "US",
@@ -59,8 +59,8 @@
       "altman_z": 12.56,
       "upside_pct": 2.4,
       "fundamental_score": 75.2,
-      "tech_score": 38.7,
-      "final_score": 57.0
+      "tech_score": 39.1,
+      "final_score": 57.2
     },
     {
       "market": "US",
@@ -70,8 +70,8 @@
       "altman_z": 9.49,
       "upside_pct": 5.8,
       "fundamental_score": 61.7,
-      "tech_score": 47.4,
-      "final_score": 54.5
+      "tech_score": 47.1,
+      "final_score": 54.4
     },
     {
       "market": "US",
@@ -81,8 +81,8 @@
       "altman_z": 45.56,
       "upside_pct": -4.9,
       "fundamental_score": 67.6,
-      "tech_score": 41.1,
-      "final_score": 54.3
+      "tech_score": 40.7,
+      "final_score": 54.1
     },
     {
       "market": "US",
@@ -92,8 +92,8 @@
       "altman_z": 17.52,
       "upside_pct": 24.9,
       "fundamental_score": 71.5,
-      "tech_score": 35.2,
-      "final_score": 53.4
+      "tech_score": 35.0,
+      "final_score": 53.2
     },
     {
       "market": "US",
@@ -103,8 +103,8 @@
       "altman_z": 9.14,
       "upside_pct": 8.9,
       "fundamental_score": 62.0,
-      "tech_score": 38.6,
-      "final_score": 50.3
+      "tech_score": 38.5,
+      "final_score": 50.2
     },
     {
       "market": "KR",
