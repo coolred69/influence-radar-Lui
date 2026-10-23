@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-22T18:13:34Z (자동 생성)",
+  "generated_at": "2026-10-23T01:43:10Z (자동 생성)",
   "methodology": {
     "US": "fundamental_score = 0.4*(Piotroski/9*100) + 0.3*(clip(AltmanZ,0,10)/10*100) + 0.3*(clip(목표주가업사이드%,-20,50) 정규화); final_score = 0.5*fundamental + 0.5*기술점수(보정)",
     "KR": "fundamental_score = 0.5*(Piotroski/9*100) + 0.5*(clip(AltmanZ,0,10)/10*100) — 애널리스트 목표주가 불가능(DART 미제공)으로 제외; final_score = 0.5*fundamental + 0.5*기술점수(보정)",
@@ -15,8 +15,8 @@
       "altman_z": 16.35,
       "upside_pct": 26.5,
       "fundamental_score": 76.6,
-      "tech_score": 46.7,
-      "final_score": 61.6
+      "tech_score": 46.0,
+      "final_score": 61.3
     },
     {
       "market": "US",
@@ -26,8 +26,8 @@
       "altman_z": 38.22,
       "upside_pct": 14.9,
       "fundamental_score": 76.1,
-      "tech_score": 41.0,
-      "final_score": 58.5
+      "tech_score": 40.2,
+      "final_score": 58.1
     },
     {
       "market": "US",
@@ -37,8 +37,8 @@
       "altman_z": 67.38,
       "upside_pct": 58.4,
       "fundamental_score": 77.8,
-      "tech_score": 36.6,
-      "final_score": 57.2
+      "tech_score": 36.4,
+      "final_score": 57.1
     },
     {
       "market": "US",
@@ -48,19 +48,8 @@
       "altman_z": 5.7,
       "upside_pct": 31.4,
       "fundamental_score": 70.2,
-      "tech_score": 43.9,
-      "final_score": 57.0
-    },
-    {
-      "market": "US",
-      "ticker": "META",
-      "name": "Meta",
-      "piotroski": 5,
-      "altman_z": 9.29,
-      "upside_pct": 13.3,
-      "fundamental_score": 64.4,
-      "tech_score": 45.1,
-      "final_score": 54.8
+      "tech_score": 43.6,
+      "final_score": 56.9
     },
     {
       "market": "US",
@@ -70,19 +59,19 @@
       "altman_z": 12.8,
       "upside_pct": 0.1,
       "fundamental_score": 74.2,
-      "tech_score": 34.8,
+      "tech_score": 34.7,
       "final_score": 54.5
     },
     {
       "market": "US",
-      "ticker": "TSLA",
-      "name": "Tesla",
+      "ticker": "META",
+      "name": "Meta",
       "piotroski": 5,
-      "altman_z": 16.84,
-      "upside_pct": 24.4,
-      "fundamental_score": 71.3,
-      "tech_score": 33.8,
-      "final_score": 52.5
+      "altman_z": 9.29,
+      "upside_pct": 13.3,
+      "fundamental_score": 64.4,
+      "tech_score": 43.3,
+      "final_score": 53.9
     },
     {
       "market": "KR",
@@ -92,8 +81,19 @@
       "altman_z": 2.5,
       "upside_pct": null,
       "fundamental_score": 56.9,
-      "tech_score": 46.5,
-      "final_score": 51.7
+      "tech_score": 49.5,
+      "final_score": 53.2
+    },
+    {
+      "market": "US",
+      "ticker": "TSLA",
+      "name": "Tesla",
+      "piotroski": 5,
+      "altman_z": 16.84,
+      "upside_pct": 24.4,
+      "fundamental_score": 71.3,
+      "tech_score": 34.0,
+      "final_score": 52.6
     },
     {
       "market": "US",
@@ -108,14 +108,14 @@
     },
     {
       "market": "KR",
-      "ticker": "207940",
-      "name": "삼성바이오로직스",
-      "piotroski": 9,
-      "altman_z": 2.1,
+      "ticker": "096770",
+      "name": "SK이노베이션",
+      "piotroski": 5,
+      "altman_z": 0.85,
       "upside_pct": null,
-      "fundamental_score": 60.5,
-      "tech_score": 29.1,
-      "final_score": 44.8
+      "fundamental_score": 32.0,
+      "tech_score": 52.9,
+      "final_score": 42.5
     },
     {
       "market": "KR",
@@ -125,19 +125,19 @@
       "altman_z": 2.13,
       "upside_pct": null,
       "fundamental_score": 49.5,
-      "tech_score": 31.0,
-      "final_score": 40.2
+      "tech_score": 34.7,
+      "final_score": 42.1
     },
     {
       "market": "KR",
-      "ticker": "096770",
-      "name": "SK이노베이션",
-      "piotroski": 5,
-      "altman_z": 0.85,
+      "ticker": "207940",
+      "name": "삼성바이오로직스",
+      "piotroski": 9,
+      "altman_z": 2.1,
       "upside_pct": null,
-      "fundamental_score": 32.0,
-      "tech_score": 47.0,
-      "final_score": 39.5
+      "fundamental_score": 60.5,
+      "tech_score": 23.1,
+      "final_score": 41.8
     },
     {
       "market": "KR",
@@ -147,8 +147,8 @@
       "altman_z": 2.42,
       "upside_pct": null,
       "fundamental_score": 45.4,
-      "tech_score": 28.7,
-      "final_score": 37.0
+      "tech_score": 36.6,
+      "final_score": 41.0
     },
     {
       "market": "KR",
@@ -158,8 +158,8 @@
       "altman_z": 1.5,
       "upside_pct": null,
       "fundamental_score": 35.3,
-      "tech_score": 38.0,
-      "final_score": 36.6
+      "tech_score": 44.3,
+      "final_score": 39.8
     },
     {
       "market": "KR",
@@ -169,8 +169,8 @@
       "altman_z": 0.67,
       "upside_pct": null,
       "fundamental_score": 47.8,
-      "tech_score": 24.2,
-      "final_score": 36.0
+      "tech_score": 30.8,
+      "final_score": 39.3
     },
     {
       "market": "KR",
@@ -180,8 +180,8 @@
       "altman_z": 0.45,
       "upside_pct": null,
       "fundamental_score": 30.0,
-      "tech_score": 34.7,
-      "final_score": 32.4
+      "tech_score": 39.5,
+      "final_score": 34.8
     },
     {
       "market": "KR",
@@ -191,8 +191,8 @@
       "altman_z": 0.8,
       "upside_pct": null,
       "fundamental_score": 26.2,
-      "tech_score": 36.2,
-      "final_score": 31.2
+      "tech_score": 42.1,
+      "final_score": 34.1
     },
     {
       "market": "KR",
@@ -202,8 +202,8 @@
       "altman_z": 1.1,
       "upside_pct": null,
       "fundamental_score": 16.6,
-      "tech_score": 30.9,
-      "final_score": 23.8
+      "tech_score": 39.8,
+      "final_score": 28.2
     }
   ]
 }
