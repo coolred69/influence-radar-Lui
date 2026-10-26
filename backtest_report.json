@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-10-25T02:27:19.158615",
-  "period": "2022-10-19 to 2026-08-26",
+  "timestamp": "2026-10-26T02:26:36.641723",
+  "period": "2022-10-25 to 2026-10-21",
   "results": {
     "total_signals": 178,
     "correct_predictions": 61,
     "accuracy": 34.27,
-    "avg_return": 1.47,
+    "avg_return": 1.55,
     "by_person": {
       "이재용": {
         "total": 14,
@@ -59,7 +59,7 @@
         "total": 17,
         "hits": 6,
         "accuracy_pct": 35.3,
-        "avg_return": 1.63
+        "avg_return": 1.6
       },
       "Jerome Powell": {
         "total": 13,
@@ -101,7 +101,7 @@
         "total": 17,
         "hits": 9,
         "accuracy_pct": 52.9,
-        "avg_return": 4.37
+        "avg_return": 5.19
       }
     },
     "by_sector": {
@@ -139,7 +139,7 @@
         "total": 17,
         "hits": 6,
         "accuracy_pct": 35.3,
-        "avg_return": 1.63
+        "avg_return": 1.6
       },
       "Macro/Rates": {
         "total": 13,
@@ -181,11 +181,11 @@
         "total": 17,
         "hits": 9,
         "accuracy_pct": 52.9,
-        "avg_return": 4.37
+        "avg_return": 5.19
       }
     },
     "max_return": 39.37,
-    "min_return": -21.84,
+    "min_return": -18.98,
     "positive_return_rate": 51.12
   }
 }
