@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-30T02:45:25Z (자동 생성)",
+  "generated_at": "2026-10-30T18:56:38Z (자동 생성)",
   "methodology": {
     "US": "fundamental_score = 0.4*(Piotroski/9*100) + 0.3*(clip(AltmanZ,0,10)/10*100) + 0.3*(clip(목표주가업사이드%,-20,50) 정규화); final_score = 0.5*fundamental + 0.5*기술점수(보정)",
     "KR": "fundamental_score = 0.5*(Piotroski/9*100) + 0.5*(clip(AltmanZ,0,10)/10*100) — 애널리스트 목표주가 불가능(DART 미제공)으로 제외; final_score = 0.5*fundamental + 0.5*기술점수(보정)",
@@ -15,19 +15,8 @@
       "altman_z": 15.52,
       "upside_pct": 34.6,
       "fundamental_score": 80.1,
-      "tech_score": 37.0,
-      "final_score": 58.5
-    },
-    {
-      "market": "US",
-      "ticker": "AMZN",
-      "name": "Amazon",
-      "piotroski": 7,
-      "altman_z": 5.67,
-      "upside_pct": 32.6,
-      "fundamental_score": 70.7,
-      "tech_score": 43.2,
-      "final_score": 57.0
+      "tech_score": 36.8,
+      "final_score": 58.4
     },
     {
       "market": "US",
@@ -37,30 +26,8 @@
       "altman_z": 66.46,
       "upside_pct": 60.8,
       "fundamental_score": 77.8,
-      "tech_score": 33.2,
-      "final_score": 55.5
-    },
-    {
-      "market": "US",
-      "ticker": "META",
-      "name": "Meta",
-      "piotroski": 5,
-      "altman_z": 8.61,
-      "upside_pct": 29.8,
-      "fundamental_score": 69.4,
-      "tech_score": 38.8,
-      "final_score": 54.1
-    },
-    {
-      "market": "US",
-      "ticker": "AAPL",
-      "name": "Apple",
-      "piotroski": 8,
-      "altman_z": 12.93,
-      "upside_pct": -2.2,
-      "fundamental_score": 73.2,
-      "tech_score": 34.0,
-      "final_score": 53.6
+      "tech_score": 38.0,
+      "final_score": 57.9
     },
     {
       "market": "US",
@@ -70,8 +37,41 @@
       "altman_z": 37.37,
       "upside_pct": 18.7,
       "fundamental_score": 77.7,
-      "tech_score": 25.1,
-      "final_score": 51.4
+      "tech_score": 37.5,
+      "final_score": 57.6
+    },
+    {
+      "market": "US",
+      "ticker": "AMZN",
+      "name": "Amazon",
+      "piotroski": 7,
+      "altman_z": 5.67,
+      "upside_pct": 32.6,
+      "fundamental_score": 70.7,
+      "tech_score": 44.1,
+      "final_score": 57.4
+    },
+    {
+      "market": "US",
+      "ticker": "META",
+      "name": "Meta",
+      "piotroski": 5,
+      "altman_z": 8.61,
+      "upside_pct": 29.8,
+      "fundamental_score": 69.4,
+      "tech_score": 40.1,
+      "final_score": 54.8
+    },
+    {
+      "market": "US",
+      "ticker": "AAPL",
+      "name": "Apple",
+      "piotroski": 8,
+      "altman_z": 12.93,
+      "upside_pct": -2.2,
+      "fundamental_score": 73.2,
+      "tech_score": 36.4,
+      "final_score": 54.8
     },
     {
       "market": "US",
@@ -81,8 +81,8 @@
       "altman_z": 9.24,
       "upside_pct": 13.5,
       "fundamental_score": 64.3,
-      "tech_score": 32.4,
-      "final_score": 48.3
+      "tech_score": 34.3,
+      "final_score": 49.3
     },
     {
       "market": "US",
@@ -92,8 +92,8 @@
       "altman_z": 17.61,
       "upside_pct": 18.8,
       "fundamental_score": 68.9,
-      "tech_score": 26.7,
-      "final_score": 47.8
+      "tech_score": 29.5,
+      "final_score": 49.2
     },
     {
       "market": "KR",
@@ -103,8 +103,8 @@
       "altman_z": 2.5,
       "upside_pct": null,
       "fundamental_score": 56.9,
-      "tech_score": 34.5,
-      "final_score": 45.7
+      "tech_score": 32.8,
+      "final_score": 44.8
     },
     {
       "market": "KR",
@@ -114,30 +114,8 @@
       "altman_z": 2.1,
       "upside_pct": null,
       "fundamental_score": 60.5,
-      "tech_score": 29.7,
-      "final_score": 45.1
-    },
-    {
-      "market": "KR",
-      "ticker": "096770",
-      "name": "SK이노베이션",
-      "piotroski": 5,
-      "altman_z": 0.85,
-      "upside_pct": null,
-      "fundamental_score": 32.0,
-      "tech_score": 45.0,
-      "final_score": 38.5
-    },
-    {
-      "market": "KR",
-      "ticker": "005930",
-      "name": "삼성전자",
-      "piotroski": 7,
-      "altman_z": 2.13,
-      "upside_pct": null,
-      "fundamental_score": 49.5,
-      "tech_score": 26.0,
-      "final_score": 37.8
+      "tech_score": 23.9,
+      "final_score": 42.2
     },
     {
       "market": "KR",
@@ -147,8 +125,30 @@
       "altman_z": 2.42,
       "upside_pct": null,
       "fundamental_score": 45.4,
-      "tech_score": 29.2,
-      "final_score": 37.3
+      "tech_score": 31.0,
+      "final_score": 38.2
+    },
+    {
+      "market": "KR",
+      "ticker": "096770",
+      "name": "SK이노베이션",
+      "piotroski": 5,
+      "altman_z": 0.85,
+      "upside_pct": null,
+      "fundamental_score": 32.0,
+      "tech_score": 43.4,
+      "final_score": 37.7
+    },
+    {
+      "market": "KR",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "piotroski": 7,
+      "altman_z": 2.13,
+      "upside_pct": null,
+      "fundamental_score": 49.5,
+      "tech_score": 23.2,
+      "final_score": 36.4
     },
     {
       "market": "KR",
@@ -158,8 +158,8 @@
       "altman_z": 1.5,
       "upside_pct": null,
       "fundamental_score": 35.3,
-      "tech_score": 35.6,
-      "final_score": 35.5
+      "tech_score": 33.7,
+      "final_score": 34.5
     },
     {
       "market": "KR",
@@ -169,8 +169,8 @@
       "altman_z": 0.67,
       "upside_pct": null,
       "fundamental_score": 47.8,
-      "tech_score": 22.5,
-      "final_score": 35.1
+      "tech_score": 20.2,
+      "final_score": 34.0
     },
     {
       "market": "KR",
@@ -180,8 +180,8 @@
       "altman_z": 0.45,
       "upside_pct": null,
       "fundamental_score": 30.0,
-      "tech_score": 34.1,
-      "final_score": 32.0
+      "tech_score": 32.0,
+      "final_score": 31.0
     },
     {
       "market": "KR",
@@ -191,8 +191,8 @@
       "altman_z": 0.8,
       "upside_pct": null,
       "fundamental_score": 26.2,
-      "tech_score": 28.9,
-      "final_score": 27.5
+      "tech_score": 26.7,
+      "final_score": 26.4
     },
     {
       "market": "KR",
@@ -202,8 +202,8 @@
       "altman_z": 1.1,
       "upside_pct": null,
       "fundamental_score": 16.6,
-      "tech_score": 29.5,
-      "final_score": 23.1
+      "tech_score": 27.2,
+      "final_score": 21.9
     }
   ]
 }
