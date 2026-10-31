@@ -1,53 +1,53 @@
 {
-  "validated_at": "2026-10-24T21:16:43.621011",
+  "validated_at": "2026-10-31T21:58:42.805002",
   "event_count": 178,
   "weight_count": 9,
   "status": "OVERFIT",
   "warnings": [
     "통계적 유의성 없음 (p=1.000) — 지표가 노이즈일 수 있음",
-    "검증 AUC 낮음 (0.2978) — 일반화 성능 부족"
+    "검증 AUC 낮음 (0.2847) — 일반화 성능 부족"
   ],
   "walk_forward": {
-    "avg_test_auc": 0.2978,
-    "avg_degradation": -0.0336,
+    "avg_test_auc": 0.2847,
+    "avg_degradation": -0.0173,
     "folds": [
       {
         "fold": 1,
         "train_size": 44,
         "test_size": 44,
-        "train_auc": 0.2484,
-        "test_auc": 0.3137,
-        "degradation": -0.0653,
+        "train_auc": 0.2632,
+        "test_auc": 0.2963,
+        "degradation": -0.0331,
         "overfit_flag": false
       },
       {
         "fold": 2,
         "train_size": 88,
         "test_size": 44,
-        "train_auc": 0.2815,
-        "test_auc": 0.2149,
-        "degradation": 0.0666,
+        "train_auc": 0.2821,
+        "test_auc": 0.1983,
+        "degradation": 0.0838,
         "overfit_flag": false
       },
       {
         "fold": 3,
         "train_size": 132,
         "test_size": 44,
-        "train_auc": 0.2626,
-        "test_auc": 0.3648,
-        "degradation": -0.1022,
+        "train_auc": 0.2568,
+        "test_auc": 0.3595,
+        "degradation": -0.1027,
         "overfit_flag": false
       }
     ]
   },
   "monte_carlo": {
-    "real_auc": 0.2851,
-    "perm_mean": 0.5052,
-    "perm_std": 0.0435,
+    "real_auc": 0.2849,
+    "perm_mean": 0.5036,
+    "perm_std": 0.0458,
     "p_value": 1.0,
-    "z_score": -5.06,
+    "z_score": -4.77,
     "significant": false
   },
-  "verdict": "과적합 경보: 통계적 유의성 없음 (p=1.000) — 지표가 노이즈일 수 있음; 검증 AUC 낮음 (0.2978) — 일반화 성능 부족",
+  "verdict": "과적합 경보: 통계적 유의성 없음 (p=1.000) — 지표가 노이즈일 수 있음; 검증 AUC 낮음 (0.2847) — 일반화 성능 부족",
   "recommendation": "① 지표 수 축소 (현재 상위 6개만 유지)  ② 정규화 강화  ③ 훈련 데이터 증가 후 재진화 권고"
 }
