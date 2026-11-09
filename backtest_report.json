@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-11-08T03:33:41.556110",
-  "period": "2022-10-27 to 2026-10-28",
+  "timestamp": "2026-11-09T03:48:04.942931",
+  "period": "2022-11-16 to 2026-11-02",
   "results": {
     "total_signals": 178,
-    "correct_predictions": 62,
-    "accuracy": 34.83,
+    "correct_predictions": 61,
+    "accuracy": 34.27,
     "avg_return": 1.6,
     "by_person": {
       "이재용": {
@@ -57,9 +57,9 @@
       },
       "Elon Musk": {
         "total": 17,
-        "hits": 7,
-        "accuracy_pct": 41.2,
-        "avg_return": 2.02
+        "hits": 6,
+        "accuracy_pct": 35.3,
+        "avg_return": 1.79
       },
       "Jerome Powell": {
         "total": 13,
@@ -89,19 +89,19 @@
         "total": 17,
         "hits": 7,
         "accuracy_pct": 41.2,
-        "avg_return": 2.67
+        "avg_return": 2.64
       },
       "Satya Nadella": {
         "total": 16,
         "hits": 6,
         "accuracy_pct": 37.5,
-        "avg_return": 1.85
+        "avg_return": 1.95
       },
       "Mark Zuckerberg": {
         "total": 17,
         "hits": 9,
         "accuracy_pct": 52.9,
-        "avg_return": 4.96
+        "avg_return": 5.09
       }
     },
     "by_sector": {
@@ -137,9 +137,9 @@
       },
       "EV/Auto": {
         "total": 17,
-        "hits": 7,
-        "accuracy_pct": 41.2,
-        "avg_return": 2.02
+        "hits": 6,
+        "accuracy_pct": 35.3,
+        "avg_return": 1.79
       },
       "Macro/Rates": {
         "total": 13,
@@ -151,7 +151,7 @@
         "total": 22,
         "hits": 8,
         "accuracy_pct": 36.4,
-        "avg_return": 1.8
+        "avg_return": 1.88
       },
       "Finance": {
         "total": 4,
@@ -175,17 +175,17 @@
         "total": 17,
         "hits": 7,
         "accuracy_pct": 41.2,
-        "avg_return": 2.67
+        "avg_return": 2.64
       },
       "Social/AI": {
         "total": 17,
         "hits": 9,
         "accuracy_pct": 52.9,
-        "avg_return": 4.96
+        "avg_return": 5.09
       }
     },
     "max_return": 39.37,
     "min_return": -18.98,
-    "positive_return_rate": 51.69
+    "positive_return_rate": 51.12
   }
 }
