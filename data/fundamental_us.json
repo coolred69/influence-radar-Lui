@@ -1,28 +1,7 @@
 {
-  "generated_at": "2026-11-08T03:59:09Z",
+  "generated_at": "2026-11-15T04:28:48Z",
   "methodology": "fundamental_score = 0.4*(Piotroski/9*100) + 0.3*(clip(AltmanZ,0,10)/10*100) + 0.3*(clip(upside%,-20,50) 정규화)",
   "results": [
-    {
-      "ticker": "AMD",
-      "name": "Advanced Micro Devices, Inc.",
-      "piotroski": 7,
-      "piotroski_detail": {
-        "roa_positive": true,
-        "cfo_positive": true,
-        "roa_improved": true,
-        "cfo_over_ni": true,
-        "leverage_decreased": false,
-        "liquidity_improved": true,
-        "no_new_shares": false,
-        "gross_margin_improved": true,
-        "asset_turnover_improved": true
-      },
-      "altman_z": 32.61,
-      "upside_pct": 45.6,
-      "roa_pct": 5.55,
-      "market_cap_usd": 733048819200,
-      "fundamental_score": 89.2
-    },
     {
       "ticker": "GOOGL",
       "name": "Alphabet Inc.",
@@ -38,32 +17,32 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 14.1,
-      "upside_pct": 40.6,
+      "altman_z": 14.52,
+      "upside_pct": 36.2,
       "roa_pct": 22.2,
-      "market_cap_usd": 3471986214535.0005,
-      "fundamental_score": 82.6
+      "market_cap_usd": 3596862995430,
+      "fundamental_score": 80.8
     },
     {
-      "ticker": "AAPL",
-      "name": "Apple Inc.",
-      "piotroski": 9,
+      "ticker": "AMD",
+      "name": "Advanced Micro Devices, Inc.",
+      "piotroski": 7,
       "piotroski_detail": {
         "roa_positive": true,
         "cfo_positive": true,
         "roa_improved": true,
         "cfo_over_ni": true,
-        "leverage_decreased": true,
+        "leverage_decreased": false,
         "liquidity_improved": true,
-        "no_new_shares": true,
+        "no_new_shares": false,
         "gross_margin_improved": true,
         "asset_turnover_improved": true
       },
-      "altman_z": 12.79,
-      "upside_pct": 0.6,
-      "roa_pct": 32.67,
-      "market_cap_usd": 4996616254000,
-      "fundamental_score": 78.8
+      "altman_z": 38.76,
+      "upside_pct": 23.4,
+      "roa_pct": 5.55,
+      "market_cap_usd": 875904997269,
+      "fundamental_score": 79.7
     },
     {
       "ticker": "NVDA",
@@ -80,11 +59,32 @@
         "gross_margin_improved": false,
         "asset_turnover_improved": false
       },
-      "altman_z": 59.35,
-      "upside_pct": 81.7,
+      "altman_z": 52.4,
+      "upside_pct": 96.5,
       "roa_pct": 58.06,
-      "market_cap_usd": 4498024000000,
+      "market_cap_usd": 3924685000000,
       "fundamental_score": 77.8
+    },
+    {
+      "ticker": "AAPL",
+      "name": "Apple Inc.",
+      "piotroski": 9,
+      "piotroski_detail": {
+        "roa_positive": true,
+        "cfo_positive": true,
+        "roa_improved": true,
+        "cfo_over_ni": true,
+        "leverage_decreased": true,
+        "liquidity_improved": true,
+        "no_new_shares": true,
+        "gross_margin_improved": true,
+        "asset_turnover_improved": true
+      },
+      "altman_z": 13.16,
+      "upside_pct": -4.3,
+      "roa_pct": 32.67,
+      "market_cap_usd": 5177386894000,
+      "fundamental_score": 76.7
     },
     {
       "ticker": "META",
@@ -101,32 +101,11 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 8.3,
-      "upside_pct": 36.7,
+      "altman_z": 8.62,
+      "upside_pct": 30.2,
       "roa_pct": 16.52,
-      "market_cap_usd": 1559690478488,
-      "fundamental_score": 71.4
-    },
-    {
-      "ticker": "TSLA",
-      "name": "Tesla, Inc.",
-      "piotroski": 5,
-      "piotroski_detail": {
-        "roa_positive": true,
-        "cfo_positive": true,
-        "roa_improved": false,
-        "cfo_over_ni": true,
-        "leverage_decreased": false,
-        "liquidity_improved": true,
-        "no_new_shares": false,
-        "gross_margin_improved": true,
-        "asset_turnover_improved": false
-      },
-      "altman_z": 17.0,
-      "upside_pct": 23.6,
-      "roa_pct": 2.8,
-      "market_cap_usd": 1415956922042,
-      "fundamental_score": 70.9
+      "market_cap_usd": 1640694170978,
+      "fundamental_score": 69.6
     },
     {
       "ticker": "AMZN",
@@ -143,11 +122,32 @@
         "gross_margin_improved": true,
         "asset_turnover_improved": false
       },
-      "altman_z": 5.86,
-      "upside_pct": 26.7,
+      "altman_z": 5.97,
+      "upside_pct": 23.3,
       "roa_pct": 9.49,
-      "market_cap_usd": 2803836830000,
-      "fundamental_score": 68.7
+      "market_cap_usd": 2883421246000,
+      "fundamental_score": 67.6
+    },
+    {
+      "ticker": "TSLA",
+      "name": "Tesla, Inc.",
+      "piotroski": 5,
+      "piotroski_detail": {
+        "roa_positive": true,
+        "cfo_positive": true,
+        "roa_improved": false,
+        "cfo_over_ni": true,
+        "leverage_decreased": false,
+        "liquidity_improved": true,
+        "no_new_shares": false,
+        "gross_margin_improved": true,
+        "asset_turnover_improved": false
+      },
+      "altman_z": 18.39,
+      "upside_pct": 13.5,
+      "roa_pct": 2.8,
+      "market_cap_usd": 1542445205688,
+      "fundamental_score": 66.6
     },
     {
       "ticker": "MSFT",
@@ -164,11 +164,11 @@
         "gross_margin_improved": false,
         "asset_turnover_improved": false
       },
-      "altman_z": 9.32,
-      "upside_pct": 15.3,
+      "altman_z": 9.23,
+      "upside_pct": 17.4,
       "roa_pct": 17.64,
-      "market_cap_usd": 3940410675900,
-      "fundamental_score": 65.3
+      "market_cap_usd": 3890432417200,
+      "fundamental_score": 65.9
     }
   ]
 }
