@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-11-15T03:58:04.160389",
+  "timestamp": "2026-11-16T03:57:36.266982",
   "period": "2022-11-16 to 2026-11-02",
   "results": {
     "total_signals": 178,
-    "correct_predictions": 61,
-    "accuracy": 34.27,
-    "avg_return": 1.6,
+    "correct_predictions": 62,
+    "accuracy": 34.83,
+    "avg_return": 1.61,
     "by_person": {
       "이재용": {
         "total": 14,
@@ -87,15 +87,15 @@
       },
       "Tim Cook": {
         "total": 17,
-        "hits": 7,
-        "accuracy_pct": 41.2,
-        "avg_return": 2.64
+        "hits": 8,
+        "accuracy_pct": 47.1,
+        "avg_return": 2.89
       },
       "Satya Nadella": {
         "total": 16,
         "hits": 6,
         "accuracy_pct": 37.5,
-        "avg_return": 1.95
+        "avg_return": 1.84
       },
       "Mark Zuckerberg": {
         "total": 17,
@@ -151,7 +151,7 @@
         "total": 22,
         "hits": 8,
         "accuracy_pct": 36.4,
-        "avg_return": 1.88
+        "avg_return": 1.8
       },
       "Finance": {
         "total": 4,
@@ -173,9 +173,9 @@
       },
       "Tech": {
         "total": 17,
-        "hits": 7,
-        "accuracy_pct": 41.2,
-        "avg_return": 2.64
+        "hits": 8,
+        "accuracy_pct": 47.1,
+        "avg_return": 2.89
       },
       "Social/AI": {
         "total": 17,
