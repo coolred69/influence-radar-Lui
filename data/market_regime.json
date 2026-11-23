@@ -1,5 +1,5 @@
 {
-  "detected_at": "2026-11-22T01:46:51.219091",
+  "detected_at": "2026-11-23T02:03:53.125361",
   "us": {
     "regime": "BEAR",
     "confidence": 0.55,
@@ -35,13 +35,13 @@
       "SIDEWAYS": 0.45
     },
     "metrics": {
-      "price": 76210.0,
-      "ma50": 95801.53,
+      "price": 73785.0,
+      "ma50": 95073.67,
       "ma200": NaN,
-      "vol_20d_ann": 59.6,
+      "vol_20d_ann": 60.3,
       "vol_1y_ann": NaN,
       "vol_ratio": NaN,
-      "ret_30d_pct": -27.76,
+      "ret_30d_pct": -27.28,
       "above_ma200": false,
       "golden_cross": false
     },
