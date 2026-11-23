@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-11-22T04:13:57.072952",
-  "period": "2022-11-16 to 2026-11-02",
+  "timestamp": "2026-11-23T04:53:35.273083",
+  "period": "2023-01-24 to 2026-11-17",
   "results": {
     "total_signals": 178,
-    "correct_predictions": 62,
-    "accuracy": 34.83,
-    "avg_return": 1.61,
+    "correct_predictions": 61,
+    "accuracy": 34.27,
+    "avg_return": 1.46,
     "by_person": {
       "이재용": {
         "total": 14,
@@ -51,9 +51,9 @@
       },
       "Jensen Huang": {
         "total": 20,
-        "hits": 8,
-        "accuracy_pct": 40.0,
-        "avg_return": 4.25
+        "hits": 7,
+        "accuracy_pct": 35.0,
+        "avg_return": 2.9
       },
       "Elon Musk": {
         "total": 17,
@@ -89,7 +89,7 @@
         "total": 17,
         "hits": 8,
         "accuracy_pct": 47.1,
-        "avg_return": 2.89
+        "avg_return": 2.83
       },
       "Satya Nadella": {
         "total": 16,
@@ -131,9 +131,9 @@
       },
       "AI/GPU": {
         "total": 22,
-        "hits": 9,
-        "accuracy_pct": 40.9,
-        "avg_return": 3.82
+        "hits": 8,
+        "accuracy_pct": 36.4,
+        "avg_return": 2.59
       },
       "EV/Auto": {
         "total": 17,
@@ -175,7 +175,7 @@
         "total": 17,
         "hits": 8,
         "accuracy_pct": 47.1,
-        "avg_return": 2.89
+        "avg_return": 2.83
       },
       "Social/AI": {
         "total": 17,
@@ -185,7 +185,7 @@
       }
     },
     "max_return": 39.37,
-    "min_return": -18.98,
-    "positive_return_rate": 51.12
+    "min_return": -19.25,
+    "positive_return_rate": 50.56
   }
 }
