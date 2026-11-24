@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-23T03:52:29Z (자동 생성)",
+  "generated_at": "2026-11-24T01:25:31Z (자동 생성)",
   "methodology": {
     "US": "fundamental_score = 0.4*(Piotroski/9*100) + 0.3*(clip(AltmanZ,0,10)/10*100) + 0.3*(clip(목표주가업사이드%,-20,50) 정규화); final_score = 0.5*fundamental + 0.5*기술점수(보정)",
     "KR": "fundamental_score = 0.5*(Piotroski/9*100) + 0.5*(clip(AltmanZ,0,10)/10*100) — 애널리스트 목표주가 불가능(DART 미제공)으로 제외; final_score = 0.5*fundamental + 0.5*기술점수(보정)",
@@ -74,17 +74,6 @@
       "final_score": 56.4
     },
     {
-      "market": "KR",
-      "ticker": "000660",
-      "name": "SK하이닉스",
-      "piotroski": 8,
-      "altman_z": 2.5,
-      "upside_pct": null,
-      "fundamental_score": 56.9,
-      "tech_score": 54.4,
-      "final_score": 55.6
-    },
-    {
       "market": "US",
       "ticker": "MSFT",
       "name": "Microsoft",
@@ -108,14 +97,25 @@
     },
     {
       "market": "KR",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "piotroski": 8,
+      "altman_z": 2.5,
+      "upside_pct": null,
+      "fundamental_score": 56.9,
+      "tech_score": 46.7,
+      "final_score": 51.8
+    },
+    {
+      "market": "KR",
       "ticker": "207940",
       "name": "삼성바이오로직스",
       "piotroski": 9,
       "altman_z": 2.1,
       "upside_pct": null,
       "fundamental_score": 60.5,
-      "tech_score": 35.8,
-      "final_score": 48.1
+      "tech_score": 19.7,
+      "final_score": 40.1
     },
     {
       "market": "KR",
@@ -125,8 +125,8 @@
       "altman_z": 2.13,
       "upside_pct": null,
       "fundamental_score": 49.5,
-      "tech_score": 33.8,
-      "final_score": 41.6
+      "tech_score": 24.2,
+      "final_score": 36.9
     },
     {
       "market": "KR",
@@ -136,19 +136,8 @@
       "altman_z": 2.42,
       "upside_pct": null,
       "fundamental_score": 45.4,
-      "tech_score": 36.8,
-      "final_score": 41.1
-    },
-    {
-      "market": "KR",
-      "ticker": "035420",
-      "name": "네이버",
-      "piotroski": 5,
-      "altman_z": 1.5,
-      "upside_pct": null,
-      "fundamental_score": 35.3,
-      "tech_score": 43.6,
-      "final_score": 39.5
+      "tech_score": 25.0,
+      "final_score": 35.2
     },
     {
       "market": "KR",
@@ -158,8 +147,19 @@
       "altman_z": 0.85,
       "upside_pct": null,
       "fundamental_score": 32.0,
-      "tech_score": 46.7,
-      "final_score": 39.4
+      "tech_score": 35.8,
+      "final_score": 33.9
+    },
+    {
+      "market": "KR",
+      "ticker": "035420",
+      "name": "네이버",
+      "piotroski": 5,
+      "altman_z": 1.5,
+      "upside_pct": null,
+      "fundamental_score": 35.3,
+      "tech_score": 29.2,
+      "final_score": 32.2
     },
     {
       "market": "KR",
@@ -169,8 +169,8 @@
       "altman_z": 0.67,
       "upside_pct": null,
       "fundamental_score": 47.8,
-      "tech_score": 26.3,
-      "final_score": 37.0
+      "tech_score": 14.9,
+      "final_score": 31.3
     },
     {
       "market": "KR",
@@ -180,8 +180,8 @@
       "altman_z": 0.45,
       "upside_pct": null,
       "fundamental_score": 30.0,
-      "tech_score": 40.5,
-      "final_score": 35.2
+      "tech_score": 28.0,
+      "final_score": 29.0
     },
     {
       "market": "KR",
@@ -191,8 +191,8 @@
       "altman_z": 0.8,
       "upside_pct": null,
       "fundamental_score": 26.2,
-      "tech_score": 35.3,
-      "final_score": 30.8
+      "tech_score": 25.3,
+      "final_score": 25.8
     },
     {
       "market": "KR",
@@ -202,8 +202,8 @@
       "altman_z": 1.1,
       "upside_pct": null,
       "fundamental_score": 16.6,
-      "tech_score": 38.0,
-      "final_score": 27.3
+      "tech_score": 26.5,
+      "final_score": 21.6
     }
   ]
 }
